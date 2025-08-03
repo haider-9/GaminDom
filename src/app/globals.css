@@ -2,17 +2,14 @@
 @import "tw-animate-css";
 
 :root {
-  --color-white: #ffffff;
   --color-red: #bb3b3b;
   --color-maroon: #361518;
-  --color-black: #000000;
-
   --font-primary: 'Poppins', sans-serif;
 }
 html,body {
   font-family: var(--font-primary);
   background-color: var(--color-maroon);
-  color: var(--color-white);
+  color:white;
   margin: 0;
   padding: 0;
 }

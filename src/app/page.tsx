@@ -1,9 +1,12 @@
 import React from 'react'
+import Header from '../components/Header'
+import CircularFloatingMenu from '@/components/LeftSideBar'
 
 const page = () => {
   return (
     <div>
-      page
+      <Header />
+      <CircularFloatingMenu />
     </div>
   )
 }
