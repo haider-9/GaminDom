@@ -1,0 +1,16 @@
+<svg width="140" height="140" viewBox="0 0 100 100"
+    xmlns="http://www.w3.org/2000/svg">
+    <!-- Background rounded container -->
+    <rect x="5" y="5" width="90" height="90" rx="18" ry="18" fill="#1A0012"/>
+
+    <!-- Dual-layer symbol -->
+    <path d="M30 70 L30 30 L50 50 L70 30 L70 70" fill="#FF4E62"/>
+    <path d="M35 65 L35 35 L50 50 L65 35 L65 65" fill="#6C1E4F"/>
+
+    <!-- Glow stroke frame -->
+    <rect x="8" y="8" width="84" height="84" rx="16" ry="16" fill="none" stroke="#FFB36C" stroke-width="3" opacity="0.35"/>
+
+    <!-- (Optional) Brand Name -->
+    <text x="50%" y="94" fill="#ffffff" font-size="10" font-family="Arial, sans-serif" text-anchor="middle">
+    G A M I N D O M    </text>
+</svg>

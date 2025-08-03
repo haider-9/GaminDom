@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import Header from "@/components/Header";
+import CircularFloatingMenu from "@/components/LeftSideBar";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
+});
 
 export const metadata: Metadata = {
   title: "GaminDom",
@@ -14,8 +23,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className={`${poppins.variable} font-poppins`}>
         <Toaster />
+        <Header />
+        <CircularFloatingMenu />
         {children}
       </body>
     </html>

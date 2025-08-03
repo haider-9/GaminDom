@@ -9,20 +9,35 @@ import {
   Star,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "./ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Separator } from "./ui/separator";
 import { ScrollArea } from "./ui/scroll-area";
+import Image from "next/image";
 
 const Header = () => {
+  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Handle search submission
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
+      setIsSearchOpen(false);
+      setSearchQuery("");
+      router.push(`/search/${encodeURIComponent(query.trim())}`);
+    }
+  };
+
+  // Handle Enter key press
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      handleSearch(searchQuery);
+    }
+  };
 
   // Handle Ctrl+K keyboard shortcut
   useEffect(() => {
@@ -67,9 +82,14 @@ const Header = () => {
       <div className="md:hidden">
         {/* Top row: Greeting and Actions */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex-shrink-0">
-            <span className="text-gray-500 text-sm">Good Morning, </span>
-            <span className="text-xl font-semibold text-white">Haider</span>
+          <div className="size-12">
+            <Image
+              src="/Logo.svg"
+              alt="Logo"
+              width={100}
+              height={100}
+              className="object-fit"
+            />
           </div>
           <div className="flex items-center space-x-2">
             <Tooltip>
@@ -122,7 +142,7 @@ const Header = () => {
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
               <kbd className="hidden sm:flex px-2 py-1 text-xs text-gray-400 bg-gray-700/50 rounded border border-gray-600 items-center">
-                <Command className="inline w-3 h-3 mr-1" />K
+                <Command className="inline w-3 h-3 mr-1" />+K
               </kbd>
             </div>
           </div>
@@ -130,11 +150,16 @@ const Header = () => {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:flex items-center justify-around">
+      <div className="hidden md:flex items-center justify-between">
         {/* Greeting Section */}
-        <div className="flex-shrink-0">
-          <span className="text-gray-500">Good Morning, </span>
-          <span className="text-2xl font-semibold text-white">Haider</span>
+        <div className="size-12">
+          <Image
+            src="/Logo.svg"
+            alt="Logo"
+            width={100}
+            height={100}
+            className="object-fit"
+          />
         </div>
 
         {/* Search Section */}
@@ -201,6 +226,7 @@ const Header = () => {
                 placeholder="Search for games, genres, or publishers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="w-full pl-12 pr-4 py-3 bg-gray-800/50 text-white  placeholder-gray-400 rounded-full border border-gray-700 focus:outline-none"
                 aria-label="Search"
                 autoFocus
@@ -225,7 +251,7 @@ const Header = () => {
                         <div
                           key={index}
                           className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-800/50 cursor-pointer transition-colors"
-                          onClick={() => setSearchQuery(search)}
+                          onClick={() => handleSearch(search)}
                         >
                           <Clock className="w-4 h-4 text-gray-500" />
                           <span className="text-gray-300">{search}</span>
@@ -249,7 +275,7 @@ const Header = () => {
                         <div
                           key={index}
                           className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-800/50 cursor-pointer transition-colors"
-                          onClick={() => setSearchQuery(game)}
+                          onClick={() => handleSearch(game)}
                         >
                           <Star className="w-4 h-4 text-yellow-500" />
                           <span className="text-gray-300">{game}</span>
@@ -266,7 +292,41 @@ const Header = () => {
                       Quick Actions
                     </h3>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors">
+                      <div 
+                        className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          router.push('/trending');
+                        }}
+                      >
+                        <div className="text-sm font-medium text-white">
+                          Trending Games
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Most popular right now
+                        </div>
+                      </div>
+                      <div 
+                        className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          router.push('/top-rated');
+                        }}
+                      >
+                        <div className="text-sm font-medium text-white">
+                          Top Rated Games
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Highest rated games
+                        </div>
+                      </div>
+                      <div 
+                        className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          router.push('/latest');
+                        }}
+                      >
                         <div className="text-sm font-medium text-white">
                           Browse All Games
                         </div>
@@ -274,12 +334,18 @@ const Header = () => {
                           View complete catalog
                         </div>
                       </div>
-                      <div className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors">
+                      <div 
+                        className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          router.push('/news');
+                        }}
+                      >
                         <div className="text-sm font-medium text-white">
-                          New Releases
+                          Gaming News
                         </div>
                         <div className="text-xs text-gray-400">
-                          Latest games
+                          Latest gaming news
                         </div>
                       </div>
                     </div>

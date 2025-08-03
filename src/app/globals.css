@@ -4,12 +4,23 @@
 :root {
   --color-red: #bb3b3b;
   --color-maroon: #361518;
-  --font-primary: 'Poppins', sans-serif;
+  --font-primary: "Poppins", sans-serif;
 }
-html,body {
-  font-family: var(--font-primary);
+html,
+body {
+  font-family: Poppins;
   background-color: var(--color-maroon);
-  color:white;
+  color: white;
   margin: 0;
   padding: 0;
+}
+.hide-bottom-overflow {
+  overflow: visible;
+  clip-path: inset(0px 0px 20px 0px); /* top right bottom left */
+}
+Link {
+  cursor: pointer;
+}
+button {
+  cursor: pointer;
 }
