@@ -6,6 +6,7 @@ import NewGames from "@/components/NewGames";
 import PlayerStats from "@/components/PlayerStats";
 import TrendingGames from "@/components/TrendingGames";
 import TopRatedGames from "@/components/TopRatedGames";
+import PopularTags from "@/components/PopularTags";
 
 const page = () => {
   return (
@@ -26,7 +27,10 @@ const page = () => {
 
       {/* Trending Games Section */}
       <TrendingGames />
-      
+
+      {/* Popular Tags Section */}
+      <PopularTags />
+
       {/* Top Rated Games Section */}
       <TopRatedGames />
 

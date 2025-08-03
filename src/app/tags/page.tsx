@@ -1,12 +1,13 @@
 import React from "react";
-import TrendingGamesGrid from "@/components/TrendingGamesGrid";
+import TagsOverview from "@/components/TagsOverview";
 
-const TrendingPage = () => {
+const TagsPage = () => {
   return (
     <div className="min-h-screen">
+   
       
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <TrendingGamesGrid />
+        <TagsOverview />
       </div>
       
       {/* Mobile spacing for bottom navigation */}
@@ -15,4 +16,4 @@ const TrendingPage = () => {
   );
 };
 
-export default TrendingPage;
+export default TagsPage;

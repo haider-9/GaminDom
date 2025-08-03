@@ -217,7 +217,7 @@ const SearchPage = () => {
           </div>
 
           <h1 className="text-4xl font-bold text-white mb-2">
-            Search Results for "{searchQuery}"
+            Search Results for &quot;{searchQuery}&quot;
           </h1>
           <p className="text-white/70">
             {loading
@@ -234,7 +234,7 @@ const SearchPage = () => {
               No Games Found
             </h2>
             <p className="text-white/70 mb-6">
-              We couldn't find any games matching "{searchQuery}". Try searching
+              We couldn&apos;t find any games matching &quot;{searchQuery}&quot;. Try searching
               with different keywords.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

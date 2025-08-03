@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
+// import Image from "next/image"; // Unused import
 import { Calendar, User, Clock, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 

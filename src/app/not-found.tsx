@@ -1,20 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation"; // Unused for now
 import {
-  Home,
-  Search,
-  ArrowLeft,
   Gamepad2,
   Zap,
-  Star,
   Trophy,
-  Target,
-  RefreshCw,
 } from "lucide-react";
 
 const NotFound = () => {
-  const router = useRouter();
+  // const router = useRouter(); // Unused for now
   const [glitchText, setGlitchText] = useState("404");
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([]);
 
@@ -44,17 +38,10 @@ const NotFound = () => {
     setParticles(newParticles);
   }, []);
 
-  const handleGoHome = () => {
-    router.push("/");
-  };
-
-  const handleGoBack = () => {
-    router.back();
-  };
-
-  const handleRefresh = () => {
-    window.location.reload();
-  };
+  // Unused handlers - can be implemented later if needed
+  // const handleGoHome = () => router.push("/");
+  // const handleGoBack = () => router.back();
+  // const handleRefresh = () => window.location.reload();
 
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
@@ -105,10 +92,10 @@ const NotFound = () => {
           </div>
           
           <p className="text-xl md:text-2xl text-white/90 mb-4 font-medium">
-            Oops! This level doesn't exist
+            Oops! This level doesn&apos;t exist
           </p>
           <p className="text-white/70 text-lg max-w-2xl mx-auto leading-relaxed">
-            Looks like you've wandered into uncharted territory. The page you're looking for might have been moved, deleted, or never existed in the first place.
+            Looks like you&apos;ve wandered into uncharted territory. The page you&apos;re looking for might have been moved, deleted, or never existed in the first place.
           </p>
         </div>
 

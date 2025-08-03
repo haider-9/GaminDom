@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Grid3X3, List, Filter, SortAsc } from "lucide-react";
+import { ArrowLeft, Grid3X3, List } from "lucide-react";
 import LatestGameCard from "@/components/LatestGameCard";
 import Pagination from "@/components/Pagination";
 
@@ -38,35 +38,33 @@ const PlatformPage = () => {
   const id = params.id as string;
 
   useEffect(() => {
-    fetchLatestGames(currentPage);
-  }, [currentPage]);
+    const fetchLatestGames = async (page: number) => {
+      try {
+        setLoading(true);
+        const apiKey = process.env.NEXT_PUBLIC_RAWG_API_KEY;
+        const apiUrl = process.env.NEXT_PUBLIC_RAWG_API_URL;
 
-  const fetchLatestGames = async (page: number) => {
-    try {
-      setLoading(true);
-      const apiKey = process.env.NEXT_PUBLIC_RAWG_API_KEY;
-      const apiUrl = process.env.NEXT_PUBLIC_RAWG_API_URL;
+        const response = await fetch(
+          `${apiUrl}?key=${apiKey}&page=${page}&page_size=${gamesPerPage}&platforms=${id}&ordering=-rating`
+        );
 
-      // Calculate date range for latest games (last 6 months)
+        if (!response.ok) {
+          throw new Error("Failed to fetch latest games");
+        }
 
-      const response = await fetch(
-        `${apiUrl}?key=${apiKey}&page=${page}&page_size=${gamesPerPage}&platforms=${id}&ordering=-rating`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch latest games");
+        const data: ApiResponse = await response.json();
+        setGames(data.results);
+        setTotalGames(data.count);
+        setTotalPages(Math.ceil(data.count / gamesPerPage));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const data: ApiResponse = await response.json();
-      setGames(data.results);
-      setTotalGames(data.count);
-      setTotalPages(Math.ceil(data.count / gamesPerPage));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchLatestGames(currentPage);
+  }, [currentPage, id, gamesPerPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

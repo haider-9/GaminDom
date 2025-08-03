@@ -5,30 +5,30 @@ import { Button } from "@/components/ui/button";
 import {
   Gamepad2,
   Settings,
-  User,
-  Star,
   Home,
   Trophy,
   ChevronDown,
   ChevronUp,
+  Newspaper,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 
 const CircularFloatingMenu = () => {
-  const [isOpen, setIsOpen] =useState(false); // for menu open/close state
-     const [menuRotation, setMenuRotation] = useState(0); // for manual rotation
+  const [isOpen, setIsOpen] = useState(false); // for menu open/close state
+  const [menuRotation, setMenuRotation] = useState(0); // for manual rotation
 
   // Menu items
   const [currentMobileIndex, setCurrentMobileIndex] = useState(0); // for mobile single icon display
 
-  // Menu items configuration
+  // Menu items configuration with all available routes
   const menuItems = [
-    { icon: <Home size={20} />, label: "/" },
-    { icon: <Gamepad2 size={20} />, label: "Latest" },
-    { icon: <Trophy size={20} />, label: "Achievements" },
-    { icon: <Star size={20} />, label: "Favorites" },
-    { icon: <User size={20} />, label: "Profile" },
-    { icon: <Settings size={20} />, label: "Settings" },
+    { icon: <Home size={20} />, label: "Home", route: "/" },
+    { icon: <Gamepad2 size={20} />, label: "Latest", route: "/latest" },
+    { icon: <Trophy size={20} />, label: "Top Rated", route: "/top-rated" },
+    { icon: <TrendingUp size={20} />, label: "Trending", route: "/trending" },
+    { icon: <Newspaper size={20} />, label: "News", route: "/news" },
+    { icon: <Settings size={20} />, label: "Settings", route: "/settings" },
   ];
 
   // Calculate positions in a circle with fixed radius
@@ -176,7 +176,7 @@ const CircularFloatingMenu = () => {
                   }}
                 >
                   <div className="group relative flex items-center">
-                    <Link href={`/${item.label.toLowerCase()}`}>
+                    <Link href={item.route}>
                       <Button
                         variant="secondary"
                         size="icon"
@@ -257,7 +257,7 @@ const CircularFloatingMenu = () => {
               }}
             >
               <div className="group relative flex flex-col items-center">
-                <Link href={`/${menuItems[currentMobileIndex].label.toLowerCase()}`}>
+                <Link href={menuItems[currentMobileIndex].route}>
                   <Button
                     variant="secondary"
                     size="icon"

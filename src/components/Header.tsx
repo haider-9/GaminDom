@@ -324,6 +324,20 @@ const Header = () => {
                         className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
                         onClick={() => {
                           setIsSearchOpen(false);
+                          router.push('/tags');
+                        }}
+                      >
+                        <div className="text-sm font-medium text-white">
+                          Browse by Tags
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Discover by themes
+                        </div>
+                      </div>
+                      <div 
+                        className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setIsSearchOpen(false);
                           router.push('/latest');
                         }}
                       >

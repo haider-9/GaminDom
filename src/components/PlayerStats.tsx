@@ -3,8 +3,6 @@ import {
   Trophy,
   Target,
   Zap,
-  TrendingUp,
-  Star,
   Crown,
 } from "lucide-react";
 
