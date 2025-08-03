@@ -35,7 +35,7 @@ const GenrePage = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const gamesPerPage = 20;
   const params = useParams();
-  const slug = params.slug as string.toLowerCase();
+  const slug = (params.slug as string).toLowerCase();
 
   useEffect(() => {
     fetchLatestGames(currentPage);
