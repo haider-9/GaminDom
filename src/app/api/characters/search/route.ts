@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const GIANTBOMB_API_KEY = process.env.NEXT_PUBLIC_GIANTBOMB_API_KEY;
 const GIANTBOMB_API_URL = process.env.NEXT_PUBLIC_GIANTBOMB_API_URL;
-
+type CharacterSummary = {
+  id: number;
+  name: string;
+  api_detail_url: string;
+  site_detail_url: string;
+};
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const gameSlug = searchParams.get('gameSlug');
@@ -57,9 +62,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ characters: [] });
     }
 
-    // Fetch detailed character information (limit to 6 for performance)
+    // Fetch detailed character information (limit to 12 for better pagination)
     const characterDetails = await Promise.all(
-      charactersData.results.characters.slice(0, 6).map(async (char: unknown) => {
+      charactersData.results.characters.map(async (char:CharacterSummary) => {
         try {
           const detailResponse = await fetch(
             `${GIANTBOMB_API_URL}/character/${char.id}/?api_key=${GIANTBOMB_API_KEY}&format=json`,

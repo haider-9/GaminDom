@@ -5,9 +5,9 @@ const GIANTBOMB_API_URL = process.env.NEXT_PUBLIC_GIANTBOMB_API_URL;
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const characterId =await params.id;
+  const { id: characterId } = await params;
 
   if (!characterId) {
     return NextResponse.json({ error: 'Character ID is required' }, { status: 400 });
