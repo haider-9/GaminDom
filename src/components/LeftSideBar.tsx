@@ -12,9 +12,7 @@ import {
   Info,
   Menu,
   X,
-  ChevronLeft,
-  ChevronRight,
-  User,
+
   LogIn,
 } from "lucide-react";
 import Link from "next/link";
@@ -22,7 +20,6 @@ import Link from "next/link";
 const CircularFloatingMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const pathname = usePathname();
 
   // Menu items configuration
@@ -99,14 +96,7 @@ const CircularFloatingMenu = () => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Navigation functions
-  const nextItem = () => {
-    setCurrentIndex((prev) => (prev + 1) % menuItems.length);
-  };
 
-  const prevItem = () => {
-    setCurrentIndex((prev) => (prev - 1 + menuItems.length) % menuItems.length);
-  };
 
   // Close menu when clicking outside or navigating
   useEffect(() => {

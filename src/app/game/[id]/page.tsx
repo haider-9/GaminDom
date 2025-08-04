@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { showToast, handleNetworkError, handleApiError } from "@/lib/toast-config";
+import { showToast} from "@/lib/toast-config";
 import {
   Star,
   Calendar,
@@ -137,7 +137,7 @@ const GamePage = () => {
         try {
           const screenshotsData = await gameApi.getGameScreenshots(gameId);
           setScreenshots(screenshotsData.results || []);
-        } catch (error) {
+        } catch {
           console.warn("Failed to fetch screenshots, but continuing...");
         }
 

@@ -7,12 +7,10 @@ import {
   Zap,
   Crown,
   Star,
-  Gamepad2,
   Sparkles,
 } from "lucide-react";
 
 const PlayerStats = () => {
-  const [activeTab, setActiveTab] = useState("overview");
   const [animateProgress, setAnimateProgress] = useState(false);
 
   // Enhanced player data
@@ -41,11 +39,7 @@ const PlayerStats = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Tab content
-  const tabs = [
-    { id: "overview", label: "Overview", icon: <Gamepad2 size={16} /> },
-  ];
-
+  
   const OverviewTab = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -195,7 +189,7 @@ const PlayerStats = () => {
       {/* Content */}
       <div className="p-6 min-h-[280px]">
         <AnimatePresence mode="wait">
-          {activeTab === "overview" && <OverviewTab key="overview" />}
+        <OverviewTab key="overview" />
         </AnimatePresence>
       </div>
 
