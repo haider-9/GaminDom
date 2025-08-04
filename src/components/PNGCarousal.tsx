@@ -102,7 +102,7 @@ const PNGCarousal = () => {
         </div>
 
         {/* Character Image at bottom-right */}
-        <div className="absolute bottom-0 -right-4 lg:-right-8 h-full w-[200px] lg:w-[320px] z-30 pointer-events-none select-none flex items-end">
+        <div className="absolute bottom-0 -right-4 lg:-right-8 h-full w-[200px] lg:w-[300px] z-30 pointer-events-none select-none flex items-end">
           <div className="relative">
             {/* Character glow effect */}
             <div className="absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-transparent blur-xl" />
@@ -111,7 +111,7 @@ const PNGCarousal = () => {
               alt={`${game.name} Character`}
               width={200}
               height={200}
-              className="object-contain drop-shadow-2xl lg:w-[320px] lg:h-[400px]"
+              className="object-cover object center drop-shadow-2xl lg:w-[300px]"
               priority
             />
           </div>

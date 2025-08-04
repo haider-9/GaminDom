@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { showToast, handleNetworkError, handleApiError } from "@/lib/toast-config";
 import {
   Star,
   Calendar,
@@ -20,6 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Flame,
+  User,
 } from "lucide-react";
 import { SiEpicgames, SiSteam, SiPlaystation, SiBox } from "react-icons/si";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,6 +31,7 @@ import Link from "next/link";
 interface GameDetails {
   id: number;
   name: string;
+  slug: string;
   description_raw: string;
   background_image: string;
   background_image_additional: string;
@@ -55,6 +58,29 @@ interface GameDetails {
   screenshots?: Array<{ id: number; image: string }>;
 }
 
+interface Character {
+  id: number;
+  name: string;
+  real_name?: string;
+  deck?: string;
+  description?: string;
+  birthday?: string;
+  image?: {
+    icon_url: string;
+    medium_url: string;
+    screen_url: string;
+    small_url: string;
+    super_url: string;
+    thumb_url: string;
+    tiny_url: string;
+    original_url: string;
+  };
+  aliases?: string;
+  gender?: number;
+  site_detail_url: string;
+  api_detail_url: string;
+}
+
 const GamePage = () => {
   const params = useParams();
   const router = useRouter();
@@ -64,9 +90,37 @@ const GamePage = () => {
   const [screenshots, setScreenshots] = useState<
     Array<{ id: number; image: string }>
   >([]);
+  const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeScreenshot, setActiveScreenshot] = useState(0);
+  const [charactersLoading, setCharactersLoading] = useState(false);
+  const [currentCharacterPage, setCurrentCharacterPage] = useState(0);
+
+  // Pagination settings for characters
+  const charactersPerPage = 6;
+  const totalCharacterPages = Math.ceil(characters.length / charactersPerPage);
+  const startIndex = currentCharacterPage * charactersPerPage;
+  const endIndex = startIndex + charactersPerPage;
+  const currentCharacters = characters.slice(startIndex, endIndex);
+
+  const fetchCharacters = async (gameSlug: string) => {
+    try {
+      setCharactersLoading(true);
+      const { getCharactersForGame } = await import('@/lib/giantbomb');
+      const characterDetails = await getCharactersForGame(gameSlug);
+      setCharacters(characterDetails);
+      
+      // Show success message if characters were found
+      if (characterDetails.length > 0) {
+        showToast.success(`Found ${characterDetails.length} character${characterDetails.length > 1 ? 's' : ''} for this game`);
+      }
+    } catch (error) {
+      console.error('Failed to fetch characters:', error);
+    } finally {
+      setCharactersLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchGameDetails = async () => {
@@ -77,7 +131,10 @@ const GamePage = () => {
 
         // Fetch game details
         const gameResponse = await fetch(`${apiUrl}/${gameId}?key=${apiKey}`);
-        if (!gameResponse.ok) throw new Error("Failed to fetch game details");
+        if (!gameResponse.ok) {
+          handleApiError(gameResponse, "Failed to load game details");
+          throw new Error("Failed to fetch game details");
+        }
         const gameData = await gameResponse.json();
 
         // Fetch screenshots
@@ -87,11 +144,24 @@ const GamePage = () => {
         if (screenshotsResponse.ok) {
           const screenshotsData = await screenshotsResponse.json();
           setScreenshots(screenshotsData.results || []);
+        } else {
+          console.warn("Failed to fetch screenshots, but continuing...");
         }
 
         setGame(gameData);
+
+        // Fetch characters from GiantBomb
+        if (gameData.slug) {
+          fetchCharacters(gameData.slug);
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        const errorMessage = err instanceof Error ? err.message : "An error occurred";
+        setError(errorMessage);
+        
+        // Show toast for network errors
+        if (err instanceof Error && err.message.includes("fetch")) {
+          handleNetworkError(err);
+        }
       } finally {
         setLoading(false);
       }
@@ -370,6 +440,105 @@ const GamePage = () => {
                     ))}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Characters */}
+            {(characters.length > 0 || charactersLoading) && (
+              <div className="bg-black/50 rounded-3xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                    <User size={24} />
+                    Characters
+                    {characters.length > 0 && (
+                      <span className="text-sm text-white/50 font-normal">
+                        ({characters.length} total)
+                      </span>
+                    )}
+                  </h2>
+                  
+                  {/* Pagination Controls */}
+                  {characters.length > charactersPerPage && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setCurrentCharacterPage(Math.max(0, currentCharacterPage - 1))}
+                        disabled={currentCharacterPage === 0}
+                        className={`p-2 rounded-full transition-colors ${
+                          currentCharacterPage === 0
+                            ? 'bg-black/20 text-white/30 cursor-not-allowed'
+                            : 'bg-black/30 hover:bg-black/50 text-white'
+                        }`}
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      
+                      <span className="text-white/70 text-sm px-3 py-1 bg-black/30 rounded-full">
+                        {currentCharacterPage + 1} / {totalCharacterPages}
+                      </span>
+                      
+                      <button
+                        onClick={() => setCurrentCharacterPage(Math.min(totalCharacterPages - 1, currentCharacterPage + 1))}
+                        disabled={currentCharacterPage === totalCharacterPages - 1}
+                        className={`p-2 rounded-full transition-colors ${
+                          currentCharacterPage === totalCharacterPages - 1
+                            ? 'bg-black/20 text-white/30 cursor-not-allowed'
+                            : 'bg-black/30 hover:bg-black/50 text-white'
+                        }`}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {charactersLoading ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="bg-black/30 rounded-2xl p-4">
+                          <div className="w-16 h-16 bg-black/50 rounded-full mx-auto mb-3"></div>
+                          <div className="h-4 bg-black/50 rounded w-3/4 mx-auto mb-2"></div>
+                          <div className="h-3 bg-black/50 rounded w-1/2 mx-auto"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {currentCharacters.map((character) => (
+                      <Link
+                        key={character.id}
+                        href={`/character/${character.id}`}
+                        className="group"
+                      >
+                        <div className="bg-black/30 rounded-2xl p-4 hover:bg-black/40 transition-colors">
+                          <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
+                            {character.image?.thumb_url ? (
+                              <Image
+                                src={character.image.thumb_url}
+                                alt={character.name}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-[#bb3b3b] to-[#bb3b3b]/60 flex items-center justify-center">
+                                <User size={24} className="text-white" />
+                              </div>
+                            )}
+                          </div>
+                          <h3 className="text-white font-semibold text-center text-sm mb-1 group-hover:text-[#bb3b3b] transition-colors">
+                            {character.name}
+                          </h3>
+                          {character.real_name && character.real_name !== character.name && (
+                            <p className="text-white/50 text-xs text-center">
+                              {character.real_name}
+                            </p>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

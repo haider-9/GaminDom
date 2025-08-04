@@ -19,11 +19,14 @@ const PlayerStats = () => {
   };
 
   const xpProgress = (playerData.xp / playerData.maxXp) * 100;
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (xpProgress / 100) * circumference;
 
   return (
     <div className="w-full max-w-sm">
       {/* Single Stats Card */}
-      <div className="bg-black/50 rounded-3xl p-6 h-[280px] flex flex-col justify-between relative overflow-hidden">
+      <div className="bg-black/50 rounded-3xl p-6 h-[320px] flex flex-col justify-between relative overflow-hidden border border-gray-700/50">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#bb3b3b] to-transparent rounded-full -translate-y-16 translate-x-16" />
@@ -38,70 +41,80 @@ const PlayerStats = () => {
               <p className="text-white/70 text-sm">Level {playerData.level}</p>
             </div>
             <div className="bg-gradient-to-r from-[#bb3b3b] to-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-              <Crown size={12} />
+              <Crown size={12} className="fill-yellow-400 stroke-yellow-400" />
               {playerData.rank}
             </div>
           </div>
 
-          {/* Progress Blob */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/70 text-sm">Experience</span>
-              <span className="text-white text-sm font-semibold">
-                {playerData.xp.toLocaleString()} / {playerData.maxXp.toLocaleString()} XP
-              </span>
-            </div>
-            
-            {/* Modern Progress Blob */}
-            <div className="relative h-6 bg-black/30 rounded-full overflow-hidden shadow-inner">
-              {/* Main Progress Fill */}
-              <div 
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#bb3b3b] via-red-500 to-orange-400 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                style={{ width: `${xpProgress}%` }}
-              />
+          {/* Circular Progress Bar */}
+          <div className="flex justify-center mb-6">
+            <div className="relative w-32 h-32">
+              {/* Background Circle */}
+              <svg className="w-full h-full" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r={radius}
+                  fill="none"
+                  stroke="#2d3748"
+                  strokeWidth="8"
+                />
+                {/* Progress Circle */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r={radius}
+                  fill="none"
+                  stroke="url(#progressGradient)"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={strokeDashoffset}
+                  transform="rotate(-90 50 50)"
+                />
+                <defs>
+                  <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#bb3b3b" />
+                    <stop offset="50%" stopColor="#ef4444" />
+                    <stop offset="100%" stopColor="#f97316" />
+                  </linearGradient>
+                </defs>
+              </svg>
               
-              {/* Animated Glow Effect */}
-              <div 
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full animate-pulse"
-                style={{ width: `${xpProgress}%` }}
-              />
-              
-              {/* Shimmer Effect */}
-              <div 
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-full animate-pulse"
-                style={{ 
-                  width: `${xpProgress}%`,
-                  animationDelay: '0.5s'
-                }}
-              />
-              
-              {/* Progress Indicator Dot */}
-              <div 
-                className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full shadow-xl transition-all duration-1000 ease-out border-2 border-white/20"
-                style={{ left: `calc(${xpProgress}% - 10px)` }}
-              >
-                <div className="absolute inset-1 bg-gradient-to-r from-[#bb3b3b] to-red-500 rounded-full animate-pulse" />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent rounded-full" />
+              {/* Center Text */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-white text-2xl font-bold">
+                  {Math.round(xpProgress)}%
+                </span>
+                <span className="text-white/60 text-xs">
+                  {playerData.xp.toLocaleString()}/{playerData.maxXp.toLocaleString()}
+                </span>
               </div>
               
-              {/* Inner Highlight */}
+              {/* Animated Indicator */}
               <div 
-                className="absolute top-1 left-1 right-1 h-1 bg-gradient-to-r from-white/30 via-white/10 to-transparent rounded-full"
-                style={{ width: `calc(${xpProgress}% - 8px)` }}
-              />
+                className="absolute top-0 left-1/2 w-2 h-2 bg-white rounded-full shadow-lg transform -translate-x-1/2"
+                style={{
+                  transform: `rotate(${xpProgress * 3.6 - 90}deg) translate(${radius}px) rotate(${90 - xpProgress * 3.6}deg)`,
+                  transition: "transform 0.5s ease-out"
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-white/80 to-transparent rounded-full" />
+              </div>
             </div>
-            
-            <p className="text-white/50 text-xs mt-2 text-center">
-              {(playerData.maxXp - playerData.xp).toLocaleString()} XP to next level
-            </p>
           </div>
 
-          {/* 3 Icon Stats */}
+          {/* Stats Icons */}
           <div className="grid grid-cols-3 gap-4">
             {/* Games Won */}
             <div className="text-center group">
-              <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-2xl p-4 mb-2 hover:from-blue-500/30 hover:to-cyan-500/30 transition-all duration-200 group-hover:scale-105">
-                <Trophy className="text-blue-400 mx-auto mb-1" size={24} />
+              <div className="bg-gradient-to-br from-blue-500/15 to-cyan-500/15 border border-blue-500/40 rounded-xl p-3 mb-2 transition-all duration-200 group-hover:bg-blue-500/25">
+                <Trophy 
+                  className="text-blue-400 mx-auto" 
+                  size={20} 
+                  fill="currentColor"
+                  fillOpacity="0.2"
+                />
               </div>
               <p className="text-white font-bold text-lg">{playerData.gamesWon}</p>
               <p className="text-white/60 text-xs">Games Won</p>
@@ -109,8 +122,13 @@ const PlayerStats = () => {
 
             {/* Win Rate */}
             <div className="text-center group">
-              <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-2xl p-4 mb-2 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 group-hover:scale-105">
-                <Target className="text-green-400 mx-auto mb-1" size={24} />
+              <div className="bg-gradient-to-br from-green-500/15 to-emerald-500/15 border border-green-500/40 rounded-xl p-3 mb-2 transition-all duration-200 group-hover:bg-green-500/25">
+                <Target 
+                  className="text-green-400 mx-auto" 
+                  size={20}
+                  fill="currentColor"
+                  fillOpacity="0.2"
+                />
               </div>
               <p className="text-white font-bold text-lg">{playerData.winRate}%</p>
               <p className="text-white/60 text-xs">Win Rate</p>
@@ -118,8 +136,13 @@ const PlayerStats = () => {
 
             {/* Current Streak */}
             <div className="text-center group">
-              <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-2xl p-4 mb-2 hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200 group-hover:scale-105">
-                <Zap className="text-yellow-400 mx-auto mb-1" size={24} />
+              <div className="bg-gradient-to-br from-yellow-500/15 to-orange-500/15 border border-yellow-500/40 rounded-xl p-3 mb-2 transition-all duration-200 group-hover:bg-yellow-500/25">
+                <Zap 
+                  className="text-yellow-400 mx-auto" 
+                  size={20}
+                  fill="currentColor"
+                  fillOpacity="0.2"
+                />
               </div>
               <p className="text-white font-bold text-lg">{playerData.streak}</p>
               <p className="text-white/60 text-xs">Win Streak</p>
@@ -127,10 +150,10 @@ const PlayerStats = () => {
           </div>
         </div>
 
-        {/* Floating Particles */}
-        <div className="absolute top-8 right-8 w-2 h-2 bg-[#bb3b3b] rounded-full opacity-50 animate-pulse" />
-        <div className="absolute bottom-12 left-8 w-1 h-1 bg-blue-400 rounded-full opacity-60 animate-pulse" />
-        <div className="absolute top-16 left-12 w-1.5 h-1.5 bg-yellow-400 rounded-full opacity-40 animate-pulse" />
+        {/* Subtle Floating Particles */}
+        <div className="absolute top-8 right-8 w-1.5 h-1.5 bg-[#bb3b3b] rounded-full opacity-40" />
+        <div className="absolute bottom-12 left-8 w-1 h-1 bg-blue-400 rounded-full opacity-30" />
+        <div className="absolute top-16 left-12 w-1 h-1 bg-yellow-400 rounded-full opacity-30" />
       </div>
     </div>
   );

@@ -153,7 +153,7 @@ const LatestGamesGrid = () => {
             <div
               key={game.id}
               onClick={() => router.push(`/game/${game.id}`)}
-              className="relative group cursor-pointer rounded-3xl overflow-hidden bg-black/20 hover:scale-105 transition-all duration-300"
+              className="relative group cursor-pointer rounded-3xl overflow-hidden bg-black/20 transition-all duration-300"
             >
               {/* Release Status Badge */}
               {releaseBadge && (

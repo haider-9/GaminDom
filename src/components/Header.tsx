@@ -17,6 +17,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Separator } from "./ui/separator";
 import { ScrollArea } from "./ui/scroll-area";
 import Image from "next/image";
+import Link from "next/link";
 
 const Header = () => {
   const router = useRouter();
@@ -82,15 +83,18 @@ const Header = () => {
       <div className="md:hidden">
         {/* Top row: Greeting and Actions */}
         <div className="flex items-center justify-between mb-4">
-          <div className="size-12">
+          <Link
+            className="size-12"
+            href="/"
+          >
             <Image
               src="/Logo.svg"
               alt="Logo"
               width={100}
               height={100}
-              className="object-fit"
+              className="object-contain"
             />
-          </div>
+          </Link>
           <div className="flex items-center space-x-2">
             <Tooltip>
               <TooltipTrigger>
@@ -142,7 +146,8 @@ const Header = () => {
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
               <kbd className="hidden sm:flex px-2 py-1 text-xs text-gray-400 bg-gray-700/50 rounded border border-gray-600 items-center">
-                <Command className="inline w-3 h-3 mr-1" />+K
+                <Command className="inline w-3 h-3 mr-1" />
+                +K
               </kbd>
             </div>
           </div>
@@ -152,7 +157,7 @@ const Header = () => {
       {/* Desktop Layout */}
       <div className="hidden md:flex items-center justify-between">
         {/* Greeting Section */}
-        <div className="size-12">
+        <Link href='/' className="size-12">
           <Image
             src="/Logo.svg"
             alt="Logo"
@@ -160,7 +165,7 @@ const Header = () => {
             height={100}
             className="object-fit"
           />
-        </div>
+        </Link>
 
         {/* Search Section */}
         <div
@@ -292,11 +297,11 @@ const Header = () => {
                       Quick Actions
                     </h3>
                     <div className="grid grid-cols-2 gap-2">
-                      <div 
+                      <div
                         className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
                         onClick={() => {
                           setIsSearchOpen(false);
-                          router.push('/trending');
+                          router.push("/trending");
                         }}
                       >
                         <div className="text-sm font-medium text-white">
@@ -306,11 +311,11 @@ const Header = () => {
                           Most popular right now
                         </div>
                       </div>
-                      <div 
+                      <div
                         className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
                         onClick={() => {
                           setIsSearchOpen(false);
-                          router.push('/top-rated');
+                          router.push("/top-rated");
                         }}
                       >
                         <div className="text-sm font-medium text-white">
@@ -320,11 +325,11 @@ const Header = () => {
                           Highest rated games
                         </div>
                       </div>
-                      <div 
+                      <div
                         className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
                         onClick={() => {
                           setIsSearchOpen(false);
-                          router.push('/tags');
+                          router.push("/tags");
                         }}
                       >
                         <div className="text-sm font-medium text-white">
@@ -334,11 +339,11 @@ const Header = () => {
                           Discover by themes
                         </div>
                       </div>
-                      <div 
+                      <div
                         className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
                         onClick={() => {
                           setIsSearchOpen(false);
-                          router.push('/latest');
+                          router.push("/latest");
                         }}
                       >
                         <div className="text-sm font-medium text-white">
@@ -348,11 +353,11 @@ const Header = () => {
                           View complete catalog
                         </div>
                       </div>
-                      <div 
+                      <div
                         className="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 cursor-pointer transition-colors"
                         onClick={() => {
                           setIsSearchOpen(false);
-                          router.push('/news');
+                          router.push("/news");
                         }}
                       >
                         <div className="text-sm font-medium text-white">

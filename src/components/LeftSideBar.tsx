@@ -11,6 +11,7 @@ import {
   ChevronUp,
   Newspaper,
   TrendingUp,
+  Info,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -28,6 +29,7 @@ const CircularFloatingMenu = () => {
     { icon: <Trophy size={20} />, label: "Top Rated", route: "/top-rated" },
     { icon: <TrendingUp size={20} />, label: "Trending", route: "/trending" },
     { icon: <Newspaper size={20} />, label: "News", route: "/news" },
+    { icon: <Info size={20} />, label: "About", route: "/about" },
     { icon: <Settings size={20} />, label: "Settings", route: "/settings" },
   ];
 

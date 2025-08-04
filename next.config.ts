@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "media.rawg.io",
         port: "",
-        pathname: "/media/games/**",
+        pathname: "/media/**",
       },
       {
         protocol: "https",
@@ -26,6 +26,18 @@ const nextConfig: NextConfig = {
         hostname: "dummyimage.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "github.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.giantbomb.com",
+        port: "",
+        pathname: "/a/uploads/**",
       },
     ],
   },

@@ -127,7 +127,7 @@ const TrendingGamesGrid = () => {
             <div
               key={game.id}
               onClick={() => router.push(`/game/${game.id}`)}
-              className="relative group cursor-pointer rounded-3xl overflow-hidden bg-black/20 hover:scale-105 transition-all duration-300"
+              className="relative group cursor-pointer rounded-3xl overflow-hidden bg-black/20 transition-all duration-300"
             >
               {/* Trending Badge */}
               <div className={`absolute top-4 left-4 z-20 ${badgeColor} text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg flex items-center gap-1`}>

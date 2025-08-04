@@ -160,7 +160,7 @@ const TagGamesGrid = ({ tagSlug }: TagGamesGridProps) => {
           <div
             key={game.id}
             onClick={() => router.push(`/game/${game.id}`)}
-            className="relative group cursor-pointer rounded-3xl overflow-hidden bg-black/20 hover:scale-105 transition-all duration-300"
+            className="relative group cursor-pointer rounded-3xl overflow-hidden bg-black/20  transition-all duration-300"
           >
             {/* Background Image */}
             <div className="relative h-64 overflow-hidden">

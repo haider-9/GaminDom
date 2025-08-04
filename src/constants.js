@@ -33,6 +33,62 @@ export const GAMES_DATA = [
     isPopular: true,
     reviews: 76,
   },
+  {
+    id: 5,
+    name: "Red Dead Redemption 2",
+    description:
+      "An action-adventure game set in an open world, focusing on the life of an outlaw in the late 1800s.",
+    image: "/assets/rdr2.png",
+    bgColor: "bg-red-500/50",
+    platforms: ["steam", "epic"],
+    isPopular: true,
+    reviews: 150,
+  },
+  {
+    id: 6,
+    name: "Assassin's Creed",
+    description:
+      "An action-adventure game series set in historical settings, focusing on the conflict between Assassins and Templars.",
+    image: "/assets/Assasin Creed.png",
+    bgColor: "bg-green-500/50",
+    platforms: ["steam"],
+    isPopular: false,
+    reviews: 95,
+  },
+  {
+    id: 7,
+    name: "Project:Playtime",
+    description:
+      "A multiplayer horror game where players must work together to survive against a monster.",
+    image: "/assets/Project Playtime.png",
+    bgColor: "bg-yellow-500/50",
+    platforms: ["steam"],
+    isPopular: false,
+    reviews: 100,
+  },
+  {
+    id:8,
+    name:'Street Fighters',
+    description:
+      "A fighting game franchise known for its competitive gameplay and iconic characters.",
+    image: "/assets/street fighters.png",
+    bgColor: "bg-pink-500/50",
+    platforms: ["steam"],
+    isPopular: true,
+    reviews: 120,
+    },
+    {
+    id: 9,
+    name: "Marvel Heroes",
+    description:
+      "An action role-playing game set in the Marvel Universe, allowing players to control various superheroes.",
+    image: "/assets/MarvelHero.png",
+    bgColor: "bg-indigo-500/50",
+    platforms: ["steam"],
+    isPopular: true,
+    reviews: 110,
+
+    }
 
 ];
 
