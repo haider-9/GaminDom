@@ -50,7 +50,10 @@ const TopRatedGames = () => {
         <div className="h-8 bg-black/50 rounded-3xl w-64 animate-pulse mb-6"></div>
         <div className="space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-24 bg-black/50 rounded-3xl animate-pulse"></div>
+            <div
+              key={i}
+              className="h-24 bg-black/50 rounded-3xl animate-pulse"
+            ></div>
           ))}
         </div>
       </div>
@@ -65,7 +68,7 @@ const TopRatedGames = () => {
           <h2 className="text-3xl font-bold text-white">Top Rated</h2>
         </div>
         <button
-          onClick={() => router.push('/top-rated')}
+          onClick={() => router.push("/top-rated")}
           className="text-yellow-500 hover:text-yellow-400 transition-colors text-lg font-semibold"
         >
           See More
@@ -110,7 +113,7 @@ const TopRatedGames = () => {
             </div>
 
             {/* Metacritic Score */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 md:block hidden">
               <div className="bg-green-500 text-white px-3 py-2 rounded-full font-bold">
                 {game.metacritic}
               </div>

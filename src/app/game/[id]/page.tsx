@@ -107,8 +107,9 @@ const GamePage = () => {
   const fetchCharacters = async (gameSlug: string) => {
     try {
       setCharactersLoading(true);
-      const { getCharactersForGame } = await import('@/lib/giantbomb');
-      const characterDetails = await getCharactersForGame(gameSlug);
+      const { characterApi } = await import('@/lib/api-client');
+      const response = await characterApi.getCharactersForGame(gameSlug);
+      const characterDetails = response.characters || [];
       setCharacters(characterDetails);
       
       // Show success message if characters were found
@@ -126,29 +127,19 @@ const GamePage = () => {
     const fetchGameDetails = async () => {
       try {
         setLoading(true);
-        const apiKey = process.env.NEXT_PUBLIC_RAWG_API_KEY;
-        const apiUrl = process.env.NEXT_PUBLIC_RAWG_API_URL;
+        const { gameApi } = await import('@/lib/api-client');
 
         // Fetch game details
-        const gameResponse = await fetch(`${apiUrl}/${gameId}?key=${apiKey}`);
-        if (!gameResponse.ok) {
-          handleApiError(gameResponse, "Failed to load game details");
-          throw new Error("Failed to fetch game details");
-        }
-        const gameData = await gameResponse.json();
+        const gameData = await gameApi.getGameDetails(gameId);
+        setGame(gameData);
 
         // Fetch screenshots
-        const screenshotsResponse = await fetch(
-          `${apiUrl}/${gameId}/screenshots?key=${apiKey}`
-        );
-        if (screenshotsResponse.ok) {
-          const screenshotsData = await screenshotsResponse.json();
+        try {
+          const screenshotsData = await gameApi.getGameScreenshots(gameId);
           setScreenshots(screenshotsData.results || []);
-        } else {
+        } catch (error) {
           console.warn("Failed to fetch screenshots, but continuing...");
         }
-
-        setGame(gameData);
 
         // Fetch characters from GiantBomb
         if (gameData.slug) {
@@ -157,11 +148,6 @@ const GamePage = () => {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "An error occurred";
         setError(errorMessage);
-        
-        // Show toast for network errors
-        if (err instanceof Error && err.message.includes("fetch")) {
-          handleNetworkError(err);
-        }
       } finally {
         setLoading(false);
       }

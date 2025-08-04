@@ -83,11 +83,11 @@ const CharacterPage = () => {
     const fetchCharacterDetails = async () => {
       try {
         setLoading(true);
-        const { getCharacterDetails } = await import("@/lib/giantbomb");
-        const characterData = await getCharacterDetails(parseInt(characterId));
+        const { characterApi } = await import("@/lib/api-client");
+        const response = await characterApi.getCharacterDetails(characterId);
 
-        if (characterData) {
-          setCharacter(characterData);
+        if (response.character) {
+          setCharacter(response.character);
         } else {
           throw new Error("Character not found");
         }
