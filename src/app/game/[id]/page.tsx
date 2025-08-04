@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { showToast} from "@/lib/toast-config";
+import { showToast } from "@/lib/toast-config";
 import {
   Star,
   Calendar,
@@ -58,6 +58,10 @@ interface GameDetails {
   screenshots?: Array<{ id: number; image: string }>;
 }
 
+interface ScreenshotsResponse {
+  results: Array<{ id: number; image: string }>;
+}
+
 interface Character {
   id: number;
   name: string;
@@ -103,39 +107,50 @@ const GamePage = () => {
   const startIndex = currentCharacterPage * charactersPerPage;
   const endIndex = startIndex + charactersPerPage;
   const currentCharacters = characters.slice(startIndex, endIndex);
+  type CharactersResponse = {
+    characters: Character[];
+  };
 
-  const fetchCharacters = async (gameSlug: string) => {
+  const fetchCharacters = React.useCallback(async (gameSlug: string) => {
     try {
       setCharactersLoading(true);
-      const { characterApi } = await import('@/lib/api-client');
-      const response = await characterApi.getCharactersForGame(gameSlug);
+      const { characterApi } = await import("@/lib/api-client");
+      const response = (await characterApi.getCharactersForGame(
+        gameSlug
+      )) as CharactersResponse;
       const characterDetails = response.characters || [];
       setCharacters(characterDetails);
-      
+
       // Show success message if characters were found
       if (characterDetails.length > 0) {
-        showToast.success(`Found ${characterDetails.length} character${characterDetails.length > 1 ? 's' : ''} for this game`);
+        showToast.success(
+          `Found ${characterDetails.length} character${
+            characterDetails.length > 1 ? "s" : ""
+          } for this game`
+        );
       }
     } catch (error) {
-      console.error('Failed to fetch characters:', error);
+      console.error("Failed to fetch characters:", error);
     } finally {
       setCharactersLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const fetchGameDetails = async () => {
       try {
         setLoading(true);
-        const { gameApi } = await import('@/lib/api-client');
+        const { gameApi } = await import("@/lib/api-client");
 
         // Fetch game details
-        const gameData = await gameApi.getGameDetails(gameId);
+        const gameData = (await gameApi.getGameDetails(gameId)) as GameDetails;
         setGame(gameData);
 
         // Fetch screenshots
         try {
-          const screenshotsData = await gameApi.getGameScreenshots(gameId);
+          const screenshotsData = (await gameApi.getGameScreenshots(
+            gameId
+          )) as ScreenshotsResponse;
           setScreenshots(screenshotsData.results || []);
         } catch {
           console.warn("Failed to fetch screenshots, but continuing...");
@@ -146,7 +161,8 @@ const GamePage = () => {
           fetchCharacters(gameData.slug);
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "An error occurred";
+        const errorMessage =
+          err instanceof Error ? err.message : "An error occurred";
         setError(errorMessage);
       } finally {
         setLoading(false);
@@ -156,7 +172,7 @@ const GamePage = () => {
     if (gameId) {
       fetchGameDetails();
     }
-  }, [gameId]);
+  }, [gameId, fetchCharacters]);
 
   if (loading) {
     return (
@@ -273,7 +289,6 @@ const GamePage = () => {
 
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-3 mb-4">
-                
                   {game.metacritic >= 80 && (
                     <span className="bg-[#FDD161] text-black text-sm px-3 py-1 rounded-full font-semibold flex items-center gap-1">
                       <Flame size={14} />
@@ -442,33 +457,46 @@ const GamePage = () => {
                       </span>
                     )}
                   </h2>
-                  
+
                   {/* Pagination Controls */}
                   {characters.length > charactersPerPage && (
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setCurrentCharacterPage(Math.max(0, currentCharacterPage - 1))}
+                        onClick={() =>
+                          setCurrentCharacterPage(
+                            Math.max(0, currentCharacterPage - 1)
+                          )
+                        }
                         disabled={currentCharacterPage === 0}
                         className={`p-2 rounded-full transition-colors ${
                           currentCharacterPage === 0
-                            ? 'bg-black/20 text-white/30 cursor-not-allowed'
-                            : 'bg-black/30 hover:bg-black/50 text-white'
+                            ? "bg-black/20 text-white/30 cursor-not-allowed"
+                            : "bg-black/30 hover:bg-black/50 text-white"
                         }`}
                       >
                         <ChevronLeft size={16} />
                       </button>
-                      
+
                       <span className="text-white/70 text-sm px-3 py-1 bg-black/30 rounded-full">
                         {currentCharacterPage + 1} / {totalCharacterPages}
                       </span>
-                      
+
                       <button
-                        onClick={() => setCurrentCharacterPage(Math.min(totalCharacterPages - 1, currentCharacterPage + 1))}
-                        disabled={currentCharacterPage === totalCharacterPages - 1}
+                        onClick={() =>
+                          setCurrentCharacterPage(
+                            Math.min(
+                              totalCharacterPages - 1,
+                              currentCharacterPage + 1
+                            )
+                          )
+                        }
+                        disabled={
+                          currentCharacterPage === totalCharacterPages - 1
+                        }
                         className={`p-2 rounded-full transition-colors ${
                           currentCharacterPage === totalCharacterPages - 1
-                            ? 'bg-black/20 text-white/30 cursor-not-allowed'
-                            : 'bg-black/30 hover:bg-black/50 text-white'
+                            ? "bg-black/20 text-white/30 cursor-not-allowed"
+                            : "bg-black/30 hover:bg-black/50 text-white"
                         }`}
                       >
                         <ChevronRight size={16} />
@@ -515,11 +543,12 @@ const GamePage = () => {
                           <h3 className="text-white font-semibold text-center text-sm mb-1 group-hover:text-[#bb3b3b] transition-colors">
                             {character.name}
                           </h3>
-                          {character.real_name && character.real_name !== character.name && (
-                            <p className="text-white/50 text-xs text-center">
-                              {character.real_name}
-                            </p>
-                          )}
+                          {character.real_name &&
+                            character.real_name !== character.name && (
+                              <p className="text-white/50 text-xs text-center">
+                                {character.real_name}
+                              </p>
+                            )}
                         </div>
                       </Link>
                     ))}
@@ -540,14 +569,17 @@ const GamePage = () => {
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {game.genres.map((genre) => (
-                    <Link href={`/genre/${genre.name.toLowerCase()}`} key={genre.id}>
-                      <span
+                      <Link
+                        href={`/genre/${genre.name.toLowerCase()}`}
                         key={genre.id}
-                        className="bg-[#bb3b3b]/20 text-[#bb3b3b] px-3 py-1 rounded-full text-sm border border-[#bb3b3b]/30"
                       >
-                        {genre.name}
-                      </span>
-                    </Link>
+                        <span
+                          key={genre.id}
+                          className="bg-[#bb3b3b]/20 text-[#bb3b3b] px-3 py-1 rounded-full text-sm border border-[#bb3b3b]/30"
+                        >
+                          {genre.name}
+                        </span>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -558,15 +590,18 @@ const GamePage = () => {
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {game.tags.slice(0, 10).map((tag) => (
-                      <Link href={`/tags/${tag.name.toLowerCase()}`} key={tag.id}>
-                        <span
+                        <Link
+                          href={`/tags/${tag.name.toLowerCase()}`}
                           key={tag.id}
-                          className="bg-black/30 text-white/70 px-3 py-1 rounded-full text-sm border border-white/20"
                         >
-                          <Tag size={12} className="inline mr-1" />
-                          {tag.name}
-                        </span>
-                      </Link>
+                          <span
+                            key={tag.id}
+                            className="bg-black/30 text-white/70 px-3 py-1 rounded-full text-sm border border-white/20"
+                          >
+                            <Tag size={12} className="inline mr-1" />
+                            {tag.name}
+                          </span>
+                        </Link>
                       ))}
                     </div>
                   </div>
@@ -624,17 +659,21 @@ const GamePage = () => {
               </h3>
               <div className="space-y-2">
                 {game.platforms.map((platform) => (
-                <Link href={`/platforms/${platform.platform.id}` } className="flex flex-col gap-2" key={platform.platform.id}>
-                  <div
+                  <Link
+                    href={`/platforms/${platform.platform.id}`}
+                    className="flex flex-col gap-2"
                     key={platform.platform.id}
-                    className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors"
                   >
-                    {getPlatformIcon(platform.platform.name)}
-                    <span className="text-white/70">
-                      {platform.platform.name}
-                    </span>
-                  </div>
-                </Link>
+                    <div
+                      key={platform.platform.id}
+                      className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors"
+                    >
+                      {getPlatformIcon(platform.platform.name)}
+                      <span className="text-white/70">
+                        {platform.platform.name}
+                      </span>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </div>

@@ -78,14 +78,16 @@ const CharacterPage = () => {
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  type CharacterResponse = {
+    character: Character | null;
+  };
+  
   useEffect(() => {
     const fetchCharacterDetails = async () => {
       try {
         setLoading(true);
         const { characterApi } = await import("@/lib/api-client");
-        const response = await characterApi.getCharacterDetails(characterId);
-
+        const response = await characterApi.getCharacterDetails(characterId) as CharacterResponse;
         if (response.character) {
           setCharacter(response.character);
         } else {
