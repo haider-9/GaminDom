@@ -572,7 +572,7 @@ const GamePage = () => {
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {game.tags.slice(0, 10).map((tag) => (
-                      <Link href={`/tag/${tag.name.toLowerCase()}`} key={tag.id}>
+                      <Link href={`/tags/${tag.name.toLowerCase()}`} key={tag.id}>
                         <span
                           key={tag.id}
                           className="bg-black/30 text-white/70 px-3 py-1 rounded-full text-sm border border-white/20"
