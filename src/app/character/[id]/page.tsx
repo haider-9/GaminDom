@@ -144,7 +144,7 @@ const CharacterPage = () => {
           </p>
           <button
             onClick={() => router.back()}
-            className="bg-[#bb3b3b] hover:bg-[#bb3b3b]/80 text-white px-6 py-3 rounded-3xl transition-colors"
+            className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white px-6 py-3 rounded-3xl transition-colors"
           >
             Go Back
           </button>
@@ -214,7 +214,7 @@ const CharacterPage = () => {
                   className="object-contain lg:object-cover rounded-3xl object-center lg:object-top max-w-fit lg:max-w-full mx-auto drop-shadow-2xl lg:drop-shadow-none drop-shadow-red-500/20 border-2 lg:border-none border-red-500/20"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-[#4b2323] to-[#bb3b3b]/60 flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-[var(--color-background-secondary)] to-[var(--color-primary-light)] flex items-center justify-center">
                   <User size={80} className="text-white" />
                 </div>
               )}

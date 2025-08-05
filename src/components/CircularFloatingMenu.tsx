@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Gamepad2,
   Settings,
@@ -26,6 +26,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
 
 const CircularFloatingMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -106,38 +107,53 @@ const CircularFloatingMenu = () => {
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (isOpen) {
+      if (isOpen && !isMobile) {
         e.preventDefault();
         setRotation(prev => prev + e.deltaY * 0.8);
       }
     };
-    if (isOpen) {
+    if (isOpen && !isMobile) {
       document.addEventListener("wheel", handleWheel, { passive: false });
       return () => document.removeEventListener("wheel", handleWheel);
     }
-  }, [isOpen]);
+  }, [isOpen, isMobile]);
 
   const activeIndex = menuItems.findIndex(item => item.route === pathname);
   const handleDrag = useCallback((_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    setIsDragging(true);
-    setRotation(prev => prev + info.delta.x * 0.8);
-  }, []);
+    if (!isMobile) {
+      setIsDragging(true);
+      setRotation(prev => prev + info.delta.x * 0.8);
+    }
+  }, [isMobile]);
   const handleDragEnd = useCallback(() => setIsDragging(false), []);
   const resetRotation = useCallback(() => setRotation(0), []);
 
+  const router = useRouter();
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      // Open menu with 'M' key on desktop
+      if (!isOpen && e.key.toLowerCase() === 'm' && !isMobile) {
+        setIsOpen(true);
+        return;
+      }
+
       if (!isOpen) return;
+
       const key = e.key.toLowerCase();
       const item = menuItems.find(i => i.shortcut.toLowerCase() === key);
-      if (item) window.location.href = item.route;
+      if (item) router.push(item.route);
       if (e.key === "Escape") setIsOpen(false);
-      if (e.key === "ArrowLeft") setRotation(r => r - 45);
-      if (e.key === "ArrowRight") setRotation(r => r + 45);
+
+      // Only allow rotation on desktop
+      if (!isMobile) {
+        if (e.key === "ArrowLeft") setRotation(r => r - 45);
+        if (e.key === "ArrowRight") setRotation(r => r + 45);
+      }
     };
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [isOpen]);
+  }, [isOpen, isMobile]);
 
   const radius = isMobile ? 90 : 140;
   const centerSize = isMobile ? 220 : 340;
@@ -168,8 +184,11 @@ const CircularFloatingMenu = () => {
       >
         <motion.button
           onClick={() => setIsOpen(p => !p)}
-          className="absolute w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-600 border-2 border-white/20 text-white flex items-center justify-center shadow-2xl z-[999]"
-          style={{ left: isOpen ? centerSize / 2 - 32 : 0, top: isOpen ? centerSize / 2 - 32 : 0 }}
+          className="absolute w-14 h-14 rounded-full border-2 border-white/20 text-white flex items-center justify-center shadow-2xl z-[999]"
+          style={{
+            background: `linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))`,
+            left: isOpen ? centerSize / 2 - 32 : 0, top: isOpen ? centerSize / 2 - 32 : 0
+          }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
@@ -178,104 +197,104 @@ const CircularFloatingMenu = () => {
         </motion.button>
 
         <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className="absolute inset-0"
-            drag
-            onDrag={handleDrag}
-            onDragEnd={handleDragEnd}
-            dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-            dragElastic={0}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1, rotate: rotation }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.5 }}
-          >
-            <TooltipProvider delayDuration={100}>
-              {menuItems.map((item, index) => {
-                const angle = (index * 2 * Math.PI) / menuItems.length - Math.PI / 2;
-                const x = centerSize / 2 + radius * Math.cos(angle);
-                const y = centerSize / 2 + radius * Math.sin(angle);
-                const isActive = activeIndex === index;
-                const [bg, text, border, bgOpacity, borderOpacity] = item.classes.split(" ");
-                const tooltipSide = x > centerSize / 2 ? "left" : "right";
+          {isOpen && (
+            <motion.div
+              className="absolute inset-0"
+              drag={!isMobile}
+              onDrag={handleDrag}
+              onDragEnd={handleDragEnd}
+              dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+              dragElastic={0}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1, rotate: isMobile ? 0 : rotation }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.5 }}
+            >
+              <TooltipProvider delayDuration={100}>
+                {menuItems.map((item, index) => {
+                  const angle = (index * 2 * Math.PI) / menuItems.length - Math.PI / 2;
+                  const x = centerSize / 2 + radius * Math.cos(angle);
+                  const y = centerSize / 2 + radius * Math.sin(angle);
+                  const isActive = activeIndex === index;
+                  const [bg, text, bgOpacity] = item.classes.split(" ");
+                  const tooltipSide = x > centerSize / 2 ? "left" : "right";
 
-                return (
-                  <motion.div
-                    key={item.route}
-                    className="absolute"
-                    style={{ left: x - 28, top: y - 28 }}
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: isActive ? 1.1 : 1 }}
-                    exit={{ opacity: 0, scale: 0 }}
-                    whileHover={{ scale: 1.2 }}
-                  >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Link href={item.route} onClick={() => setIsOpen(false)}>
-                          <div className={cn(
-                            "w-14 h-14 rounded-2xl flex items-center justify-center border-2 shadow-md text-white relative",
-                            bg,
-                            "border-white/30 hover:border-white"
-                          )}>
-                            <motion.div
-                              animate={{ rotate: -rotation }}
-                              transition={{ duration: 0.3 }}
-                              className={cn(
-                                "drop-shadow-sm filter brightness-110",
-                                text
-                              )}
-                            >
-                              {item.icon}
-                            </motion.div>
-                            <motion.div
-                              className="hidden md:flex absolute -top-1 -right-1 w-5 h-5 bg-black/80 backdrop-blur-sm border border-white/30 rounded-full items-center justify-center"
-                              animate={{ rotate: -rotation }}
-                              transition={{ duration: 0.3 }}
-                            >
-                              <span className="text-[10px] font-mono font-semibold text-white/90">
-                                {item.shortcut}
-                              </span>
-                            </motion.div>
-                          </div>
-                        </Link>
-                      </TooltipTrigger>
-                      {!isMobile && (
-                        <TooltipContent
-                          side={tooltipSide}
-                          sideOffset={8}
-                          className={cn(
-                            "relative px-3 py-2 text-sm font-medium rounded-lg shadow-md",
-                            bgOpacity,
-                            "text-white border-none",
-                            "data-[side=left]:-translate-x-1",
-                            "data-[side=right]:translate-x-1"
-                          )}
-                        >
-                          
-                          <div className="flex flex-col gap-1 items-start">
-                            <div>{item.label}</div>
-                            <div className="flex items-center gap-1 text-xs text-white/80">
-                              <span>Press</span>
-                              <span className={cn(
-                                "px-1.5 py-0.5 rounded font-mono font-bold",
-                                `${bg}/50`,
-                                "text-white"
-                              )}>
-                                {item.shortcut}
-                              </span>
+                  return (
+                    <motion.div
+                      key={item.route}
+                      className="absolute"
+                      style={{ left: x - 28, top: y - 28 }}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: isActive ? 1.1 : 1 }}
+                      exit={{ opacity: 0, scale: 0 }}
+                      whileHover={{ scale: 1.2 }}
+                    >
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link href={item.route} onClick={() => setIsOpen(false)}>
+                            <div className={cn(
+                              "w-14 h-14 rounded-2xl flex items-center justify-center border-2 shadow-md text-white relative",
+                              bg,
+                              "border-white/30 hover:border-white"
+                            )}>
+                              <motion.div
+                                animate={{ rotate: isMobile ? 0 : -rotation }}
+                                transition={{ duration: 0.3 }}
+                                className={cn(
+                                  "drop-shadow-sm filter brightness-110",
+                                  text
+                                )}
+                              >
+                                {item.icon}
+                              </motion.div>
+                              <motion.div
+                                className="hidden md:flex absolute -top-1 -right-1 w-5 h-5 bg-black/80 backdrop-blur-sm border border-white/30 rounded-full items-center justify-center"
+                                animate={{ rotate: isMobile ? 0 : -rotation }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                <span className="text-[10px] font-mono font-semibold text-white/90">
+                                  {item.shortcut}
+                                </span>
+                              </motion.div>
                             </div>
-                          </div>
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </motion.div>
-                );
-              })}
-            </TooltipProvider>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                          </Link>
+                        </TooltipTrigger>
+                        {!isMobile && (
+                          <TooltipContent
+                            side={tooltipSide}
+                            sideOffset={8}
+                            className={cn(
+                              "relative px-3 py-2 text-sm font-medium rounded-lg shadow-md",
+                              bgOpacity,
+                              "text-white border-none",
+                              "data-[side=left]:-translate-x-1",
+                              "data-[side=right]:translate-x-1"
+                            )}
+                          >
+
+                            <div className="flex flex-col gap-1 items-start">
+                              <div>{item.label}</div>
+                              <div className="flex items-center gap-1 text-xs text-white/80">
+                                <span>Press</span>
+                                <span className={cn(
+                                  "px-1.5 py-0.5 rounded font-mono font-bold",
+                                  `${bg}/50`,
+                                  "text-white"
+                                )}>
+                                  {item.shortcut}
+                                </span>
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </motion.div>
+                  );
+                })}
+              </TooltipProvider>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
 
         {isOpen && (
@@ -307,6 +326,10 @@ const CircularFloatingMenu = () => {
 
               <div className="space-y-2">
                 <div className="hidden md:block space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-white/70">Open menu</span>
+                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded">M</span>
+                  </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/70">Drag to rotate</span>
                     <span className="text-white/50 font-mono bg-white/10 px-2 py-0.5 rounded">Mouse</span>
@@ -343,27 +366,29 @@ const CircularFloatingMenu = () => {
 
               <div className="border-t border-white/10" />
 
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-white/60 text-xs">Rotation:</span>
-                  <span className="font-mono text-white/90 text-sm font-medium bg-white/10 px-2 py-1 rounded">
-                    {Math.round(rotation % 360)}°
-                  </span>
+              {!isMobile && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-white/60 text-xs">Rotation:</span>
+                    <span className="font-mono text-white/90 text-sm font-medium bg-white/10 px-2 py-1 rounded">
+                      {Math.round(rotation % 360)}°
+                    </span>
+                  </div>
+                  <button
+                    onClick={resetRotation}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                      rotation === 0
+                        ? "bg-white/5 text-white/30 cursor-not-allowed"
+                        : "bg-white/10 text-white/80 hover:text-white hover:bg-emerald-500/20"
+                    )}
+                    disabled={rotation === 0}
+                  >
+                    <RotateCcw size={12} />
+                    <span>Reset</span>
+                  </button>
                 </div>
-                <button
-                  onClick={resetRotation}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-                    rotation === 0
-                      ? "bg-white/5 text-white/30 cursor-not-allowed"
-                      : "bg-white/10 text-white/80 hover:text-white hover:bg-emerald-500/20"
-                  )}
-                  disabled={rotation === 0}
-                >
-                  <RotateCcw size={12} />
-                  <span>Reset</span>
-                </button>
-              </div>
+              )}
             </div>
           </motion.div>
         )}
