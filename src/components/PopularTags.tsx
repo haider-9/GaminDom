@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Hash, TrendingUp } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Tag {
   id: number;
@@ -57,75 +58,142 @@ const PopularTags = () => {
 
   if (loading) {
     return (
-      <div className="w-full max-w-6xl mx-auto px-4 py-8">
-        <div className="h-8 bg-black/50 rounded-3xl w-64 animate-pulse mb-6"></div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-6xl mx-auto px-4 py-8"
+      >
+        <motion.div 
+          className="h-8 bg-surface rounded-3xl w-64 mb-6"
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
         <div className="flex flex-wrap gap-3">
           {[...Array(12)].map((_, i) => (
-            <div
+            <motion.div
               key={i}
-              className="h-10 bg-black/50 rounded-full w-24 animate-pulse"
-            ></div>
+              className="h-10 bg-surface rounded-full w-24"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.05 }}
+            />
           ))}
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+    <motion.div 
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="w-full max-w-6xl mx-auto px-4 py-8"
+    >
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="flex items-center justify-between mb-6"
+      >
         <div className="flex items-center gap-3">
-          <Hash className="text-blue-500" size={32} />
-          <h2 className="text-3xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 300, delay: 0.3 }}
+          >
+            <Hash className="text-blue-500" size={32} />
+          </motion.div>
+          <motion.h2 
+            className="text-3xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
             Popular Tags
-          </h2>
+          </motion.h2>
         </div>
-        <button
+        <motion.button
           onClick={() => router.push("/tags")}
           className="text-blue-500 hover:text-blue-400 transition-colors text-lg font-semibold"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
         >
           See All Tags
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       <div className="flex flex-wrap gap-3">
-        {tags.map((tag, index) => (
-          <button
-            key={tag.id}
-            onClick={() => router.push(`/tags/${tag.slug}`)}
-            className={`group relative px-6 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r text-sm ${getTagColor(
-              index
-            )}`}
-          >
-            {/* Background Animation */}
-            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <AnimatePresence>
+          {tags.map((tag, index) => (
+            <motion.button
+              key={tag.id}
+              onClick={() => router.push(`/tags/${tag.slug}`)}
+              className={`group relative px-6 py-3 rounded-full text-white font-semibold bg-gradient-to-r text-sm ${getTagColor(
+                index
+              )}`}
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ 
+                duration: 0.5, 
+                delay: index * 0.05,
+                type: "spring",
+                stiffness: 300
+              }}
+              whileHover={{ 
+                scale: 1.05, 
+                y: -2,
+                transition: { duration: 0.2 }
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+        
 
             {/* Content */}
-            <div className="relative z-10 flex items-center gap-2">
-              <Hash className="w-4 h-4" />
+            <motion.div 
+              className="relative z-10 flex items-center gap-2"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 + index * 0.05 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.2, rotate: 10 }}
+              >
+                <Hash className="w-4 h-4" />
+              </motion.div>
               <span>{tag.name}</span>
-              <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
+              <motion.span 
+                className="text-xs bg-white/20 px-2 py-1 rounded-full"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 300, delay: 0.3 + index * 0.05 }}
+              >
                 {(tag.games_count / 1000).toFixed(0)}k
-              </span>
-            </div>
+              </motion.span>
+            </motion.div>
 
             {/* Trending indicator for top 3 tags */}
             {index < 3 && (
-              <div className="absolute -top-1 -right-1 bg-orange-500 text-white p-1 rounded-full">
+              <motion.div 
+                className="absolute -top-1 -right-1 bg-orange-500 text-white p-1 rounded-full"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 300, delay: 0.4 + index * 0.05 }}
+                whileHover={{ scale: 1.2, rotate: 10 }}
+              >
                 <TrendingUp className="w-3 h-3" />
-              </div>
+              </motion.div>
             )}
-          </button>
-        ))}
+          </motion.button>
+          ))}
+        </AnimatePresence>
       </div>
 
       {/* Quick Stats */}
       <div className="mt-6 text-center">
-        <p className="text-white/70">
+        <p className="text-secondary">
           Discover games through thousands of community tags
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

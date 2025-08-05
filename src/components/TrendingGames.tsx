@@ -48,11 +48,11 @@ const TrendingGames = () => {
 
   if (loading) {
     return (
-      <div className="w-full max-w-6xl mx-auto px-4 py-8">
-        <div className="h-8 bg-black/50 rounded-3xl w-64 animate-pulse mb-6"></div>
+      <div className="w-full mx-auto px-4 py-8">
+        <div className="h-8 bg-surface rounded-3xl w-64 animate-pulse mb-6"></div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-64 bg-black/50 rounded-3xl animate-pulse"></div>
+            <div key={i} className="h-64 bg-surface rounded-3xl animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -64,7 +64,7 @@ const TrendingGames = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <TrendingUp className="text-orange-500" size={32} />
-          <h2 className="text-3xl font-bold text-white">Trending Now</h2>
+          <h2 className="text-3xl font-bold text-primary">Trending Now</h2>
         </div>
         <button
           onClick={() => router.push('/trending')}
@@ -79,7 +79,7 @@ const TrendingGames = () => {
           <div
             key={game.id}
             onClick={() => router.push(`/game/${game.id}`)}
-            className="relative group cursor-pointer rounded-3xl overflow-hidden bg-black/20 transition-all duration-300"
+            className="relative group cursor-pointer rounded-3xl overflow-hidden bg-surface transition-all duration-300"
           >
             {/* Trending Badge */}
             <div className="absolute top-4 left-4 z-20 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">

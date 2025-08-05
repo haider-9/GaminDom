@@ -4,6 +4,8 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Header from "@/components/Header";
 import CircularFloatingMenu from "@/components/CircularFloatingMenu";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+
 
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -24,10 +26,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${orbitron.variable} font-Orbitron`}>
-        <Toaster />
-        <Header />
-        <CircularFloatingMenu />
-        {children}
+        <ThemeProvider>
+          <Toaster />
+          <Header />
+          <CircularFloatingMenu />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

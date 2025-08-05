@@ -111,19 +111,19 @@ const CharacterPage = () => {
       <div className="min-h-screen p-6">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-black/50 rounded-3xl w-32 mb-6"></div>
-            <div className="h-96 bg-black/50 rounded-3xl mb-8"></div>
+            <div className="h-8 bg-surface rounded-3xl w-32 mb-6"></div>
+            <div className="h-96 bg-surface rounded-3xl mb-8"></div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
-                <div className="h-8 bg-black/50 rounded-3xl w-3/4"></div>
+                <div className="h-8 bg-surface rounded-3xl w-3/4"></div>
                 <div className="space-y-3">
-                  <div className="h-4 bg-black/50 rounded-3xl"></div>
-                  <div className="h-4 bg-black/50 rounded-3xl w-5/6"></div>
-                  <div className="h-4 bg-black/50 rounded-3xl w-4/6"></div>
+                  <div className="h-4 bg-surface rounded-3xl"></div>
+                  <div className="h-4 bg-surface rounded-3xl w-5/6"></div>
+                  <div className="h-4 bg-surface rounded-3xl w-4/6"></div>
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="h-64 bg-black/50 rounded-3xl"></div>
+                <div className="h-64 bg-surface rounded-3xl"></div>
               </div>
             </div>
           </div>
@@ -135,16 +135,16 @@ const CharacterPage = () => {
   if (error || !character) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-black/50 rounded-3xl p-8 text-center max-w-md">
-          <h1 className="text-2xl font-bold text-white mb-4">
+        <div className="bg-surface rounded-3xl p-8 text-center max-w-md">
+          <h1 className="text-2xl font-bold text-primary mb-4">
             Character Not Found
           </h1>
-          <p className="text-white/70 mb-6">
+          <p className="text-secondary mb-6">
             {error || "The requested character could not be found."}
           </p>
           <button
             onClick={() => router.back()}
-            className="bg-[#bb3b3b] hover:bg-[#bb3b3b]/80 text-white px-6 py-3 rounded-3xl transition-colors"
+            className="accent-bg hover:accent-bg-hover text-white px-6 py-3 rounded-3xl transition-colors"
           >
             Go Back
           </button>
@@ -181,20 +181,20 @@ const CharacterPage = () => {
     <div className="min-h-screen p-6">
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-6">
-        <div className="bg-black/50 rounded-3xl px-6 py-4 flex items-center justify-between">
+        <div className="bg-surface rounded-3xl px-6 py-4 flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-white hover:text-white/80 transition-colors"
+            className="flex items-center gap-2 text-primary hover:text-secondary transition-colors"
           >
             <ArrowLeft size={20} />
             Back
           </button>
           <div className="flex items-center gap-4">
-            <button className="p-2 bg-black/30 hover:bg-red-500/70 rounded-full transition-colors">
-              <Heart size={20} className="text-white" />
+            <button className="p-2 bg-surface hover:bg-red-500/70 rounded-full transition-colors">
+              <Heart size={20} className="text-primary" />
             </button>
-            <button className="p-2 bg-black/30 hover:bg-blue-500/70 rounded-full transition-colors">
-              <Share2 size={20} className="text-white" />
+            <button className="p-2 bg-surface hover:bg-blue-500/70 rounded-full transition-colors">
+              <Share2 size={20} className="text-primary" />
             </button>
           </div>
         </div>
@@ -202,39 +202,39 @@ const CharacterPage = () => {
 
       <div className="max-w-7xl mx-auto">
         {/* Hero Card */}
-        <div className="bg-black/50 rounded-3xl p-6 mb-8">
+        <div className="bg-surface rounded-3xl p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Character Image */}
-            <div className="w-full lg:w-80 h-80 rounded-3xl relative">
+            <div className="w-full lg:w-80 h-80 rounded-3xl relative overflow-hidden">
               {character.image?.super_url ? (
                 <Image
                   src={character.image.super_url}
                   alt={character.name}
                   fill
-                  className="object-contain lg:object-cover rounded-3xl object-center lg:object-top max-w-fit lg:max-w-full mx-auto drop-shadow-2xl lg:drop-shadow-none drop-shadow-red-500/20 border-2 lg:border-none border-red-500/20"
+                  className="object-cover rounded-3xl"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-[#4b2323] to-[#bb3b3b]/60 flex items-center justify-center">
-                  <User size={80} className="text-white" />
+                <div className="w-full h-full bg-gradient-to-br from-[var(--color-background-secondary)] to-[var(--color-primary-light)] flex items-center justify-center">
+                  <User size={80} className="text-primary" />
                 </div>
               )}
             </div>
 
             {/* Character Info */}
             <div className="flex-1">
-              <h1 className="text-4xl font-bold text-white mb-4">
+              <h1 className="text-4xl font-bold text-primary mb-4">
                 {character.name}
               </h1>
 
               {character.real_name &&
                 character.real_name !== character.name && (
-                  <p className="text-xl text-white/70 mb-4">
+                  <p className="text-xl text-secondary mb-4">
                     Real Name: {character.real_name}
                   </p>
                 )}
 
               {character.deck && (
-                <p className="text-white/80 text-lg leading-relaxed mb-6">
+                <p className="text-secondary text-lg leading-relaxed mb-6">
                   {character.deck}
                 </p>
               )}
@@ -242,28 +242,28 @@ const CharacterPage = () => {
               {/* Character Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {character.birthday && (
-                  <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-2xl">
+                  <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-2xl">
                     <Calendar size={16} className="text-blue-400" />
-                    <span className="text-white/70">Born:</span>
-                    <span className="text-white">
+                    <span className="text-secondary">Born:</span>
+                    <span className="text-primary">
                       {formatDate(character.birthday)}
                     </span>
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-2xl">
+                <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-2xl">
                   <User size={16} className="text-green-400" />
-                  <span className="text-white/70">Gender:</span>
-                  <span className="text-white">
+                  <span className="text-secondary">Gender:</span>
+                  <span className="text-primary">
                     {getGenderText(character.gender)}
                   </span>
                 </div>
 
                 {character.aliases && (
-                  <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-2xl md:col-span-2">
+                  <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-2xl md:col-span-2">
                     <Tag size={16} className="text-purple-400" />
-                    <span className="text-white/70">Aliases:</span>
-                    <span className="text-white">{character.aliases}</span>
+                    <span className="text-secondary">Aliases:</span>
+                    <span className="text-primary">{character.aliases}</span>
                   </div>
                 )}
               </div>
@@ -276,12 +276,12 @@ const CharacterPage = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Description */}
             {character.description && (
-              <div className="bg-black/50 rounded-3xl p-6">
-                <h2 className="text-2xl font-bold text-white mb-4">
+              <div className="bg-surface rounded-3xl p-6">
+                <h2 className="text-2xl font-bold text-primary mb-4">
                   Biography
                 </h2>
                 <div
-                  className="text-white/70 leading-relaxed prose prose-invert max-w-none prose-rose prose-h2:text-rose-400 prose-li:mb-8"
+                  className="text-secondary leading-relaxed prose prose-invert max-w-none prose-rose prose-h2:text-rose-400 prose-li:mb-8"
                   dangerouslySetInnerHTML={{ __html: character.description }}
                 />
               </div>
@@ -289,8 +289,8 @@ const CharacterPage = () => {
 
             {/* Games */}
             {character.games && character.games.length > 0 && (
-              <div className="bg-black/50 rounded-3xl p-6">
-                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <div className="bg-surface rounded-3xl p-6">
+                <h2 className="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
                   <Gamepad2 size={24} />
                   Appears In Games
                 </h2>
@@ -299,9 +299,9 @@ const CharacterPage = () => {
                     <Link
                       href={`/search/${game.name}`}
                       key={game.id}
-                      className="bg-black/30 rounded-2xl p-4 hover:bg-black/40 transition-colors"
+                      className="bg-surface rounded-2xl p-4 hover:bg-surface-hover transition-colors"
                     >
-                      <h3 className="text-white font-semibold mb-2">
+                      <h3 className="text-primary font-semibold mb-2">
                         {game.name}
                       </h3>
                     </Link>
@@ -312,8 +312,8 @@ const CharacterPage = () => {
 
             {/* Concepts */}
             {character.concepts && character.concepts.length > 0 && (
-              <div className="bg-black/50 rounded-3xl p-6">
-                <h2 className="text-2xl font-bold text-white mb-4">
+              <div className="bg-surface rounded-3xl p-6">
+                <h2 className="text-2xl font-bold text-primary mb-4">
                   Related Concepts
                 </h2>
                 <div className="flex flex-wrap gap-2">
@@ -322,7 +322,7 @@ const CharacterPage = () => {
                       key={concept.id}
                       href={`/tags/${concept.name}`}
                       rel="noopener noreferrer"
-                      className="bg-black/30 text-white/70 px-3 py-1 rounded-full text-sm border border-white/20 hover:bg-black/40 hover:text-white transition-colors inline-flex items-center gap-1"
+                      className="bg-surface text-secondary px-3 py-1 rounded-full text-sm border border-primary hover:bg-surface-hover hover:text-primary transition-colors inline-flex items-center gap-1"
                     >
                       <Hash className="w-4 h-4" />
                       {concept.name}
@@ -338,8 +338,8 @@ const CharacterPage = () => {
             {/* Relationships */}
             {((character.friends && character.friends.length > 0) ||
               (character.enemies && character.enemies.length > 0)) && (
-                <div className="bg-black/50 rounded-3xl p-6">
-                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <div className="bg-surface rounded-3xl p-6">
+                  <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
                     <Users size={20} />
                     Relationships
                   </h3>
@@ -354,9 +354,9 @@ const CharacterPage = () => {
                             <Link
                               key={friend.id}
                               href={`/character/${friend.id}`}
-                              className="block bg-black/30 rounded-2xl p-3 hover:bg-black/40 transition-colors"
+                              className="block bg-surface rounded-2xl p-3 hover:bg-surface-hover transition-colors"
                             >
-                              <span className="text-white/70 hover:text-white">
+                              <span className="text-secondary hover:text-primary">
                                 {friend.name}
                               </span>
                             </Link>
@@ -375,9 +375,9 @@ const CharacterPage = () => {
                             <Link
                               key={enemy.id}
                               href={`/character/${enemy.id}`}
-                              className="block bg-black/30 rounded-2xl p-3 hover:bg-black/40 transition-colors"
+                              className="block bg-surface rounded-2xl p-3 hover:bg-surface-hover transition-colors"
                             >
-                              <span className="text-white/70 hover:text-white">
+                              <span className="text-secondary hover:text-primary">
                                 {enemy.name}
                               </span>
                             </Link>
@@ -391,8 +391,8 @@ const CharacterPage = () => {
 
             {/* Locations */}
             {character.locations && character.locations.length > 0 && (
-              <div className="bg-black/50 rounded-3xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <div className="bg-surface rounded-3xl p-6">
+                <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
                   <MapPin size={20} />
                   Locations
                 </h3>
@@ -403,15 +403,15 @@ const CharacterPage = () => {
                       href={location.site_detail_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors group"
+                      className="flex items-center gap-3 p-3 bg-surface rounded-2xl hover:bg-surface-hover transition-colors group"
                     >
                       <MapPin size={16} className="text-blue-400" />
-                      <span className="text-white/70 group-hover:text-white">
+                      <span className="text-secondary group-hover:text-primary">
                         {location.name}
                       </span>
                       <ExternalLink
                         size={14}
-                        className="text-white/50 ml-auto"
+                        className="text-muted ml-auto"
                       />
                     </a>
                   ))}
@@ -420,20 +420,20 @@ const CharacterPage = () => {
             )}
 
             {/* External Links */}
-            <div className="bg-black/50 rounded-3xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4">Links</h3>
+            <div className="bg-surface rounded-3xl p-6">
+              <h3 className="text-xl font-bold text-primary mb-4">Links</h3>
               <div className="space-y-2">
                 <a
                   href={character.site_detail_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors group"
+                  className="flex items-center gap-3 p-3 bg-surface rounded-2xl hover:bg-surface-hover transition-colors group"
                 >
                   <Globe size={16} className="text-blue-400" />
-                  <span className="text-white/70 group-hover:text-white">
+                  <span className="text-secondary group-hover:text-primary">
                     GiantBomb Page
                   </span>
-                  <ExternalLink size={14} className="text-white/50 ml-auto" />
+                  <ExternalLink size={14} className="text-muted ml-auto" />
                 </a>
               </div>
             </div>

@@ -446,13 +446,13 @@ const GamePage = () => {
 
             {/* Characters */}
             {(characters.length > 0 || charactersLoading) && (
-              <div className="bg-black/50 rounded-3xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                    <User size={24} />
-                    Characters
+              <div className="bg-surface rounded-3xl p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-4">
+                  <h2 className="text-xl sm:text-2xl font-bold text-primary flex items-center gap-2">
+                    <User size={20} className="sm:w-6 sm:h-6" />
+                    <span className="truncate">Characters</span>
                     {characters.length > 0 && (
-                      <span className="text-sm text-white/50 font-normal">
+                      <span className="text-xs sm:text-sm text-secondary font-normal whitespace-nowrap">
                         ({characters.length} total)
                       </span>
                     )}
@@ -460,7 +460,7 @@ const GamePage = () => {
 
                   {/* Pagination Controls */}
                   {characters.length > charactersPerPage && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2">
                       <button
                         onClick={() =>
                           setCurrentCharacterPage(
@@ -468,16 +468,16 @@ const GamePage = () => {
                           )
                         }
                         disabled={currentCharacterPage === 0}
-                        className={`p-2 rounded-full transition-colors ${
+                        className={`p-1.5 sm:p-2 rounded-full transition-colors ${
                           currentCharacterPage === 0
-                            ? "bg-black/20 text-white/30 cursor-not-allowed"
-                            : "bg-black/30 hover:bg-black/50 text-white"
+                            ? "bg-surface text-muted cursor-not-allowed"
+                            : "bg-surface hover:bg-surface-hover text-primary"
                         }`}
                       >
-                        <ChevronLeft size={16} />
+                        <ChevronLeft size={14} className="sm:w-4 sm:h-4" />
                       </button>
 
-                      <span className="text-white/70 text-sm px-3 py-1 bg-black/30 rounded-full">
+                      <span className="text-secondary text-xs sm:text-sm px-2 sm:px-3 py-1 bg-surface rounded-full whitespace-nowrap">
                         {currentCharacterPage + 1} / {totalCharacterPages}
                       </span>
 
@@ -493,10 +493,10 @@ const GamePage = () => {
                         disabled={
                           currentCharacterPage === totalCharacterPages - 1
                         }
-                        className={`p-2 rounded-full transition-colors ${
+                        className={`p-1.5 sm:p-2 rounded-full transition-colors ${
                           currentCharacterPage === totalCharacterPages - 1
-                            ? "bg-black/20 text-white/30 cursor-not-allowed"
-                            : "bg-black/30 hover:bg-black/50 text-white"
+                            ? "bg-surface text-muted cursor-not-allowed"
+                            : "bg-surface hover:bg-surface-hover text-primary"
                         }`}
                       >
                         <ChevronRight size={16} />
@@ -506,27 +506,27 @@ const GamePage = () => {
                 </div>
 
                 {charactersLoading ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
                     {[...Array(6)].map((_, i) => (
                       <div key={i} className="animate-pulse">
-                        <div className="bg-black/30 rounded-2xl p-4">
-                          <div className="w-16 h-16 bg-black/50 rounded-full mx-auto mb-3"></div>
-                          <div className="h-4 bg-black/50 rounded w-3/4 mx-auto mb-2"></div>
-                          <div className="h-3 bg-black/50 rounded w-1/2 mx-auto"></div>
+                        <div className="bg-surface rounded-2xl p-3 sm:p-4">
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-surface rounded-full mx-auto mb-3"></div>
+                          <div className="h-3 sm:h-4 bg-surface rounded w-3/4 mx-auto mb-2"></div>
+                          <div className="h-2 sm:h-3 bg-surface rounded w-1/2 mx-auto"></div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
                     {currentCharacters.map((character) => (
                       <Link
                         key={character.id}
                         href={`/character/${character.id}`}
                         className="group"
                       >
-                        <div className="bg-black/30 rounded-2xl p-4 hover:bg-black/40 transition-colors">
-                          <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
+                        <div className="bg-surface rounded-2xl p-3 sm:p-4 hover:bg-surface-hover transition-colors">
+                          <div className="relative w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 rounded-full overflow-hidden">
                             {character.image?.thumb_url ? (
                               <Image
                                 src={character.image.thumb_url}
@@ -535,17 +535,17 @@ const GamePage = () => {
                                 className="object-cover"
                               />
                             ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-[#bb3b3b] to-[#bb3b3b]/60 flex items-center justify-center">
-                                <User size={24} className="text-white" />
+                              <div className="w-full h-full accent-bg flex items-center justify-center">
+                                <User size={16} className="sm:w-6 sm:h-6 text-white" />
                               </div>
                             )}
                           </div>
-                          <h3 className="text-white font-semibold text-center text-sm mb-1 group-hover:text-[#bb3b3b] transition-colors">
+                          <h3 className="text-primary font-semibold text-center text-xs sm:text-sm mb-1 group-hover:accent-primary transition-colors line-clamp-2">
                             {character.name}
                           </h3>
                           {character.real_name &&
                             character.real_name !== character.name && (
-                              <p className="text-white/50 text-xs text-center">
+                              <p className="text-secondary text-xs text-center line-clamp-1">
                                 {character.real_name}
                               </p>
                             )}

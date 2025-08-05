@@ -60,15 +60,15 @@ export const GAMES_DATA = [
     name: "Project:Playtime",
     description:
       "A multiplayer horror game where players must work together to survive against a monster.",
-    image: "/assets/Project Playtime.png",
+    image: "/assets/Project-Playtime.png",
     bgColor: "bg-yellow-500/50",
     platforms: ["steam"],
     isPopular: false,
     reviews: 100,
   },
   {
-    id:8,
-    name:'Street Fighters',
+    id: 8,
+    name: 'Street Fighters',
     description:
       "A fighting game franchise known for its competitive gameplay and iconic characters.",
     image: "/assets/street fighters.png",
@@ -76,8 +76,8 @@ export const GAMES_DATA = [
     platforms: ["steam"],
     isPopular: true,
     reviews: 120,
-    },
-    {
+  },
+  {
     id: 9,
     name: "Marvel Heroes",
     description:
@@ -87,9 +87,30 @@ export const GAMES_DATA = [
     platforms: ["steam"],
     isPopular: true,
     reviews: 110,
-
-    }
-
+  },
+  {
+    id: 10,
+    name: "Apex Legends",
+    description:
+      "Apex Legends is a 2019 battle royale-hero shooter video game developed by Respawn Entertainment and published by Electronic Arts, set in the same science fiction universe as Respawn's Titanfall series",
+    image: "/assets/Apex-Legends.png",
+    bgColor: "bg-slate-600/50",
+    platforms: ["steam"],
+    isPopular: true,
+    reviews: 134,
+  },
+  {
+    id: 11,
+    name: "Genshin Impact",
+    description:
+      "An open-world action RPG by HoYoverse, featuring elemental combat, character switching, and a vast fantasy world called Teyvat.",
+    image: "/assets/GenshinImpact.png",
+    bgColor: "bg-sky-500/50",
+    platforms: ["epic", "hoyolab"],
+    isPopular: true,
+    reviews: 185,
+  }
+  
 ];
 
 // Platform icons mapping

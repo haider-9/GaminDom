@@ -64,7 +64,7 @@ const PlayerStats = () => {
               cy="50"
               r="40"
               fill="none"
-              stroke="rgba(255,255,255,0.1)"
+              stroke="var(--color-border)"
               strokeWidth="3"
             />
             <motion.circle
@@ -94,10 +94,10 @@ const PlayerStats = () => {
               transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
               className="text-center"
             >
-              <div className="text-2xl font-bold text-white mb-1">
+              <div className="text-2xl font-bold text-primary mb-1">
                 {playerData.level}
               </div>
-              <div className="text-xs text-white/60">Level</div>
+              <div className="text-xs text-secondary">Level</div>
             </motion.div>
           </div>
 
@@ -210,7 +210,7 @@ const PlayerStats = () => {
           </motion.div>
         </div>
 
-        <div className="bg-gradient-to-r from-[#bb3b3b] to-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 w-fit mx-auto">
+        <div className="accent-bg text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 w-fit mx-auto">
           <Crown size={14} className="fill-yellow-400 stroke-yellow-400" />
           {playerData.rank}
           <div className="text-xs opacity-80">({playerData.rankProgress}%)</div>
@@ -221,33 +221,33 @@ const PlayerStats = () => {
       <div className="flex gap-2">
         <div className="flex-1 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-xl p-2 text-center">
           <Trophy className="text-blue-400 mx-auto mb-1" size={16} />
-          <div className="text-white text-sm font-bold">
+          <div className="text-primary text-sm font-bold">
             {playerData.gamesWon}
           </div>
-          <div className="text-white/60 text-xs">Won</div>
+          <div className="text-secondary text-xs">Won</div>
         </div>
 
         <div className="flex-1 bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-2 text-center">
           <Target className="text-green-400 mx-auto mb-1" size={16} />
-          <div className="text-white text-sm font-bold">
+          <div className="text-primary text-sm font-bold">
             {playerData.winRate}%
           </div>
-          <div className="text-white/60 text-xs">Win Rate</div>
+          <div className="text-secondary text-xs">Win Rate</div>
         </div>
 
         <div className="flex-1 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-2 text-center">
           <Zap className="text-purple-400 mx-auto mb-1" size={16} />
-          <div className="text-white text-sm font-bold">
+          <div className="text-primary text-sm font-bold">
             {playerData.streak}
           </div>
-          <div className="text-white/60 text-xs">Streak</div>
+          <div className="text-secondary text-xs">Streak</div>
         </div>
       </div>
     </motion.div>
   );
 
   return (
-    <div className="relative w-full max-w-sm bg-gradient-to-br from-black/60 via-black/50 to-black/40 backdrop-blur-sm rounded-2xl p-5 overflow-hidden border border-white/10 shadow-2xl">
+    <div className="relative lg:ml-10 ml-0 max-w-xl w-full backdrop-blur-sm rounded-2xl p-5 overflow-hidden border border-primary shadow-2xl">
       {/* Content */}
       <div className="min-h-[200px]">
         <AnimatePresence mode="wait">
@@ -257,22 +257,22 @@ const PlayerStats = () => {
 
       {/* Enhanced Footer */}
       <div className="mt-4">
-        <div className="bg-gradient-to-r from-white/5 via-white/10 to-white/5 rounded-xl p-3 border border-white/5">
+        <div className="bg-surface rounded-xl p-3 border border-primary">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <motion.div
               >
                 <Star size={12} className="text-yellow-400" />
               </motion.div>
-              <span className="text-white/90 text-xs font-medium">XP Progress</span>
+              <span className="text-primary text-xs font-medium">XP Progress</span>
             </div>
-            <span className="text-white font-semibold text-xs">
+            <span className="text-primary font-semibold text-xs">
               {playerData.xp.toLocaleString()}/{playerData.maxXp.toLocaleString()}
             </span>
           </div>
 
           {/* XP Progress Bar */}
-          <div className="mt-2 w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+          <div className="mt-2 w-full bg-surface rounded-full h-1.5 overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full"
               initial={{ width: 0 }}

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Star, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Game {
   id: number;
@@ -46,82 +47,165 @@ const TopRatedGames = () => {
 
   if (loading) {
     return (
-      <div className="w-full max-w-4xl mx-auto px-4 py-8">
-        <div className="h-8 bg-black/50 rounded-3xl w-64 animate-pulse mb-6"></div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full mx-auto px-4 py-8"
+      >
+        <motion.div 
+          className="h-8 bg-surface rounded-3xl w-64 mb-6"
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
         <div className="space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div
+            <motion.div
               key={i}
-              className="h-24 bg-black/50 rounded-3xl animate-pulse"
-            ></div>
+              className="h-24 bg-surface rounded-3xl"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+            />
           ))}
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="w-full mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+    <motion.div 
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="w-full mx-auto px-4 py-8"
+    >
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="flex items-center justify-between mb-6"
+      >
         <div className="flex items-center gap-3">
-          <Trophy className="text-yellow-500" size={32} />
-          <h2 className="text-3xl font-bold text-white">Top Rated</h2>
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 300, delay: 0.3 }}
+          >
+            <Trophy className="text-yellow-500" size={32} />
+          </motion.div>
+          <motion.h2 
+            className="text-3xl font-bold text-primary"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            Top Rated
+          </motion.h2>
         </div>
-        <button
+        <motion.button
           onClick={() => router.push("/top-rated")}
           className="text-yellow-500 hover:text-yellow-400 transition-colors text-lg font-semibold"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
         >
           See More
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
-      <div className="space-y-4 max-w-4xl mx-auto">
-        {games.map((game, index) => (
-          <div
-            key={game.id}
-            onClick={() => router.push(`/game/${game.id}`)}
-            className="flex items-center gap-4 p-4 bg-black/20 rounded-3xl hover:bg-black/30 transition-all duration-300 cursor-pointer group"
-          >
+      <div className="space-y-4">
+        <AnimatePresence>
+          {games.map((game, index) => (
+            <motion.div
+              key={game.id}
+              onClick={() => router.push(`/game/${game.id}`)}
+              className="flex items-center gap-4 p-4 bg-surface hover:bg-surface-hover rounded-3xl cursor-pointer group"
+              initial={{ opacity: 0, x: -20, scale: 0.95 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ 
+                duration: 0.5, 
+                delay: index * 0.1,
+                type: "spring",
+                stiffness: 300
+              }}
+              whileHover={{ 
+                scale: 1.02, 
+                x: 5,
+                transition: { duration: 0.2 }
+              }}
+              whileTap={{ scale: 0.98 }}
+            >
             {/* Rank */}
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
-              <span className="text-black font-bold text-lg">#{index + 1}</span>
-            </div>
+            <motion.div 
+              className="flex-shrink-0 sm:w-12 sm:h-12 size-7 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 300, delay: 0.2 + index * 0.05 }}
+              whileHover={{ scale: 1.1, rotate: 5 }}
+            >
+              <span className="text-black font-bold">#{index + 1}</span>
+            </motion.div>
 
             {/* Game Image */}
-            <div className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
+            <motion.div 
+              className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0"
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
               <Image
                 src={game.background_image || "/placeholder-game.jpg"}
                 alt={game.name}
                 fill
-                className="object-cover transition-transform duration-300 group-hover:scale-110"
+                className="object-cover"
               />
-            </div>
+            </motion.div>
 
             {/* Game Info */}
-            <div className="flex-1 min-w-0">
-              <h3 className="text-white font-bold text-lg line-clamp-1 mb-1">
+            <motion.div 
+              className="flex-1 min-w-0"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
+            >
+              <motion.h3 
+                className="text-primary font-bold text-lg line-clamp-1 mb-1"
+                whileHover={{ scale: 1.02 }}
+              >
                 {game.name}
-              </h3>
-              <div className="flex items-center gap-4 text-sm text-white/70">
+              </motion.h3>
+              <motion.div 
+                className="flex items-center gap-4 text-sm text-secondary"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.4 + index * 0.05 }}
+              >
                 <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-400" />
+                  <motion.div
+                    whileHover={{ scale: 1.2, rotate: 10 }}
+                  >
+                    <Star className="w-4 h-4 text-yellow-400" />
+                  </motion.div>
                   <span>{game.rating.toFixed(1)}</span>
                 </div>
                 <span>{new Date(game.released).getFullYear()}</span>
                 <span>{game.genres[0]?.name}</span>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Metacritic Score */}
-            <div className="flex-shrink-0 md:block hidden">
+            <motion.div 
+              className="flex-shrink-0 md:block hidden"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, delay: 0.5 + index * 0.05 }}
+              whileHover={{ scale: 1.1 }}
+            >
               <div className="bg-green-500 text-white px-3 py-2 rounded-full font-bold">
                 {game.metacritic}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         ))}
+      </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

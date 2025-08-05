@@ -103,7 +103,7 @@ const GetStartedPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#361518] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)] p-4">
       <div className="w-full max-w-2xl">
         {/* Back Button */}
         <motion.div
@@ -113,7 +113,7 @@ const GetStartedPage = () => {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-[#f0e6e6] hover:text-white transition-colors text-sm"
+            className="inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors text-sm"
           >
             <ArrowLeft size={16} />
             Back to Home
@@ -124,7 +124,7 @@ const GetStartedPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1a0a0a] rounded-3xl shadow-xl overflow-hidden border border-[#3a1a1a]"
+          className="bg-surface rounded-3xl shadow-xl overflow-hidden border border-primary"
         >
           <div className="p-10">
             {/* Logo and Header */}
@@ -132,7 +132,7 @@ const GetStartedPage = () => {
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="w-20 h-20 mx-auto mb-6 bg-[#bb3b3b] rounded-2xl flex items-center justify-center shadow-md"
+                className="w-20 h-20 mx-auto mb-6 accent-bg rounded-2xl flex items-center justify-center shadow-md"
               >
                 <GamepadIcon size={32} className="text-white" />
               </motion.div>
@@ -142,10 +142,10 @@ const GetStartedPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h2 className="text-3xl font-bold text-white mb-2">
+                <h2 className="text-3xl font-bold text-primary mb-2">
                   {isLogin ? "Welcome Back" : "Create Account"}
                 </h2>
-                <p className="text-[#d1c0c0]">
+                <p className="text-secondary">
                   {isLogin
                     ? "Sign in to continue your gaming journey"
                     : "Join our gaming community today"}
@@ -170,13 +170,13 @@ const GetStartedPage = () => {
                       transition={{ duration: 0.3 }}
                       className="space-y-2"
                     >
-                      <label className="text-[#e0d0d0] text-sm font-medium">
+                      <label className="text-secondary text-sm font-medium">
                         Username
                       </label>
                       <div className="relative">
                         <User
                           size={18}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-[#bb3b3b]"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 accent-primary"
                         />
                         <input
                           type="text"
@@ -184,7 +184,7 @@ const GetStartedPage = () => {
                           value={formData.username}
                           onChange={handleInputChange}
                           required={!isLogin}
-                          className="w-full bg-[#2a1a1a] border border-[#3a1a1a] rounded-xl pl-12 pr-4 py-3 text-white placeholder-[#8a6e6e] focus:border-[#bb3b3b] focus:ring-2 focus:ring-[#bb3b3b]/30 focus:outline-none transition-all duration-300"
+                          className="w-full bg-surface border border-primary rounded-xl pl-12 pr-4 py-3 text-primary placeholder-muted focus:accent-border focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:outline-none transition-all duration-300"
                           placeholder="Choose a username"
                         />
                       </div>
