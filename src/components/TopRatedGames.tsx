@@ -61,7 +61,7 @@ const TopRatedGames = () => {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-8">
+    <div className="w-full mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Trophy className="text-yellow-500" size={32} />
@@ -75,7 +75,7 @@ const TopRatedGames = () => {
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 max-w-4xl mx-auto">
         {games.map((game, index) => (
           <div
             key={game.id}

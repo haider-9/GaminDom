@@ -93,9 +93,9 @@ const PopularTags = () => {
           <button
             key={tag.id}
             onClick={() => router.push(`/tags/${tag.slug}`)}
-            className={`group relative px-6 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r ${getTagColor(
+            className={`group relative px-6 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r text-sm ${getTagColor(
               index
-            )} overflow-hidden`}
+            )}`}
           >
             {/* Background Animation */}
             <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

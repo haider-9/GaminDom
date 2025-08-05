@@ -99,7 +99,7 @@ const NewGames = () => {
   }
 
   return (
-    <div className="w-full max-w-3xl  px-2 py-8">
+    <div className="px-2 py-8 w-full max-w-full lg:w-[780px]">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold text-white">New Games</h2>
@@ -118,14 +118,14 @@ const NewGames = () => {
           onClick={prevSlide}
           className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-3 rounded-full shadow-lg transition-all duration-200"
         >
-          <ChevronLeft size={24} />
+          <ChevronLeft size={20} />
         </button>
 
         <button
           onClick={nextSlide}
           className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-3 rounded-full shadow-lg transition-all duration-200"
         >
-          <ChevronRight size={24} />
+          <ChevronRight size={20} />
         </button>
 
         {/* Games Container - Fixed width to show 2 full + half of 3rd */}
@@ -140,7 +140,7 @@ const NewGames = () => {
               <div
                 key={game.id}
                 onClick={() => handleGameClick(game.id)}
-                className="flex-shrink-0 w-56 h-48 relative rounded-3xl overflow-hidden cursor-pointer group bg-black/20"
+                className="flex-shrink-0 w-56 md:w-56 h-48 md:h-64 relative rounded-3xl overflow-hidden cursor-pointer group bg-black/20"
               >
                 {/* Background Image */}
                 <div className="absolute inset-0">
