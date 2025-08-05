@@ -3,7 +3,7 @@ import { Orbitron } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Header from "@/components/Header";
-import CircularFloatingMenu from "@/components/LeftSideBar";
+import CircularFloatingMenu from "@/components/CircularFloatingMenu";
 
 const orbitron = Orbitron({
   subsets: ["latin"],

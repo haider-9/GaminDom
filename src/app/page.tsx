@@ -1,7 +1,8 @@
-import React from "react";
+import React, { Suspense } from "react";
 import RightSideBar from "@/components/RightSideBar";
 import PNGCarousal from "@/components/PNGCarousal";
 import RecentGame from "@/components/RecentGame";
+import RecentGameSkeleton from "@/components/RecentGameSkeleton";
 import NewGames from "@/components/NewGames";
 import PlayerStats from "@/components/PlayerStats";
 import TrendingGames from "@/components/TrendingGames";
@@ -10,17 +11,19 @@ import PopularTags from "@/components/PopularTags";
 
 const page = () => {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-4/5 mx-auto">
       <RightSideBar />
 
       {/* First Row - Desktop: side by side, Mobile: stacked */}
-      <div className="flex flex-col lg:flex-row lg:items-center mx-auto w-4/5 lg:justify-between gap-6 lg:gap-0">
+      <div className="flex flex-col lg:flex-row lg:items-center mx-auto lg:justify-between gap-6 lg:gap-0">
         <PNGCarousal />
-        <RecentGame />
+        <Suspense fallback={<RecentGameSkeleton count={3} />}>
+          <RecentGame />
+        </Suspense>
       </div>
 
       {/* Second Row - Desktop: side by side, Mobile: stacked */}
-      <div className="flex flex-col lg:flex-row lg:items-center w-4/5 mx-auto lg:justify-between gap-6 lg:gap-0">
+      <div className="flex flex-col lg:flex-row lg:items-start mx-auto lg:justify-between gap-6 gap-y-4 lg:gap-0">
         <NewGames />
         <PlayerStats />
       </div>

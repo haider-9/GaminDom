@@ -14,6 +14,7 @@ import {
   Tag,
   Heart,
   Share2,
+  Hash,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -81,7 +82,7 @@ const CharacterPage = () => {
   type CharacterResponse = {
     character: Character | null;
   };
-  
+
   useEffect(() => {
     const fetchCharacterDetails = async () => {
       try {
@@ -189,10 +190,10 @@ const CharacterPage = () => {
             Back
           </button>
           <div className="flex items-center gap-4">
-            <button className="p-2 bg-black/30 hover:bg-black/50 rounded-full transition-colors">
+            <button className="p-2 bg-black/30 hover:bg-red-500/70 rounded-full transition-colors">
               <Heart size={20} className="text-white" />
             </button>
-            <button className="p-2 bg-black/30 hover:bg-black/50 rounded-full transition-colors">
+            <button className="p-2 bg-black/30 hover:bg-blue-500/70 rounded-full transition-colors">
               <Share2 size={20} className="text-white" />
             </button>
           </div>
@@ -204,17 +205,16 @@ const CharacterPage = () => {
         <div className="bg-black/50 rounded-3xl p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Character Image */}
-            <div className="w-full lg:w-80 h-80 rounded-3xl overflow-hidden">
+            <div className="w-full lg:w-80 h-80 rounded-3xl relative">
               {character.image?.super_url ? (
                 <Image
                   src={character.image.super_url}
                   alt={character.name}
-                  width={320}
-                  height={320}
-                  className="object-cover w-full h-full"
+                  fill
+                  className="object-contain lg:object-cover rounded-3xl object-center lg:object-top max-w-fit lg:max-w-full mx-auto drop-shadow-2xl lg:drop-shadow-none drop-shadow-red-500/20 border-2 lg:border-none border-red-500/20"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-[#bb3b3b] to-[#bb3b3b]/60 flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-[#4b2323] to-[#bb3b3b]/60 flex items-center justify-center">
                   <User size={80} className="text-white" />
                 </div>
               )}
@@ -281,7 +281,7 @@ const CharacterPage = () => {
                   Biography
                 </h2>
                 <div
-                  className="text-white/70 leading-relaxed prose prose-invert max-w-none"
+                  className="text-white/70 leading-relaxed prose prose-invert max-w-none prose-rose prose-h2:text-rose-400 prose-li:mb-8"
                   dangerouslySetInnerHTML={{ __html: character.description }}
                 />
               </div>
@@ -322,8 +322,9 @@ const CharacterPage = () => {
                       key={concept.id}
                       href={`/tags/${concept.name}`}
                       rel="noopener noreferrer"
-                      className="bg-black/30 text-white/70 px-3 py-1 rounded-full text-sm border border-white/20 hover:bg-black/40 hover:text-white transition-colors"
+                      className="bg-black/30 text-white/70 px-3 py-1 rounded-full text-sm border border-white/20 hover:bg-black/40 hover:text-white transition-colors inline-flex items-center gap-1"
                     >
+                      <Hash className="w-4 h-4" />
                       {concept.name}
                     </Link>
                   ))}
@@ -337,56 +338,56 @@ const CharacterPage = () => {
             {/* Relationships */}
             {((character.friends && character.friends.length > 0) ||
               (character.enemies && character.enemies.length > 0)) && (
-              <div className="bg-black/50 rounded-3xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <Users size={20} />
-                  Relationships
-                </h3>
-                <div className="space-y-4">
-                  {character.friends && character.friends.length > 0 && (
-                    <div>
-                      <h4 className="text-green-400 font-semibold mb-2">
-                        Friends
-                      </h4>
-                      <div className="space-y-2">
-                        {character.friends.slice(0, 5).map((friend) => (
-                          <Link
-                            key={friend.id}
-                            href={`/character/${friend.id}`}
-                            className="block bg-black/30 rounded-2xl p-3 hover:bg-black/40 transition-colors"
-                          >
-                            <span className="text-white/70 hover:text-white">
-                              {friend.name}
-                            </span>
-                          </Link>
-                        ))}
+                <div className="bg-black/50 rounded-3xl p-6">
+                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <Users size={20} />
+                    Relationships
+                  </h3>
+                  <div className="space-y-4">
+                    {character.friends && character.friends.length > 0 && (
+                      <div>
+                        <h4 className="text-green-400 font-semibold mb-2">
+                          Friends
+                        </h4>
+                        <div className="space-y-2">
+                          {character.friends.slice(0, 5).map((friend) => (
+                            <Link
+                              key={friend.id}
+                              href={`/character/${friend.id}`}
+                              className="block bg-black/30 rounded-2xl p-3 hover:bg-black/40 transition-colors"
+                            >
+                              <span className="text-white/70 hover:text-white">
+                                {friend.name}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {character.enemies && character.enemies.length > 0 && (
-                    <div>
-                      <h4 className="text-red-400 font-semibold mb-2">
-                        Enemies
-                      </h4>
-                      <div className="space-y-2">
-                        {character.enemies.slice(0, 5).map((enemy) => (
-                          <Link
-                            key={enemy.id}
-                            href={`/character/${enemy.id}`}
-                            className="block bg-black/30 rounded-2xl p-3 hover:bg-black/40 transition-colors"
-                          >
-                            <span className="text-white/70 hover:text-white">
-                              {enemy.name}
-                            </span>
-                          </Link>
-                        ))}
+                    {character.enemies && character.enemies.length > 0 && (
+                      <div>
+                        <h4 className="text-red-400 font-semibold mb-2">
+                          Enemies
+                        </h4>
+                        <div className="space-y-2">
+                          {character.enemies.slice(0, 5).map((enemy) => (
+                            <Link
+                              key={enemy.id}
+                              href={`/character/${enemy.id}`}
+                              className="block bg-black/30 rounded-2xl p-3 hover:bg-black/40 transition-colors"
+                            >
+                              <span className="text-white/70 hover:text-white">
+                                {enemy.name}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Locations */}
             {character.locations && character.locations.length > 0 && (

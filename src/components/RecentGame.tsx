@@ -1,8 +1,7 @@
-"use client";
 import { ChevronRight, Star, Calendar, Gamepad2 } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Game {
   id: number;
@@ -15,79 +14,33 @@ interface Game {
   metacritic: number;
 }
 
-const RecentGame = () => {
-  const router = useRouter();
-  const [gamesList, setGamesList] = useState<Game[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+async function fetchGames(): Promise<Game[]> {
+  const apiKey = process.env.NEXT_PUBLIC_RAWG_API_KEY;
+  const apiUrl = process.env.NEXT_PUBLIC_RAWG_API_URL;
 
-  const handleGameClick = (gameId: number) => {
-    router.push(`/game/${gameId}`);
-  };
+  const response = await fetch(
+    `${apiUrl}?key=${apiKey}&page_size=3&ordering=-added&metacritic=80,100`,
+    { next: { revalidate: 3600 } } // Cache for 1 hour
+  );
 
-  useEffect(() => {
-    const fetchGames = async () => {
-      try {
-        setLoading(true);
-        const apiKey = process.env.NEXT_PUBLIC_RAWG_API_KEY;
-        const apiUrl = process.env.NEXT_PUBLIC_RAWG_API_URL;
-
-        // Fetch top 3 recent popular games
-        const response = await fetch(
-          `${apiUrl}?key=${apiKey}&page_size=3&ordering=-added&metacritic=80,100`
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch games data");
-        }
-
-        const data = await response.json();
-        setGamesList(data.results);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGames();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="flex items-center bg-black/50 p-3 rounded-3xl w-full max-w-sm lg:w-96 justify-between gap-4 animate-pulse"
-          >
-            <div className="rounded-lg size-16 bg-gray-600"></div>
-            <div className="flex flex-col gap-2 flex-1">
-              <div className="h-4 bg-gray-600 rounded w-3/4"></div>
-              <div className="h-3 bg-gray-600 rounded w-full"></div>
-            </div>
-            <ChevronRight size={20} className="text-gray-600" />
-          </div>
-        ))}
-      </div>
-    );
+  if (!response.ok) {
+    throw new Error("Failed to fetch games data");
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center bg-red-500/20 p-3 rounded-3xl w-full max-w-sm lg:w-96 justify-center">
-        <p className="text-red-400">Error loading games: {error}</p>
-      </div>
-    );
-  }
+  const data = await response.json();
+  return data.results;
+}
+
+const RecentGame = async () => {
+  const gamesList = await fetchGames();
 
   return (
     <div className="space-y-3">
       {gamesList.map((game) => (
-        <div
+        <Link
           key={game.id}
-          onClick={() => handleGameClick(game.id)}
-          className="flex items-center bg-black/50 p-3 rounded-3xl w-full max-w-sm lg:w-96 justify-between gap-4 hover:bg-black/70 transition-all duration-200 cursor-pointer"
+          href={`/game/${game.id}`}
+          className="flex items-center bg-black/50 p-3 rounded-3xl w-full lg:w-96 justify-between gap-4 hover:bg-black/70 transition-all duration-200 cursor-pointer"
         >
           <div>
             <div className="rounded-lg size-16 overflow-hidden">
@@ -111,9 +64,9 @@ const RecentGame = () => {
             <p className="text-white/70 text-sm line-clamp-2">
               {game.platforms && game.platforms.length > 0
                 ? `Available on ${game.platforms
-                    .slice(0, 2)
-                    .map((p) => p.platform.name)
-                    .join(", ")}`
+                  .slice(0, 2)
+                  .map((p) => p.platform.name)
+                  .join(", ")}`
                 : "Multi-platform game"}
             </p>
 
@@ -153,7 +106,7 @@ const RecentGame = () => {
           </div>
 
           <ChevronRight size={20} className="text-white/50" />
-        </div>
+        </Link>
       ))}
     </div>
   );
