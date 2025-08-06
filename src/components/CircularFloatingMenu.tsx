@@ -130,7 +130,7 @@ const CircularFloatingMenu = () => {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       // Open menu with 'M' key on desktop
-      if (!isOpen && e.key.toLowerCase() === 'm' && !isMobile) {
+      if (!isOpen && e.key.toLowerCase() === 'm' && !isMobile && e.ctrlKey ) {
         setIsOpen(true);
         return;
       }

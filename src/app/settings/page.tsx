@@ -13,7 +13,6 @@ import {
   Volume2,
   VolumeX,
   Save,
-  RotateCcw,
   Gamepad2,
   Mail,
   ArrowLeft,
@@ -133,15 +132,6 @@ const SettingsPage = () => {
     { name: "Purple", value: "purple", color: "#7e3bbb" },
     { name: "Orange", value: "orange", color: "#bb7e3b" },
     { name: "Pink", value: "pink", color: "#bb3b7e" },
-  ];
-
-  const platforms = [
-    "PC", "PlayStation", "Xbox", "Nintendo Switch", "Mobile", "VR"
-  ];
-
-  const genres = [
-    "Action", "Adventure", "RPG", "Strategy", "Simulation", "Sports",
-    "Racing", "Puzzle", "Horror", "Indie", "MMO", "Fighting"
   ];
 
   return (

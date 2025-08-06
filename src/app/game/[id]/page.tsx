@@ -525,30 +525,32 @@ const GamePage = () => {
                         href={`/character/${character.id}`}
                         className="group"
                       >
-                        <div className="bg-surface rounded-2xl p-3 sm:p-4 hover:bg-surface-hover transition-colors">
-                          <div className="relative w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 rounded-full overflow-hidden">
-                            {character.image?.thumb_url ? (
-                              <Image
-                                src={character.image.thumb_url}
-                                alt={character.name}
-                                fill
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full accent-bg flex items-center justify-center">
-                                <User size={16} className="sm:w-6 sm:h-6 text-white" />
-                              </div>
-                            )}
-                          </div>
-                          <h3 className="text-primary font-semibold text-center text-xs sm:text-sm mb-1 group-hover:accent-primary transition-colors line-clamp-2">
-                            {character.name}
-                          </h3>
-                          {character.real_name &&
-                            character.real_name !== character.name && (
-                              <p className="text-secondary text-xs text-center line-clamp-1">
+                        <div className="relative flex flex-col items-center justify-start bg-surface rounded-2xl shadow-lg overflow-hidden min-h-[140px] p-0 theme-transition">
+                          <div className="absolute left-0 top-0 h-full w-1 bg-primary" />
+                          <div className="flex flex-col items-center w-full pt-4 pb-3 px-3">
+                            <div className="relative w-12 h-12 sm:w-14 sm:h-14 mb-2 rounded-full overflow-hidden border-2 border-primary bg-surface">
+                              {character.image?.thumb_url ? (
+                                <Image
+                                  src={character.image.thumb_url}
+                                  alt={character.name}
+                                  fill
+                                  className="object-cover rounded-full"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center rounded-full bg-surface">
+                                  <User size={22} className="sm:w-8 sm:h-8 text-muted" />
+                                </div>
+                              )}
+                            </div>
+                            <h3 className="text-primary font-semibold text-center text-xs sm:text-sm mb-0.5 truncate w-full">
+                              {character.name}
+                            </h3>
+                            {character.real_name && character.real_name !== character.name && (
+                              <p className="text-secondary text-xs text-center truncate w-full">
                                 {character.real_name}
                               </p>
                             )}
+                          </div>
                         </div>
                       </Link>
                     ))}

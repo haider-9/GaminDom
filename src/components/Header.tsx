@@ -8,7 +8,7 @@ import {
   TrendingUp,
   Star,
 } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -24,10 +24,55 @@ const Header = () => {
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  interface GameResult {
+    id: string | number;
+    name: string;
+    background_image?: string;
+    released?: string;
+  }
+  const [searchResults, setSearchResults] = useState<GameResult[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounced realtime search
+  useEffect(() => {
+    if (!searchQuery) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      setSearchError(null);
+      return;
+    }
+    setSearchLoading(true);
+    setSearchError(null);
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const { gameApi } = await import("@/lib/api-client");
+        interface SearchGamesResponse {
+          results: GameResult[];
+        }
+        const res = (await gameApi.searchGames(
+          searchQuery,
+          "1",
+          "10"
+        )) as SearchGamesResponse;
+        setSearchResults(res.results || []);
+        setSearchLoading(false);
+      } catch {
+        setSearchError("Failed to fetch games");
+        setSearchLoading(false);
+      }
+    }, 700);
+    return () => {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    };
+  }, [searchQuery]);
 
   // Handle search submission
   const handleSearch = (query: string) => {
     if (query.trim()) {
+      saveRecentSearch(query.trim());
       setIsSearchOpen(false);
       setSearchQuery("");
       router.push(`/search/${encodeURIComponent(query.trim())}`);
@@ -69,8 +114,28 @@ const Header = () => {
       "bg-surface rounded-full size-10 flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-colors",
   };
 
-  // Sample search suggestions and recent searches
-  const recentSearches = ["Call of Duty", "FIFA 24", "Minecraft"];
+  // Recent searches state (persisted in localStorage)
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  // Load recent searches from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("recentSearches");
+    if (stored) {
+      try {
+        setRecentSearches(JSON.parse(stored));
+      } catch {}
+    }
+  }, []);
+
+  // Save recent search
+  const saveRecentSearch = (query: string) => {
+    if (!query.trim()) return;
+    setRecentSearches((prev) => {
+      const updated = [query, ...prev.filter((s) => s !== query)].slice(0, 8);
+      localStorage.setItem("recentSearches", JSON.stringify(updated));
+      return updated;
+    });
+  };
   const popularGames = [
     "Cyberpunk 2077",
     "The Witcher 3",
@@ -79,7 +144,7 @@ const Header = () => {
   ];
 
   return (
-    <motion.header 
+    <motion.header
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -89,10 +154,7 @@ const Header = () => {
       <div className="md:hidden">
         {/* Top row: Greeting and Actions */}
         <div className="flex items-center justify-between mb-4">
-          <Link
-            className="size-12"
-            href="/"
-          >
+          <Link className="size-12" href="/">
             <Image
               src="/Logo.svg"
               alt="Logo"
@@ -163,7 +225,7 @@ const Header = () => {
       {/* Desktop Layout */}
       <div className="hidden md:flex items-center justify-between">
         {/* Greeting Section */}
-        <Link href='/' className="size-12">
+        <Link href="/" className="size-12">
           <Image
             src="/Logo.svg"
             alt="Logo"
@@ -258,16 +320,24 @@ const Header = () => {
                       </h3>
                     </div>
                     <div className="space-y-2">
-                      {recentSearches.map((search, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover cursor-pointer transition-colors"
-                          onClick={() => handleSearch(search)}
-                        >
-                          <Clock className="w-4 h-4 text-muted" />
-                          <span className="text-secondary">{search}</span>
+                      {recentSearches.length === 0 ? (
+                        <div className="text-muted text-xs px-2 py-1">
+                          No recent searches.
                         </div>
-                      ))}
+                      ) : (
+                        recentSearches.map((search, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover cursor-pointer transition-colors"
+                            onClick={() => handleSearch(search)}
+                          >
+                            <Clock className="w-4 h-4 text-muted" />
+                            <span className="text-secondary truncate max-w-[180px] overflow-hidden whitespace-nowrap">
+                              {search}
+                            </span>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
 
@@ -381,16 +451,55 @@ const Header = () => {
                   <div className="text-sm text-muted mb-3">
                     {`Search results for "${searchQuery}"`}
                   </div>
-                  {/* Search results would go here */}
-                  <div className="text-center py-8 text-muted">
-                    <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p>Start typing to search for games...</p>
-                  </div>
+                  {searchLoading ? (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <span className="relative flex h-10 w-10 mb-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60"></span>
+                        <span className="relative inline-flex rounded-full h-10 w-10 bg-primary"></span>
+                      </span>
+                      <p className="text-muted">Searching games...</p>
+                    </div>
+                  ) : searchError ? (
+                    <div className="text-center py-8 text-red-500">
+                      <p>{searchError}</p>
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <div className="space-y-2">
+                      {searchResults.map((game) => (
+                        <div
+                          key={game.id}
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover cursor-pointer transition-colors"
+                          onClick={() => handleSearch(game.name)}
+                        >
+                          <Image
+                            src={
+                              game.background_image || "/placeholder-game.jpg"
+                            }
+                            alt={game.name}
+                            width={40}
+                            height={40}
+                            className="rounded-md object-cover w-10 h-10"
+                          />
+                          <span className="text-primary font-medium truncate">
+                            {game.name}
+                          </span>
+                          {game.released && (
+                            <span className="text-xs text-secondary ml-auto">
+                              {game.released.slice(0, 4)}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted">
+                      <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>No games found.</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-
-            
           </ScrollArea>
         </DialogContent>
       </Dialog>
