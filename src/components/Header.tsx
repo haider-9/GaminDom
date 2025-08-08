@@ -19,6 +19,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Spinner from "./Spinner";
 
 const Header = () => {
   const router = useRouter();
@@ -75,7 +76,7 @@ const Header = () => {
       saveRecentSearch(query.trim());
       setIsSearchOpen(false);
       setSearchQuery("");
-      router.push(`/search/${encodeURIComponent(query.trim())}`);
+      router.push(`/game/${encodeURIComponent(query.trim())}`);
     }
   };
 
@@ -453,10 +454,7 @@ const Header = () => {
                   </div>
                   {searchLoading ? (
                     <div className="flex flex-col items-center justify-center py-8">
-                      <span className="relative flex h-10 w-10 mb-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60"></span>
-                        <span className="relative inline-flex rounded-full h-10 w-10 bg-primary"></span>
-                      </span>
+                      <Spinner />
                       <p className="text-muted">Searching games...</p>
                     </div>
                   ) : searchError ? (
@@ -469,7 +467,7 @@ const Header = () => {
                         <div
                           key={game.id}
                           className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover cursor-pointer transition-colors"
-                          onClick={() => handleSearch(game.name)}
+                          onClick={() => handleSearch(String(game.id))}
                         >
                           <Image
                             src={

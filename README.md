@@ -185,6 +185,12 @@ Fully typed components and API responses for better development experience and c
 
 ## 🌟 Key Features Explained
 
+### Menu Shortcut Hint (Landing Page)
+- On first visit to the landing page, a contextual hint appears showing how to open the circular floating menu ("Press Cmd+M" on Mac or "Ctrl+M" on Windows/Linux).
+- The hint is visually positioned with a curved arrow pointing to the menu trigger: above the menu button on mobile, and to the left of the menu button on desktop.
+- The hint is shown only once per user (using localStorage) and will not reappear on subsequent visits or reloads.
+- Implemented via the `MenuHintWithArrow` component.
+
 ### Circular Floating Menu
 - Innovative navigation pattern
 - Smooth rotation animations

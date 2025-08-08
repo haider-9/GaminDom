@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import Header from "@/components/Header";
 import CircularFloatingMenu from "@/components/CircularFloatingMenu";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import FloatingHint from "@/components/FloatingHint";
 
 
 const orbitron = Orbitron({

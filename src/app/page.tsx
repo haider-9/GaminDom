@@ -1,6 +1,5 @@
 "use client";
 import React, { Suspense } from "react";
-import RightSideBar from "@/components/RightSideBar";
 import PNGCarousal from "@/components/PNGCarousal";
 import RecentGame from "@/components/RecentGame";
 import RecentGameSkeleton from "@/components/RecentGameSkeleton";
@@ -10,6 +9,7 @@ import TrendingGames from "@/components/TrendingGames";
 import TopRatedGames from "@/components/TopRatedGames";
 import PopularTags from "@/components/PopularTags";
 import { motion } from "framer-motion";
+import MenuHintWithArrow from "@/components/MenuHintWithArrow";
 
 const page = () => {
   return (
@@ -17,9 +17,9 @@ const page = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="w-full max-w-7xl mx-auto px-4 py-8"
+      className="w-full max-w-7xl mx-auto px-4 py-8 relative"
     >
-      <RightSideBar />
+      <MenuHintWithArrow />
 
       {/* Grid Layout */}
       <motion.div 
