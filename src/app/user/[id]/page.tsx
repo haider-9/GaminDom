@@ -65,7 +65,10 @@ const UserPage = () => {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
 
   const fetchUserData = useCallback(async (id: string) => {
+    if (!id) return;
+    
     try {
+      setLoading(true);
       // Fetch user profile with favorites
       const userResponse = await fetch(`/api/users/${id}`);
       if (userResponse.ok) {
@@ -92,15 +95,21 @@ const UserPage = () => {
   }, [router]);
 
   useEffect(() => {
+    let isMounted = true;
+    
     // Get current user from localStorage
     const userData = localStorage.getItem('user');
-    if (userData) {
+    if (userData && isMounted) {
       setCurrentUser(JSON.parse(userData));
     }
 
-    if (userId) {
+    if (userId && isMounted) {
       fetchUserData(userId);
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [userId, fetchUserData]);
 
 

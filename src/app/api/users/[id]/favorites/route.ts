@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
-import User from '@/models/User';
-import Game from '@/models/Game';
+import { User, Game } from '@/models/index.js';
 
 export async function POST(
   request: NextRequest,
@@ -36,7 +35,7 @@ export async function POST(
       id,
       { $addToSet: { favourites: game._id } }, // $addToSet prevents duplicates
       { new: true }
-    ).populate('favourites');
+    );
     
     if (!user) {
       return NextResponse.json(
@@ -45,9 +44,14 @@ export async function POST(
       );
     }
     
+    // Manually get favorites to avoid populate issues
+    const favorites = await Game.find({
+      '_id': { $in: user.favourites }
+    });
+    
     return NextResponse.json({ 
       message: 'Game added to favorites',
-      favorites: user.favourites 
+      favorites: favorites 
     });
   } catch (error: unknown) {
     return NextResponse.json(
@@ -79,7 +83,7 @@ export async function DELETE(
       id,
       { $pull: { favourites: gameId } },
       { new: true }
-    ).populate('favourites');
+    );
     
     if (!user) {
       return NextResponse.json(
@@ -88,9 +92,14 @@ export async function DELETE(
       );
     }
     
+    // Manually get favorites to avoid populate issues
+    const favorites = await Game.find({
+      '_id': { $in: user.favourites }
+    });
+    
     return NextResponse.json({ 
       message: 'Game removed from favorites',
-      favorites: user.favourites 
+      favorites: favorites 
     });
   } catch (error: unknown) {
     return NextResponse.json(

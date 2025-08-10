@@ -38,18 +38,25 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Load favorites on mount and when auth changes
   useEffect(() => {
+    let isMounted = true;
+    
     const handleAuthChange = () => {
-      loadFavorites();
+      if (isMounted) {
+        loadFavorites();
+      }
     };
 
     // Initial load
-    loadFavorites();
+    if (isMounted) {
+      loadFavorites();
+    }
 
     // Listen for auth changes
     window.addEventListener('storage', handleAuthChange);
     window.addEventListener('authChange', handleAuthChange);
 
     return () => {
+      isMounted = false;
       window.removeEventListener('storage', handleAuthChange);
       window.removeEventListener('authChange', handleAuthChange);
     };

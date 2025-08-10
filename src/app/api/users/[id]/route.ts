@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
-import User from '@/models/User';
+import { User, Game } from '@/models/index.js'; // Import all models to ensure registration
 
 export async function GET(
   request: NextRequest,
@@ -9,6 +9,9 @@ export async function GET(
   try {
     await connectDB();
     
+    // Ensure Game model is registered
+    Game;
+    
     const { id } = await params;
     if (!id) {
       return NextResponse.json(
@@ -16,15 +19,29 @@ export async function GET(
         { status: 400 }
       );
     }
-    const rawUser = await User.findById(id)
-      .populate('favourites', 'title description image rating rawgId')
-      .select('-password'); // Exclude password from response
+    
+    // First get user without populate to avoid schema issues
+    const rawUser = await User.findById(id).select('-password');
     
     if (!rawUser) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
+    }
+    
+    // Manually populate favourites to avoid schema registration issues
+    let populatedFavourites = [];
+    if (rawUser.favourites && rawUser.favourites.length > 0) {
+      try {
+        populatedFavourites = await Game.find({
+          '_id': { $in: rawUser.favourites }
+        }).select('title description image rating rawgId released platforms genres');
+      } catch (gameError) {
+        console.error('Error fetching games:', gameError);
+        // If game fetch fails, just return empty favourites
+        populatedFavourites = [];
+      }
     }
     
     // Convert _id to id for consistency
@@ -36,11 +53,12 @@ export async function GET(
       bannerImage: rawUser.bannerImage,
       bio: rawUser.bio,
       createdAt: rawUser.createdAt,
-      favourites: rawUser.favourites,
+      favourites: populatedFavourites,
     };
     
     return NextResponse.json({ user });
   } catch (error: unknown) {
+    console.error('API Error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

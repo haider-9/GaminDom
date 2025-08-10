@@ -84,23 +84,29 @@ const ProfilePage = () => {
 
   
   useEffect(() => {
+    let isMounted = true;
+
     const checkAuthAndLoadProfile = () => {
       const userData = localStorage.getItem("user");
       if (userData) {
         const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        // Handle both 'id' and '_id' field names safely
-        const userId = normalizeId(parsedUser.id) || normalizeId(parsedUser._id);
-        if (userId) {
-          fetchUserFavorites(userId);
-        } else {
-          setLoading(false);
-          showToast.error("Invalid user data. Please log in again.");
+        if (isMounted) {
+          setUser(parsedUser);
+          // Handle both 'id' and '_id' field names safely
+          const userId = normalizeId(parsedUser.id) || normalizeId(parsedUser._id);
+          if (userId) {
+            fetchUserFavorites(userId);
+          } else {
+            setLoading(false);
+            showToast.error("Invalid user data. Please log in again.");
+          }
         }
       } else {
-        setLoading(false);
-        showToast.error("Please log in to view your profile");
-        router.push("/get-started");
+        if (isMounted) {
+          setLoading(false);
+          showToast.error("Please log in to view your profile");
+          router.push("/get-started");
+        }
       }
     };
 
@@ -116,6 +122,7 @@ const ProfilePage = () => {
     window.addEventListener("authChange", handleAuthChange);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("storage", handleAuthChange);
       window.removeEventListener("authChange", handleAuthChange);
     };

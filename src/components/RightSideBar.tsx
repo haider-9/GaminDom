@@ -65,18 +65,18 @@ const RightSidebar = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const router = useRouter();
 
-  
-  const fetchUserData = useCallback(async (userId: string) => {
+  const fetchUserData = useCallback(async (userId: string, currentUser: UserData | null) => {
     // Prevent multiple simultaneous calls
     if (isLoading) {
       return;
     }
 
     // Only skip if we already have this user's full profile (including favourites)
-    const sameUser = !!(user && (normalizeId(user?.id) === userId || normalizeId(user?._id) === userId));
-    if (sameUser && Array.isArray(user?.favourites)) {
+    const sameUser = !!(currentUser && (normalizeId(currentUser?.id) === userId || normalizeId(currentUser?._id) === userId));
+    if (sameUser && Array.isArray(currentUser?.favourites)) {
       return; // Already have this user's full data
     }
 
@@ -88,20 +88,27 @@ const RightSidebar = () => {
       if (userResponse.ok) {
         const userData = await userResponse.json();
         setUser(userData.user);
-      }
-
-      // Fetch user's reviews
-      const reviewsResponse = await fetch(`/api/reviews?userId=${userId}`);
-      if (reviewsResponse.ok) {
-        const reviewsData = await reviewsResponse.json();
-        setReviews(reviewsData.reviews || []);
+        
+        // Only fetch reviews if user fetch was successful
+        const reviewsResponse = await fetch(`/api/reviews?userId=${userId}`);
+        if (reviewsResponse.ok) {
+          const reviewsData = await reviewsResponse.json();
+          setReviews(reviewsData.reviews || []);
+        }
+      } else {
+        // If user fetch fails, don't retry - just log the error
+        console.error(`Failed to fetch user data: ${userResponse.status} ${userResponse.statusText}`);
+        // Stop trying to fetch on server errors
+        setHasInitialized(true);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
+      // Stop trying to fetch on errors
+      setHasInitialized(true);
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, user]);
+  }, [isLoading]);
 
   useEffect(() => {
     setMounted(true);
@@ -113,32 +120,49 @@ const RightSidebar = () => {
         if (userData) {
           const parsedUser = JSON.parse(userData);
           const storedId = normalizeId(parsedUser.id) || normalizeId(parsedUser._id);
-          const currentId = normalizeId(user?.id) || normalizeId(user?._id);
-
-          // Only update if it's actually a different user or we don't have a user yet
-          if (!user || (storedId && storedId !== currentId)) {
-            setUser(parsedUser);
-            // Fetch full profile and reviews using a safe ID string
-            if (storedId) {
-              fetchUserData(storedId);
+          
+          setUser(prevUser => {
+            const currentId = normalizeId(prevUser?.id) || normalizeId(prevUser?._id);
+            
+            // Only update if it's actually a different user or we don't have a user yet
+            if (!prevUser || (storedId && storedId !== currentId)) {
+              // Reset initialization flag for new user
+              setHasInitialized(false);
+              // Fetch full profile and reviews using a safe ID string
+              if (storedId) {
+                setTimeout(() => fetchUserData(storedId, parsedUser), 0);
+              }
+              return parsedUser;
+            } else if (prevUser && !Array.isArray(prevUser.favourites) && !hasInitialized) {
+              // We have a user but likely from localStorage without favourites populated
+              if (storedId) {
+                setHasInitialized(true);
+                setTimeout(() => fetchUserData(storedId, prevUser), 0);
+              }
+              return prevUser;
             }
-          } else if (user && !Array.isArray(user.favourites)) {
-            // We have a user but likely from localStorage without favourites populated
-            if (storedId) {
-              fetchUserData(storedId);
+            return prevUser;
+          });
+        } else {
+          setUser(prevUser => {
+            if (prevUser) {
+              setReviews([]);
+              setHasInitialized(false);
+              return null;
             }
-          }
-        } else if (user) {
-          // Only clear if we currently have a user
-          setUser(null);
-          setReviews([]);
+            return prevUser;
+          });
         }
       } catch (error) {
         console.error('RightSideBar: Error parsing user data:', error);
-        if (user) {
-          setUser(null);
-          setReviews([]);
-        }
+        setUser(prevUser => {
+          if (prevUser) {
+            setReviews([]);
+            setHasInitialized(false);
+            return null;
+          }
+          return prevUser;
+        });
       }
     };
 
@@ -150,6 +174,7 @@ const RightSidebar = () => {
 
     // Also listen for a custom event that we can dispatch after login
     const handleAuthChange = () => {
+      setHasInitialized(false); // Reset initialization flag on auth change
       checkAuth();
     };
     window.addEventListener('authChange', handleAuthChange);
@@ -158,7 +183,7 @@ const RightSidebar = () => {
       window.removeEventListener('storage', checkAuth);
       window.removeEventListener('authChange', handleAuthChange);
     };
-  }, [fetchUserData, user]);
+  }, []); // Remove all dependencies to prevent infinite loops
 
   const handleLogout = () => {
     localStorage.removeItem('user');
