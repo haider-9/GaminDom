@@ -9,8 +9,7 @@ import {
   GamepadIcon,
   MessageSquare,
   ArrowLeft,
-  UserPlus,
-  UserCheck
+  
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -62,7 +61,7 @@ const UserPage = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'favorites' | 'reviews'>('favorites');
-  const [isFollowing, setIsFollowing] = useState(false);
+
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
 
   const fetchUserData = useCallback(async (id: string) => {
@@ -104,11 +103,6 @@ const UserPage = () => {
     }
   }, [userId, fetchUserData]);
 
-  const handleFollowToggle = () => {
-    // TODO: Implement follow/unfollow functionality
-    setIsFollowing(!isFollowing);
-    showToast.success(isFollowing ? 'Unfollowed user' : 'Following user');
-  };
 
   if (loading) {
     return (

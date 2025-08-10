@@ -53,6 +53,25 @@ interface Review {
   };
 }
 
+// Helpers defined at module scope to avoid unstable references in hooks and eliminate any
+const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+const normalizeId = (val: unknown): string | null => {
+  if (!val) return null;
+  if (typeof val === 'string') return val;
+  if (isObject(val)) {
+    const obj = val as Record<string, unknown>;
+    if (typeof obj['$oid'] === 'string') return obj['$oid'] as string;
+    if (typeof obj['id'] === 'string') return obj['id'] as string;
+    if (typeof obj['_id'] === 'string') return obj['_id'] as string;
+    const toStringFn = (obj as { toString?: () => string }).toString;
+    if (typeof toStringFn === 'function') {
+      const s = toStringFn.call(obj);
+      if (s && s !== '[object Object]') return s;
+    }
+  }
+  return null;
+};
+
 const ProfilePage = () => {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -63,23 +82,7 @@ const ProfilePage = () => {
   );
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
-  // Normalize various possible ID shapes to a string
-  const normalizeId = (val: unknown): string | null => {
-    if (!val) return null;
-    if (typeof val === "string") return val;
-    if (typeof val === "object") {
-      const obj = val as Record<string, unknown> & { toString?: () => string };
-      if (typeof (obj as any).$oid === "string") return (obj as any).$oid as string;
-      if (typeof (obj as any).id === "string") return (obj as any).id as string;
-      if (typeof (obj as any)._id === "string") return (obj as any)._id as string;
-      if (typeof obj.toString === "function") {
-        const s = obj.toString();
-        if (s && s !== "[object Object]") return s;
-      }
-    }
-    return null;
-  };
-
+  
   useEffect(() => {
     const checkAuthAndLoadProfile = () => {
       const userData = localStorage.getItem("user");
