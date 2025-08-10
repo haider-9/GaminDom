@@ -67,16 +67,7 @@ interface Character {
   deck?: string;
   description?: string;
   birthday?: string;
-  image?: {
-    icon_url: string;
-    medium_url: string;
-    screen_url: string;
-    small_url: string;
-    super_url: string;
-    thumb_url: string;
-    tiny_url: string;
-    original_url: string;
-  };
+  image?: string;
   aliases?: string;
   gender?: number;
   site_detail_url: string;
@@ -514,7 +505,8 @@ const GamePage = () => {
                 ) : (
                   <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
                     {currentCharacters.map((character) => (
-                      <div
+                      <Link
+                        href={`/character/${character.id}`}
                         key={character.id}
                         className="group"
                       >
@@ -522,13 +514,13 @@ const GamePage = () => {
                           <div className="absolute left-0 top-0 h-full w-1 bg-[#bb3b3b]" />
                           <div className="flex flex-col items-center w-full pt-4 pb-3 px-3">
                             <div className="relative w-12 h-12 sm:w-14 sm:h-14 mb-2 rounded-full overflow-hidden border-2 border-[#bb3b3b] bg-black/30">
-                              {character.image?.thumb_url ? (
-                                <Image
-                                  src={character.image.super_url}
-                                  alt={character.name}
-                                  fill
-                                  className="object-cover rounded-full"
-                                />
+                              {character.image ? (
+                              <Image
+                              src={character.image}
+                              alt={character.name}
+                              fill
+                              className="object-cover rounded-full"
+                              />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center rounded-full bg-black/30">
                                   <User size={22} className="sm:w-8 sm:h-8 text-white/50" />
@@ -545,7 +537,7 @@ const GamePage = () => {
                             )}
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 )}

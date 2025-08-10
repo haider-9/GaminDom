@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Settings,
-  User,
   Bell,
   Shield,
   Palette,
@@ -38,11 +37,11 @@ const SettingsPage = () => {
 
   useEffect(() => {
     // Load user data from localStorage
-    const userData = localStorage.getItem('user');
+    const userData = localStorage.getItem("user");
     if (userData) {
       try {
         const user = JSON.parse(userData);
-        setSettings(prev => ({
+        setSettings((prev) => ({
           ...prev,
           username: user.username || "",
           email: user.email || "",
@@ -58,7 +57,7 @@ const SettingsPage = () => {
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
-        setSettings(prev => ({
+        setSettings((prev) => ({
           ...prev,
           ...parsed,
         }));
@@ -73,12 +72,14 @@ const SettingsPage = () => {
     if (key === "theme" && typeof value === "string") {
       setTheme(value as "dark" | "light" | "auto");
     } else if (key === "accentColor" && typeof value === "string") {
-      setAccentColor(value as "red" | "blue" | "green" | "purple" | "orange" | "pink");
+      setAccentColor(
+        value as "red" | "blue" | "green" | "purple" | "orange" | "pink"
+      );
     }
 
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
     setHasChanges(true);
   };
@@ -90,7 +91,7 @@ const SettingsPage = () => {
       localStorage.setItem("userSettings", JSON.stringify(settings));
 
       // Update user data if profile settings changed
-      const userData = localStorage.getItem('user');
+      const userData = localStorage.getItem("user");
       if (userData) {
         const user = JSON.parse(userData);
         const updatedUser = {
@@ -100,7 +101,7 @@ const SettingsPage = () => {
           bio: settings.bio,
           id: user.id || user._id, // Ensure id is set
         };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
+        localStorage.setItem("user", JSON.stringify(updatedUser));
       }
 
       showToast.success("Settings saved successfully!");
@@ -113,14 +114,16 @@ const SettingsPage = () => {
   };
 
   const tabs = [
-    { id: "profile", label: "Profile", icon: User },
     { id: "appearance", label: "Appearance", icon: Palette },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "privacy", label: "Privacy", icon: Shield },
   ];
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div
+      className="min-h-screen p-6"
+      style={{ backgroundColor: "var(--color-background)" }}
+    >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -157,8 +160,12 @@ const SettingsPage = () => {
                 <Settings size={32} className="text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-primary mb-2">Settings</h1>
-                <p className="text-secondary">Manage your account and preferences</p>
+                <h1 className="text-4xl font-bold text-primary mb-2">
+                  Settings
+                </h1>
+                <p className="text-secondary">
+                  Manage your account and preferences
+                </p>
               </div>
             </div>
           </div>
@@ -175,10 +182,11 @@ const SettingsPage = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${activeTab === tab.id
-                        ? "accent-bg text-white"
-                        : "text-secondary hover:text-primary hover:bg-surface-hover"
-                        }`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${
+                        activeTab === tab.id
+                          ? "accent-bg text-white"
+                          : "text-secondary hover:text-primary hover:bg-surface-hover"
+                      }`}
                     >
                       <Icon size={20} />
                       {tab.label}
@@ -192,58 +200,6 @@ const SettingsPage = () => {
           {/* Content */}
           <div className="lg:col-span-3">
             <div className="bg-surface rounded-xl p-8 border border-primary">
-              {/* Profile Settings */}
-              {activeTab === "profile" && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="space-y-6"
-                >
-                  <h2 className="text-2xl font-bold text-primary mb-6">Profile Settings</h2>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-secondary text-sm font-medium mb-2">
-                        Username
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.username}
-                        onChange={(e) => handleSettingChange("username", e.target.value)}
-                        className="w-full bg-surface border border-primary rounded-lg px-4 py-3 text-primary placeholder-muted focus:accent-border focus:outline-none transition-colors"
-                        placeholder="Enter username"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-secondary text-sm font-medium mb-2">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={settings.email}
-                        onChange={(e) => handleSettingChange("email", e.target.value)}
-                        className="w-full bg-surface border border-primary rounded-lg px-4 py-3 text-primary placeholder-muted focus:accent-border focus:outline-none transition-colors"
-                        placeholder="Enter email"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-secondary text-sm font-medium mb-2">
-                        Bio
-                      </label>
-                      <textarea
-                        value={settings.bio}
-                        onChange={(e) => handleSettingChange("bio", e.target.value)}
-                        rows={4}
-                        className="w-full bg-surface border border-primary rounded-lg px-4 py-3 text-primary placeholder-muted focus:accent-border focus:outline-none transition-colors resize-none"
-                        placeholder="Tell others about yourself..."
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
               {/* Appearance Settings */}
               {activeTab === "appearance" && (
                 <motion.div
@@ -251,7 +207,9 @@ const SettingsPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  <h2 className="text-2xl font-bold text-primary mb-6">Appearance</h2>
+                  <h2 className="text-2xl font-bold text-primary mb-6">
+                    Appearance
+                  </h2>
 
                   <div className="space-y-6">
                     <div>
@@ -268,11 +226,14 @@ const SettingsPage = () => {
                           return (
                             <button
                               key={themeOption.value}
-                              onClick={() => handleSettingChange("theme", themeOption.value)}
-                              className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-colors ${settings.theme === themeOption.value
-                                ? "accent-bg accent-border text-white"
-                                : "bg-surface border-primary text-secondary hover:text-primary hover:accent-border"
-                                }`}
+                              onClick={() =>
+                                handleSettingChange("theme", themeOption.value)
+                              }
+                              className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-colors ${
+                                settings.theme === themeOption.value
+                                  ? "accent-bg accent-border text-white"
+                                  : "bg-surface border-primary text-secondary hover:text-primary hover:accent-border"
+                              }`}
                             >
                               <Icon size={18} />
                               {themeOption.label}
@@ -298,13 +259,19 @@ const SettingsPage = () => {
                         ].map((color) => (
                           <button
                             key={color.value}
-                            onClick={() => handleSettingChange("accentColor", color.value)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${settings.accentColor === color.value
-                              ? "border-primary text-primary"
-                              : "border-primary text-secondary hover:text-primary"
-                              }`}
+                            onClick={() =>
+                              handleSettingChange("accentColor", color.value)
+                            }
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                              settings.accentColor === color.value
+                                ? "border-primary text-primary"
+                                : "border-primary text-secondary hover:text-primary"
+                            }`}
                             style={{
-                              backgroundColor: settings.accentColor === color.value ? color.color + '20' : 'transparent'
+                              backgroundColor:
+                                settings.accentColor === color.value
+                                  ? color.color + "20"
+                                  : "transparent",
                             }}
                           >
                             <div
@@ -327,22 +294,39 @@ const SettingsPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  <h2 className="text-2xl font-bold text-primary mb-6">Notifications</h2>
+                  <h2 className="text-2xl font-bold text-primary mb-6">
+                    Notifications
+                  </h2>
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between p-4 bg-surface rounded-lg border border-primary">
                       <div>
-                        <h3 className="text-primary font-medium">Push Notifications</h3>
-                        <p className="text-muted text-sm">Receive notifications about game updates and reviews</p>
+                        <h3 className="text-primary font-medium">
+                          Push Notifications
+                        </h3>
+                        <p className="text-muted text-sm">
+                          Receive notifications about game updates and reviews
+                        </p>
                       </div>
                       <button
-                        onClick={() => handleSettingChange("notifications", !settings.notifications)}
-                        className={`relative w-12 h-6 rounded-full transition-colors ${settings.notifications ? "accent-bg" : "bg-surface border border-primary"
-                          }`}
+                        onClick={() =>
+                          handleSettingChange(
+                            "notifications",
+                            !settings.notifications
+                          )
+                        }
+                        className={`relative w-12 h-6 rounded-full transition-colors ${
+                          settings.notifications
+                            ? "accent-bg"
+                            : "bg-surface border border-primary"
+                        }`}
                       >
                         <div
-                          className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${settings.notifications ? "translate-x-7" : "translate-x-1"
-                            }`}
+                          className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                            settings.notifications
+                              ? "translate-x-7"
+                              : "translate-x-1"
+                          }`}
                         />
                       </button>
                     </div>
@@ -357,17 +341,28 @@ const SettingsPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  <h2 className="text-2xl font-bold text-primary mb-6">Privacy</h2>
+                  <h2 className="text-2xl font-bold text-primary mb-6">
+                    Privacy
+                  </h2>
 
                   <div className="space-y-4">
                     <div className="p-4 bg-surface rounded-lg border border-primary">
                       <div className="mb-3">
-                        <h3 className="text-primary font-medium">Profile Visibility</h3>
-                        <p className="text-muted text-sm">Control who can see your profile and activity</p>
+                        <h3 className="text-primary font-medium">
+                          Profile Visibility
+                        </h3>
+                        <p className="text-muted text-sm">
+                          Control who can see your profile and activity
+                        </p>
                       </div>
                       <select
                         value={settings.profileVisibility}
-                        onChange={(e) => handleSettingChange("profileVisibility", e.target.value)}
+                        onChange={(e) =>
+                          handleSettingChange(
+                            "profileVisibility",
+                            e.target.value
+                          )
+                        }
                         className="bg-surface border border-primary rounded-lg px-4 py-2 text-primary focus:accent-border focus:outline-none transition-colors"
                       >
                         <option value="public">Public</option>

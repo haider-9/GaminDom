@@ -1,5 +1,5 @@
 import React from "react";
-import { Github, ExternalLink, Heart, Code, Gamepad2 } from "lucide-react";
+import { Github, ExternalLink, Heart, Gamepad2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -105,26 +105,32 @@ const AboutPage = () => {
 
         {/* Tech Stack Section */}
         <div className="mb-20">
-          <h2 className="text-4xl font-bold text-center mb-12 text-white">Built With Modern Tech</h2>
+          <h2 className="text-4xl font-bold text-center mb-12 text-white">Tech Stack</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6 rounded-xl border border-red-500/20 bg-red-500/5">
-              <Code size={48} className="mx-auto mb-4 text-red-400" />
-              <h3 className="text-xl font-bold text-white mb-2">Next.js 15</h3>
-              <p className="text-gray-400">React framework with App Router for optimal performance</p>
+            <div className="text-center p-6 rounded-xl border border-white/10 bg-black/40 shadow">
+              <Image src="/tech/nextjs.png" alt="Next.js" width={100} height={36} className="mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-white mb-1">Next.js 15</h3>
+              <p className="text-gray-400 text-sm">Modern React framework for fast, scalable web apps.</p>
             </div>
-            <div className="text-center p-6 rounded-xl border border-red-500/20 bg-red-500/5">
-              <div className="w-12 h-12 mx-auto mb-4 bg-red-400 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">TS</span>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">TypeScript</h3>
-              <p className="text-gray-400">Type-safe development for better code quality</p>
+            <div className="text-center p-6 rounded-xl border border-white/10 bg-black/40 shadow">
+              <Image src="/tech/typescript.png" alt="TypeScript" width={100} height={36} className="mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-white mb-1">TypeScript</h3>
+              <p className="text-gray-400 text-sm">Type-safe JavaScript for reliable, maintainable code.</p>
             </div>
-            <div className="text-center p-6 rounded-xl border border-red-500/20 bg-red-500/5">
-              <div className="w-12 h-12 mx-auto mb-4 bg-red-400 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">TW</span>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Tailwind CSS</h3>
-              <p className="text-gray-400">Utility-first CSS for rapid UI development</p>
+            <div className="text-center p-6 rounded-xl border border-white/10 bg-black/40 shadow">
+              <Image src="/tech/tailwind.png" alt="Tailwind CSS" width={100} height={36} className="mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-white mb-1">Tailwind CSS</h3>
+              <p className="text-gray-400 text-sm">Utility-first CSS for rapid, responsive UI design.</p>
+            </div>
+            <div className="text-center p-6 rounded-xl border border-white/10 bg-black/40 shadow">
+              <Image src="/tech/mongodb.png" alt="MongoDB" width={100} height={36} className="mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-white mb-1">MongoDB</h3>
+              <p className="text-gray-400 text-sm">Flexible NoSQL database for storing all game data.</p>
+            </div>
+            <div className="text-center p-6 rounded-xl border border-white/10 bg-black/40 shadow">
+              <Image src="/tech/nodejs.png" alt="Node.js" width={100} height={36} className="mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-white mb-1">Node.js</h3>
+              <p className="text-gray-400 text-sm">JavaScript runtime powering the backend logic.</p>
             </div>
           </div>
         </div>

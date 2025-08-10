@@ -81,51 +81,52 @@ const CircularFloatingMenu = () => {
   }
 
   const menuItems = useMemo(() => {
+    const iconSize = isMobile ? 14 : 20;
     const baseItems: MenuItem[] = [
       {
-        icon: <Home size={20} />,
+        icon: <Home size={iconSize} />,
         label: "Home",
         route: "/",
         shortcut: "H",
         classes: "bg-red-500 text-red-100 border-red-300 bg-red-500/95 border-red-300/30"
       },
       {
-        icon: <Gamepad2 size={20} />,
+        icon: <Gamepad2 size={iconSize} />,
         label: "Latest",
         route: "/latest",
         shortcut: "L",
         classes: "bg-emerald-500 text-emerald-100 border-emerald-300 bg-emerald-500/95 border-emerald-300/30"
       },
       {
-        icon: <Trophy size={20} />,
+        icon: <Trophy size={iconSize} />,
         label: "Top Rated",
         route: "/top-rated",
         shortcut: "T",
         classes: "bg-yellow-500 text-yellow-100 border-yellow-300 bg-yellow-500/95 border-yellow-300/30"
       },
       {
-        icon: <TrendingUp size={20} />,
+        icon: <TrendingUp size={iconSize} />,
         label: "Trending",
         route: "/trending",
         shortcut: "R",
         classes: "bg-purple-500 text-purple-100 border-purple-300 bg-purple-500/95 border-purple-300/30"
       },
       {
-        icon: <Newspaper size={20} />,
+        icon: <Newspaper size={iconSize} />,
         label: "News",
         route: "/news",
         shortcut: "N",
         classes: "bg-blue-500 text-blue-100 border-blue-300 bg-blue-500/95 border-blue-300/30"
       },
       {
-        icon: <Info size={20} />,
+        icon: <Info size={iconSize} />,
         label: "About",
         route: "/about",
         shortcut: "A",
         classes: "bg-cyan-500 text-cyan-100 border-cyan-300 bg-cyan-500/95 border-cyan-300/30"
       },
       {
-        icon: <Settings size={20} />,
+        icon: <Settings size={iconSize} />,
         label: "Settings",
         route: "/settings",
         shortcut: "S",
@@ -135,21 +136,21 @@ const CircularFloatingMenu = () => {
 
     if (isLoggedIn) {
       baseItems.splice(5, 0, {
-        icon: <User size={20} />,
+        icon: <User size={iconSize} />,
         label: "Profile",
         route: "/profile",
         shortcut: "P",
         classes: "bg-indigo-500 text-indigo-100 border-indigo-300 bg-indigo-500/95 border-indigo-300/30"
       });
       baseItems.splice(6, 0, {
-        icon: <Users size={20} />,
+        icon: <Users size={iconSize} />,
         label: "Users",
         route: "/users",
         shortcut: "U",
         classes: "bg-orange-500 text-orange-100 border-orange-300 bg-orange-500/95 border-orange-300/30"
       });
       baseItems.push({
-        icon: <LogOut size={20} />,
+        icon: <LogOut size={iconSize} />,
         label: "Logout",
         route: "#",
         shortcut: "O",
@@ -158,7 +159,7 @@ const CircularFloatingMenu = () => {
       });
     } else {
       baseItems.push({
-        icon: <LogIn size={20} />,
+        icon: <LogIn size={iconSize} />,
         label: "Get Started",
         route: "/get-started",
         shortcut: "G",
@@ -167,7 +168,7 @@ const CircularFloatingMenu = () => {
     }
 
     return baseItems;
-  }, [isLoggedIn, handleLogout]);
+  }, [isLoggedIn, handleLogout, isMobile]);
 
   useEffect(() => {
     setMounted(true);
@@ -315,7 +316,8 @@ const CircularFloatingMenu = () => {
                                 item.onClick?.();
                               }}
                               className={cn(
-                                "w-14 h-14 rounded-2xl flex items-center justify-center border-2 shadow-md text-white relative cursor-pointer",
+                                isMobile ? "w-10 h-10 rounded-xl" : "w-14 h-14 rounded-2xl",
+                                "flex items-center justify-center border-2 shadow-md text-white relative cursor-pointer",
                                 bg,
                                 "border-white/30 hover:border-white"
                               )}
@@ -343,7 +345,8 @@ const CircularFloatingMenu = () => {
                           ) : (
                             <Link href={item.route} onClick={() => setIsOpen(false)}>
                               <div className={cn(
-                                "w-14 h-14 rounded-2xl flex items-center justify-center border-2 shadow-md text-white relative",
+                                isMobile ? "w-10 h-10 rounded-xl" : "w-14 h-14 rounded-2xl",
+                                "flex items-center justify-center border-2 shadow-md text-white relative",
                                 bg,
                                 "border-white/30 hover:border-white"
                               )}>
