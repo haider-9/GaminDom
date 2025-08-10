@@ -150,7 +150,7 @@ const TopRatedGames = () => {
               transition={{ duration: 0.2 }}
             >
               <Image
-                src={game.background_image || "/placeholder-game.jpg"}
+                src={game.background_image || "/placeholder-game.svg"}
                 alt={game.name}
                 fill
                 className="object-cover"

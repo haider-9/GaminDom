@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const GIANTBOMB_API_KEY = process.env.NEXT_PUBLIC_GIANTBOMB_API_KEY;
 const GIANTBOMB_API_URL = process.env.NEXT_PUBLIC_GIANTBOMB_API_URL;
+
 type CharacterSummary = {
   id: number;
   name: string;
   api_detail_url: string;
   site_detail_url: string;
 };
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const gameSlug = searchParams.get('gameSlug');
@@ -35,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     const searchData = await searchResponse.json();
-    
+
     if (!searchData.results || searchData.results.length === 0) {
       return NextResponse.json({ characters: [] });
     }
@@ -57,14 +59,14 @@ export async function GET(request: NextRequest) {
     }
 
     const charactersData = await charactersResponse.json();
-    
+
     if (!charactersData.results?.characters) {
       return NextResponse.json({ characters: [] });
     }
 
     // Fetch detailed character information (limit to 12 for better pagination)
     const characterDetails = await Promise.all(
-      charactersData.results.characters.map(async (char:CharacterSummary) => {
+      charactersData.results.characters.map(async (char: CharacterSummary) => {
         try {
           const detailResponse = await fetch(
             `${GIANTBOMB_API_URL}/character/${char.id}/?api_key=${GIANTBOMB_API_KEY}&format=json`,
@@ -77,7 +79,14 @@ export async function GET(request: NextRequest) {
 
           if (detailResponse.ok) {
             const detailData = await detailResponse.json();
-            return detailData.error === "OK" && detailData.results ? detailData.results : null;
+            if (detailData.error === "OK" && detailData.results) {
+              return {
+                id: detailData.results.id,
+                name: detailData.results.name,
+                image: detailData.results.image?.medium_url || detailData.results.image?.small_url || null,
+                description: detailData.results.description || detailData.results.deck || null
+              };
+            }
           }
         } catch (error) {
           console.error(`Failed to fetch character ${char.id}:`, error);
@@ -91,22 +100,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ characters: validCharacters });
   } catch (error) {
     console.error('Error fetching characters:', error);
-    
+
     if (error instanceof Error) {
       if (error.message.includes('fetch')) {
-        return NextResponse.json({ 
-          error: 'Network error: Unable to connect to GiantBomb API' 
+        return NextResponse.json({
+          error: 'Network error: Unable to connect to GiantBomb API'
         }, { status: 503 });
       }
       if (error.message.includes('timeout')) {
-        return NextResponse.json({ 
-          error: 'Request timeout: GiantBomb API is taking too long to respond' 
+        return NextResponse.json({
+          error: 'Request timeout: GiantBomb API is taking too long to respond'
         }, { status: 408 });
       }
     }
-    
-    return NextResponse.json({ 
-      error: 'Failed to fetch characters from GiantBomb' 
+
+    return NextResponse.json({
+      error: 'Failed to fetch characters from GiantBomb'
     }, { status: 500 });
   }
 }

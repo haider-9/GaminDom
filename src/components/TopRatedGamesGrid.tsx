@@ -6,13 +6,13 @@ import {
   Star,
   Calendar,
   Users,
-  Play,
-  Heart,
- 
+
   ArrowLeft,
+
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Pagination from "./Pagination";
+
 
 interface Game {
   id: number;
@@ -149,7 +149,7 @@ const TopRatedGamesGrid = () => {
               {/* Background Image */}
               <div className="relative h-64 overflow-hidden">
                 <Image
-                  src={game.background_image || "/placeholder-game.jpg"}
+                  src={game.background_image || "/placeholder-game.svg"}
                   alt={game.name}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -160,10 +160,10 @@ const TopRatedGamesGrid = () => {
               {/* Action Buttons */}
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-colors">
-                  <Play size={16} fill="white" />
+                  <Star size={16} fill="white" />
                 </button>
                 <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-colors">
-                  <Heart size={16} />
+                  <Star size={16} />
                 </button>
               </div>
 

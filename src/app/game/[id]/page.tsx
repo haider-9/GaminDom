@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { showToast } from "@/lib/toast-config";
@@ -8,7 +8,6 @@ import {
   Calendar,
   Users,
   Clock,
-  Heart,
   Share2,
   ArrowLeft,
   Trophy,
@@ -22,11 +21,14 @@ import {
   ChevronRight,
   Flame,
   User,
+  MessageSquare
 } from "lucide-react";
 import { SiEpicgames, SiSteam, SiPlaystation, SiBox } from "react-icons/si";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SAMPLE_AVATARS } from "@/constants";
 import Link from "next/link";
+import FavoriteButton from "@/components/FavoriteButton";
+import ReviewModal from "@/components/ReviewModal";
 
 interface GameDetails {
   id: number;
@@ -58,10 +60,6 @@ interface GameDetails {
   screenshots?: Array<{ id: number; image: string }>;
 }
 
-interface ScreenshotsResponse {
-  results: Array<{ id: number; image: string }>;
-}
-
 interface Character {
   id: number;
   name: string;
@@ -85,20 +83,33 @@ interface Character {
   api_detail_url: string;
 }
 
+interface Review {
+  _id: string;
+  rating: number;
+  text: string;
+  createdAt: string;
+  user: {
+    _id?: string;
+    id?: string;
+    username: string;
+    profileImage: string;
+  };
+}
+
 const GamePage = () => {
   const params = useParams();
   const router = useRouter();
   const gameId = params.id as string;
-
   const [game, setGame] = useState<GameDetails | null>(null);
-  const [screenshots, setScreenshots] = useState<
-    Array<{ id: number; image: string }>
-  >([]);
+  const [screenshots, setScreenshots] = useState<Array<{ id: number; image: string }>>([]);
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeScreenshot, setActiveScreenshot] = useState(0);
   const [charactersLoading, setCharactersLoading] = useState(false);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [currentCharacterPage, setCurrentCharacterPage] = useState(0);
 
   // Pagination settings for characters
@@ -107,27 +118,21 @@ const GamePage = () => {
   const startIndex = currentCharacterPage * charactersPerPage;
   const endIndex = startIndex + charactersPerPage;
   const currentCharacters = characters.slice(startIndex, endIndex);
-  type CharactersResponse = {
-    characters: Character[];
-  };
+
+
 
   const fetchCharacters = React.useCallback(async (gameSlug: string) => {
     try {
       setCharactersLoading(true);
-      const { characterApi } = await import("@/lib/api-client");
-      const response = (await characterApi.getCharactersForGame(
-        gameSlug
-      )) as CharactersResponse;
-      const characterDetails = response.characters || [];
-      setCharacters(characterDetails);
-
-      // Show success message if characters were found
-      if (characterDetails.length > 0) {
-        showToast.success(
-          `Found ${characterDetails.length} character${
-            characterDetails.length > 1 ? "s" : ""
-          } for this game`
-        );
+      const response = await fetch(`/api/characters/search?gameSlug=${gameSlug}`);
+      if (response.ok) {
+        const data = await response.json();
+        const characterDetails = data.characters || [];
+        setCharacters(characterDetails);
+        // Show success message if characters were found
+        if (characterDetails.length > 0) {
+          showToast.success(`Found ${characterDetails.length} character${characterDetails.length > 1 ? "s" : ""} for this game`);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch characters:", error);
@@ -136,22 +141,52 @@ const GamePage = () => {
     }
   }, []);
 
+  const fetchReviews = useCallback(async () => {
+    try {
+      setReviewsLoading(true);
+      // First check if game exists in our database
+      const gameResponse = await fetch(`/api/games?rawgId=${gameId}`);
+      if (gameResponse.ok) {
+        const gameData = await gameResponse.json();
+        if (gameData.game) {
+          // Fetch reviews for this game
+          const reviewsResponse = await fetch(`/api/reviews?gameId=${gameData.game._id}`);
+          if (reviewsResponse.ok) {
+            const reviewsData = await reviewsResponse.json();
+            setReviews(reviewsData.reviews || []);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, [gameId]);
+
+  const handleReviewSubmitted = () => {
+    fetchReviews(); // Refresh reviews after submission
+  };
+
   useEffect(() => {
     const fetchGameDetails = async () => {
       try {
         setLoading(true);
-        const { gameApi } = await import("@/lib/api-client");
 
-        // Fetch game details
-        const gameData = (await gameApi.getGameDetails(gameId)) as GameDetails;
+        // Fetch game details through our API
+        const response = await fetch(`/api/games?action=details&gameId=${gameId}`);
+        if (!response.ok) throw new Error("Failed to fetch game details");
+        const data = await response.json();
+        const gameData = data.game as GameDetails;
         setGame(gameData);
 
-        // Fetch screenshots
+        // Fetch screenshots through our API
         try {
-          const screenshotsData = (await gameApi.getGameScreenshots(
-            gameId
-          )) as ScreenshotsResponse;
-          setScreenshots(screenshotsData.results || []);
+          const screenshotsResponse = await fetch(`/api/games?action=screenshots&gameId=${gameId}`);
+          if (screenshotsResponse.ok) {
+            const screenshotsData = await screenshotsResponse.json();
+            setScreenshots(screenshotsData.screenshots || []);
+          }
         } catch {
           console.warn("Failed to fetch screenshots, but continuing...");
         }
@@ -160,9 +195,11 @@ const GamePage = () => {
         if (gameData.slug) {
           fetchCharacters(gameData.slug);
         }
+
+        // Fetch reviews
+        fetchReviews();
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An error occurred";
+        const errorMessage = err instanceof Error ? err.message : "An error occurred";
         setError(errorMessage);
       } finally {
         setLoading(false);
@@ -172,7 +209,7 @@ const GamePage = () => {
     if (gameId) {
       fetchGameDetails();
     }
-  }, [gameId, fetchCharacters]);
+  }, [gameId, fetchCharacters, fetchReviews]);
 
   if (loading) {
     return (
@@ -205,9 +242,7 @@ const GamePage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-black/50 rounded-3xl p-8 text-center max-w-md">
           <h1 className="text-2xl font-bold text-white mb-4">Game Not Found</h1>
-          <p className="text-white/70 mb-6">
-            {error || "The requested game could not be found."}
-          </p>
+          <p className="text-white/70 mb-6">{error || "The requested game could not be found."}</p>
           <button
             onClick={() => router.back()}
             className="bg-[#bb3b3b] hover:bg-[#bb3b3b]/80 text-white px-6 py-3 rounded-3xl transition-colors"
@@ -223,11 +258,7 @@ const GamePage = () => {
     const name = platformName.toLowerCase();
     if (name.includes("pc") || name.includes("windows"))
       return <Monitor size={16} />;
-    if (
-      name.includes("mobile") ||
-      name.includes("android") ||
-      name.includes("ios")
-    )
+    if (name.includes("mobile") || name.includes("android") || name.includes("ios"))
       return <Smartphone size={16} />;
     return <Gamepad2 size={16} />;
   };
@@ -245,9 +276,11 @@ const GamePage = () => {
             Back
           </button>
           <div className="flex items-center gap-4">
-            <button className="p-2 bg-black/30 hover:bg-black/50 rounded-full transition-colors">
-              <Heart size={20} className="text-white" />
-            </button>
+            <FavoriteButton
+              game={game}
+              size={20}
+              className="p-2 bg-black/30 hover:bg-black/50 rounded-full transition-colors"
+            />
             <button className="p-2 bg-black/30 hover:bg-black/50 rounded-full transition-colors">
               <Share2 size={20} className="text-white" />
             </button>
@@ -272,7 +305,7 @@ const GamePage = () => {
               {/* Game Image */}
               <div className="w-full lg:w-80 h-64 rounded-3xl overflow-hidden">
                 <Image
-                  src={game.background_image || "/placeholder-game.jpg"}
+                  src={game.background_image || "/placeholder-game.svg"}
                   alt={game.name}
                   width={320}
                   height={256}
@@ -283,9 +316,7 @@ const GamePage = () => {
 
               {/* Game Info */}
               <div className="flex-1">
-                <h1 className="text-4xl font-bold text-white mb-4">
-                  {game.name}
-                </h1>
+                <h1 className="text-4xl font-bold text-white mb-4">{game.name}</h1>
 
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -295,51 +326,44 @@ const GamePage = () => {
                       Popular
                     </span>
                   )}
-
                   <div className="flex items-center gap-2 bg-black/30 px-3 py-1 rounded-full">
-                    <Star
-                      className="text-yellow-400 fill-yellow-400"
-                      size={16}
-                    />
-                    <span className="text-white font-semibold">
-                      {game.rating}/5
-                    </span>
-                    <span className="text-white/70">
-                      ({game.ratings_count.toLocaleString()})
-                    </span>
+                    <Star className="text-yellow-400 fill-yellow-400" size={16} />
+                    <span className="text-white font-semibold">{game.rating}/5</span>
+                    <span className="text-white/70">({game.ratings_count.toLocaleString()})</span>
                   </div>
-
                   {game.metacritic && (
                     <div className="flex items-center gap-2 bg-green-600/80 px-3 py-1 rounded-full">
                       <Trophy size={16} className="text-white" />
-                      <span className="text-white font-semibold">
-                        {game.metacritic}
-                      </span>
+                      <span className="text-white font-semibold">{game.metacritic}</span>
                     </div>
                   )}
-
                   <div className="flex items-center gap-2 bg-black/30 px-3 py-1 rounded-full">
                     <Calendar size={16} className="text-blue-400" />
-                    <span className="text-white">
-                      {new Date(game.released).getFullYear()}
-                    </span>
+                    <span className="text-white">{new Date(game.released).getFullYear()}</span>
                   </div>
                 </div>
 
                 {/* Platform Icons */}
                 <div className="flex items-center gap-2 mb-4">
-                  {game.platforms.some((p) =>
-                    p.platform.name.toLowerCase().includes("steam")
-                  ) && <SiSteam className="text-[#c7d5e0] text-xl" />}
-                  {game.platforms.some((p) =>
-                    p.platform.name.toLowerCase().includes("epic")
-                  ) && <SiEpicgames className="text-white text-xl" />}
-                  {game.platforms.some((p) =>
-                    p.platform.name.toLowerCase().includes("playstation")
-                  ) && <SiPlaystation className="text-blue-400 text-xl" />}
-                  {game.platforms.some((p) =>
-                    p.platform.name.toLowerCase().includes("xbox")
-                  ) && <SiBox className="text-green-400 text-xl" />}
+                  {game.platforms.some((p) => p.platform.name.toLowerCase().includes("steam")) &&
+                    <SiSteam className="text-[#c7d5e0] text-xl" />}
+                  {game.platforms.some((p) => p.platform.name.toLowerCase().includes("epic")) &&
+                    <SiEpicgames className="text-white text-xl" />}
+                  {game.platforms.some((p) => p.platform.name.toLowerCase().includes("playstation")) &&
+                    <SiPlaystation className="text-blue-400 text-xl" />}
+                  {game.platforms.some((p) => p.platform.name.toLowerCase().includes("xbox")) &&
+                    <SiBox className="text-green-400 text-xl" />}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-4 mb-4">
+                  <button
+                    onClick={() => setReviewModalOpen(true)}
+                    className="flex items-center gap-2 bg-[#bb3b3b] hover:bg-[#d14d4d] text-white px-6 py-3 rounded-xl transition-colors font-semibold"
+                  >
+                    <MessageSquare size={16} />
+                    Write Review
+                  </button>
                 </div>
 
                 {/* Reviews */}
@@ -367,69 +391,52 @@ const GamePage = () => {
             {/* Description */}
             <div className="bg-black/50 rounded-3xl p-6">
               <h2 className="text-2xl font-bold text-white mb-4">About</h2>
-              <p className="text-white/70 leading-relaxed">
-                {game.description_raw}
-              </p>
+              <p className="text-white/70 leading-relaxed">{game.description_raw}</p>
             </div>
 
             {/* Screenshots */}
             {screenshots.length > 0 && (
               <div className="bg-black/50 rounded-3xl p-6">
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  Screenshots
-                </h2>
+                <h2 className="text-2xl font-bold text-white mb-4">Screenshots</h2>
                 <div className="space-y-4">
                   {/* Navigation Buttons */}
                   <div className="relative">
                     <button
                       onClick={() =>
                         setActiveScreenshot(
-                          activeScreenshot === 0
-                            ? screenshots.length - 1
-                            : activeScreenshot - 1
+                          activeScreenshot === 0 ? screenshots.length - 1 : activeScreenshot - 1
                         )
                       }
                       className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200"
                     >
                       <ChevronLeft size={20} />
                     </button>
-
                     <button
                       onClick={() =>
                         setActiveScreenshot(
-                          activeScreenshot === screenshots.length - 1
-                            ? 0
-                            : activeScreenshot + 1
+                          activeScreenshot === screenshots.length - 1 ? 0 : activeScreenshot + 1
                         )
                       }
                       className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200"
                     >
                       <ChevronRight size={20} />
                     </button>
-
                     <div className="relative h-64 rounded-3xl overflow-hidden">
                       <Image
-                        src={
-                          screenshots[activeScreenshot]?.image ||
-                          screenshots[0]?.image
-                        }
+                        src={screenshots[activeScreenshot]?.image || screenshots[0]?.image}
                         alt="Game screenshot"
                         fill
                         className="object-cover transition-all duration-500"
                       />
                     </div>
                   </div>
-
                   <div className="flex gap-2 overflow-x-auto pb-2">
                     {screenshots.slice(0, 6).map((screenshot, index) => (
                       <button
                         key={screenshot.id}
                         onClick={() => setActiveScreenshot(index)}
-                        className={`relative flex-shrink-0 w-20 h-12 rounded-2xl overflow-hidden border-2 transition-colors ${
-                          activeScreenshot === index
-                            ? "border-[#bb3b3b]"
-                            : "border-transparent"
-                        }`}
+                        className={`relative flex-shrink-0 w-20 h-12 rounded-2xl overflow-hidden border-2 transition-colors ${activeScreenshot === index ? "border-[#bb3b3b]" : "border-transparent"
+                          }`}
                       >
                         <Image
                           src={screenshot.image}
@@ -446,73 +453,60 @@ const GamePage = () => {
 
             {/* Characters */}
             {(characters.length > 0 || charactersLoading) && (
-              <div className="bg-surface rounded-3xl p-4 sm:p-6">
+              <div className="bg-black/50 rounded-3xl p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-4">
-                  <h2 className="text-xl sm:text-2xl font-bold text-primary flex items-center gap-2">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
                     <User size={20} className="sm:w-6 sm:h-6" />
                     <span className="truncate">Characters</span>
                     {characters.length > 0 && (
-                      <span className="text-xs sm:text-sm text-secondary font-normal whitespace-nowrap">
+                      <span className="text-xs sm:text-sm text-white/70 font-normal whitespace-nowrap">
                         ({characters.length} total)
                       </span>
                     )}
                   </h2>
-
                   {/* Pagination Controls */}
                   {characters.length > charactersPerPage && (
                     <div className="flex items-center gap-1 sm:gap-2">
                       <button
                         onClick={() =>
-                          setCurrentCharacterPage(
-                            Math.max(0, currentCharacterPage - 1)
-                          )
+                          setCurrentCharacterPage(Math.max(0, currentCharacterPage - 1))
                         }
                         disabled={currentCharacterPage === 0}
-                        className={`p-1.5 sm:p-2 rounded-full transition-colors ${
-                          currentCharacterPage === 0
-                            ? "bg-surface text-muted cursor-not-allowed"
-                            : "bg-surface hover:bg-surface-hover text-primary"
-                        }`}
+                        className={`p-1.5 sm:p-2 rounded-full transition-colors ${currentCharacterPage === 0
+                          ? "bg-black/30 text-white/50 cursor-not-allowed"
+                          : "bg-black/30 hover:bg-black/50 text-white"
+                          }`}
                       >
                         <ChevronLeft size={14} className="sm:w-4 sm:h-4" />
                       </button>
-
-                      <span className="text-secondary text-xs sm:text-sm px-2 sm:px-3 py-1 bg-surface rounded-full whitespace-nowrap">
+                      <span className="text-white/70 text-xs sm:text-sm px-2 sm:px-3 py-1 bg-black/30 rounded-full whitespace-nowrap">
                         {currentCharacterPage + 1} / {totalCharacterPages}
                       </span>
-
                       <button
                         onClick={() =>
                           setCurrentCharacterPage(
-                            Math.min(
-                              totalCharacterPages - 1,
-                              currentCharacterPage + 1
-                            )
+                            Math.min(totalCharacterPages - 1, currentCharacterPage + 1)
                           )
                         }
-                        disabled={
-                          currentCharacterPage === totalCharacterPages - 1
-                        }
-                        className={`p-1.5 sm:p-2 rounded-full transition-colors ${
-                          currentCharacterPage === totalCharacterPages - 1
-                            ? "bg-surface text-muted cursor-not-allowed"
-                            : "bg-surface hover:bg-surface-hover text-primary"
-                        }`}
+                        disabled={currentCharacterPage === totalCharacterPages - 1}
+                        className={`p-1.5 sm:p-2 rounded-full transition-colors ${currentCharacterPage === totalCharacterPages - 1
+                          ? "bg-black/30 text-white/50 cursor-not-allowed"
+                          : "bg-black/30 hover:bg-black/50 text-white"
+                          }`}
                       >
                         <ChevronRight size={16} />
                       </button>
                     </div>
                   )}
                 </div>
-
                 {charactersLoading ? (
                   <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
                     {[...Array(6)].map((_, i) => (
                       <div key={i} className="animate-pulse">
-                        <div className="bg-surface rounded-2xl p-3 sm:p-4">
-                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-surface rounded-full mx-auto mb-3"></div>
-                          <div className="h-3 sm:h-4 bg-surface rounded w-3/4 mx-auto mb-2"></div>
-                          <div className="h-2 sm:h-3 bg-surface rounded w-1/2 mx-auto"></div>
+                        <div className="bg-black/30 rounded-2xl p-3 sm:p-4">
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-black/30 rounded-full mx-auto mb-3"></div>
+                          <div className="h-3 sm:h-4 bg-black/30 rounded w-3/4 mx-auto mb-2"></div>
+                          <div className="h-2 sm:h-3 bg-black/30 rounded w-1/2 mx-auto"></div>
                         </div>
                       </div>
                     ))}
@@ -520,39 +514,38 @@ const GamePage = () => {
                 ) : (
                   <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
                     {currentCharacters.map((character) => (
-                      <Link
+                      <div
                         key={character.id}
-                        href={`/character/${character.id}`}
                         className="group"
                       >
-                        <div className="relative flex flex-col items-center justify-start bg-surface rounded-2xl shadow-lg overflow-hidden min-h-[140px] p-0 theme-transition">
-                          <div className="absolute left-0 top-0 h-full w-1 bg-primary" />
+                        <div className="relative flex flex-col items-center justify-start bg-black/30 rounded-2xl shadow-lg overflow-hidden min-h-[140px] p-0 transition-all duration-200 hover:bg-black/40">
+                          <div className="absolute left-0 top-0 h-full w-1 bg-[#bb3b3b]" />
                           <div className="flex flex-col items-center w-full pt-4 pb-3 px-3">
-                            <div className="relative w-12 h-12 sm:w-14 sm:h-14 mb-2 rounded-full overflow-hidden border-2 border-primary bg-surface">
+                            <div className="relative w-12 h-12 sm:w-14 sm:h-14 mb-2 rounded-full overflow-hidden border-2 border-[#bb3b3b] bg-black/30">
                               {character.image?.thumb_url ? (
                                 <Image
-                                  src={character.image.thumb_url}
+                                  src={character.image.super_url}
                                   alt={character.name}
                                   fill
                                   className="object-cover rounded-full"
                                 />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center rounded-full bg-surface">
-                                  <User size={22} className="sm:w-8 sm:h-8 text-muted" />
+                                <div className="w-full h-full flex items-center justify-center rounded-full bg-black/30">
+                                  <User size={22} className="sm:w-8 sm:h-8 text-white/50" />
                                 </div>
                               )}
                             </div>
-                            <h3 className="text-primary font-semibold text-center text-xs sm:text-sm mb-0.5 truncate w-full">
+                            <h3 className="text-white font-semibold text-center text-xs sm:text-sm mb-0.5 truncate w-full">
                               {character.name}
                             </h3>
                             {character.real_name && character.real_name !== character.name && (
-                              <p className="text-secondary text-xs text-center truncate w-full">
+                              <p className="text-white/70 text-xs text-center truncate w-full">
                                 {character.real_name}
                               </p>
                             )}
                           </div>
                         </div>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -561,20 +554,13 @@ const GamePage = () => {
 
             {/* Genres & Tags */}
             <div className="bg-black/50 rounded-3xl p-6">
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Genres & Tags
-              </h2>
+              <h2 className="text-2xl font-bold text-white mb-4">Genres & Tags</h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    Genres
-                  </h3>
+                  <h3 className="text-lg font-semibold text-white mb-2">Genres</h3>
                   <div className="flex flex-wrap gap-2">
                     {game.genres.map((genre) => (
-                      <Link
-                        href={`/genre/${genre.name.toLowerCase()}`}
-                        key={genre.id}
-                      >
+                      <Link href={`/genre/${genre.name.toLowerCase()}`} key={genre.id}>
                         <span
                           key={genre.id}
                           className="bg-[#bb3b3b]/20 text-[#bb3b3b] px-3 py-1 rounded-full text-sm border border-[#bb3b3b]/30"
@@ -587,15 +573,10 @@ const GamePage = () => {
                 </div>
                 {game.tags && game.tags.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">
-                      Tags
-                    </h3>
+                    <h3 className="text-lg font-semibold text-white mb-2">Tags</h3>
                     <div className="flex flex-wrap gap-2">
                       {game.tags.slice(0, 10).map((tag) => (
-                        <Link
-                          href={`/tags/${tag.name.toLowerCase()}`}
-                          key={tag.id}
-                        >
+                        <Link href={`/tags/${tag.name.toLowerCase()}`} key={tag.id}>
                           <span
                             key={tag.id}
                             className="bg-black/30 text-white/70 px-3 py-1 rounded-full text-sm border border-white/20"
@@ -610,6 +591,89 @@ const GamePage = () => {
                 )}
               </div>
             </div>
+
+            {/* Reviews Section */}
+            <div className="bg-black/50 rounded-3xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">
+                  Reviews ({reviews.length})
+                </h2>
+                <button
+                  onClick={() => setReviewModalOpen(true)}
+                  className="flex items-center gap-2 bg-[#bb3b3b] hover:bg-[#d14d4d] text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                >
+                  <MessageSquare size={14} />
+                  Write Review
+                </button>
+              </div>
+
+              {reviewsLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-[#bb3b3b]/30 border-t-[#bb3b3b] rounded-full animate-spin" />
+                </div>
+              ) : reviews.length > 0 ? (
+                <div className="space-y-6">
+                  {reviews.map((review) => (
+                    <div key={review._id} className="border-b border-white/10 pb-6 last:border-b-0">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center overflow-hidden">
+                          {review.user.profileImage ? (
+                            <Image
+                              src={review.user.profileImage}
+                              alt={review.user.username}
+                              width={40}
+                              height={40}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-[#bb3b3b] text-sm font-bold">
+                              {review.user.username.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-semibold text-white">{review.user.username}</h4>
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  size={14}
+                                  className={`${i < review.rating
+                                    ? 'text-yellow-500 fill-current'
+                                    : 'text-white/20'
+                                    }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm text-white/50">
+                              {new Date(review.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+
+                          {review.text && (
+                            <p className="text-white/70 leading-relaxed">{review.text}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <MessageSquare size={48} className="text-[#bb3b3b] mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-white mb-2">No Reviews Yet</h3>
+                  <p className="text-white/70 mb-4">Be the first to review this game!</p>
+                  <button
+                    onClick={() => setReviewModalOpen(true)}
+                    className="bg-[#bb3b3b] hover:bg-[#d14d4d] text-white px-6 py-3 rounded-xl transition-colors"
+                  >
+                    Write First Review
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -623,32 +687,24 @@ const GamePage = () => {
                     <Users className="text-blue-400" size={16} />
                     <span className="text-white/70">Players</span>
                   </div>
-                  <span className="text-white font-semibold">
-                    {game.added.toLocaleString()}
-                  </span>
+                  <span className="text-white font-semibold">{game.added.toLocaleString()}</span>
                 </div>
-
                 {game.playtime > 0 && (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Clock className="text-green-400" size={16} />
                       <span className="text-white/70">Avg Playtime</span>
                     </div>
-                    <span className="text-white font-semibold">
-                      {game.playtime}h
-                    </span>
+                    <span className="text-white font-semibold">{game.playtime}h</span>
                   </div>
                 )}
-
                 {game.achievements_count > 0 && (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Trophy className="text-yellow-400" size={16} />
                       <span className="text-white/70">Achievements</span>
                     </div>
-                    <span className="text-white font-semibold">
-                      {game.achievements_count}
-                    </span>
+                    <span className="text-white font-semibold">{game.achievements_count}</span>
                   </div>
                 )}
               </div>
@@ -656,9 +712,7 @@ const GamePage = () => {
 
             {/* Platforms */}
             <div className="bg-black/50 rounded-3xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4">
-                Available On
-              </h3>
+              <h3 className="text-xl font-bold text-white mb-4">Available On</h3>
               <div className="space-y-2">
                 {game.platforms.map((platform) => (
                   <Link
@@ -671,9 +725,7 @@ const GamePage = () => {
                       className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors"
                     >
                       {getPlatformIcon(platform.platform.name)}
-                      <span className="text-white/70">
-                        {platform.platform.name}
-                      </span>
+                      <span className="text-white/70">{platform.platform.name}</span>
                     </div>
                   </Link>
                 ))}
@@ -703,9 +755,7 @@ const GamePage = () => {
                 {game.esrb_rating && (
                   <div className="bg-black/30 rounded-2xl p-3">
                     <span className="text-white/50 text-sm">ESRB Rating</span>
-                    <p className="text-white font-medium">
-                      {game.esrb_rating.name}
-                    </p>
+                    <p className="text-white font-medium">{game.esrb_rating.name}</p>
                   </div>
                 )}
               </div>
@@ -723,9 +773,7 @@ const GamePage = () => {
                     className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors group"
                   >
                     <Globe size={16} className="text-blue-400" />
-                    <span className="text-white/70 group-hover:text-white">
-                      Official Website
-                    </span>
+                    <span className="text-white/70 group-hover:text-white">Official Website</span>
                     <ExternalLink size={14} className="text-white/50 ml-auto" />
                   </a>
                 )}
@@ -737,9 +785,7 @@ const GamePage = () => {
                     className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors group"
                   >
                     <Trophy size={16} className="text-green-400" />
-                    <span className="text-white/70 group-hover:text-white">
-                      Metacritic
-                    </span>
+                    <span className="text-white/70 group-hover:text-white">Metacritic</span>
                     <ExternalLink size={14} className="text-white/50 ml-auto" />
                   </a>
                 )}
@@ -751,9 +797,7 @@ const GamePage = () => {
                     className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors group"
                   >
                     <Users size={16} className="text-orange-400" />
-                    <span className="text-white/70 group-hover:text-white">
-                      Reddit
-                    </span>
+                    <span className="text-white/70 group-hover:text-white">Reddit</span>
                     <ExternalLink size={14} className="text-white/50 ml-auto" />
                   </a>
                 )}
@@ -762,6 +806,14 @@ const GamePage = () => {
           </div>
         </div>
       </div>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        game={game}
+        onReviewSubmitted={handleReviewSubmitted}
+      />
     </div>
   );
 };

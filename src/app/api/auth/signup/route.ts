@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/db';
+import User from '@/models/User';
 
 export async function POST(request: NextRequest) {
   try {
-    const { username, email, password } = await request.json();
+    await connectDB();
+    
+    const { username, email, password, profileImage, bannerImage } = await request.json();
 
     // Basic validation
     if (!username || !email || !password) {
@@ -28,35 +32,59 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Replace with actual user creation logic
-    // For now, we'll simulate checking if user exists and creating account
-    
-    // Simulate checking if email already exists
-    if (email === 'existing@gamindom.com') {
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (existingUser) {
+      const field = existingUser.email === email ? 'email' : 'username';
       return NextResponse.json(
-        { error: 'An account with this email already exists' },
+        { error: `An account with this ${field} already exists` },
         { status: 409 }
       );
     }
 
-    // Simulate account creation delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    const user = {
-      id: Date.now().toString(),
+    // Create new user
+    const user = new User({
       username,
       email,
-      avatar: null,
-      joinedDate: new Date().toISOString(),
+      password, // In production, hash this password with bcrypt!
+      profileImage: profileImage || '',
+      bannerImage: bannerImage || '',
+    });
+
+    await user.save();
+
+    // Return user data (excluding password)
+    const userData = {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      profileImage: user.profileImage,
+      bannerImage: user.bannerImage,
+      bio: user.bio,
+      createdAt: user.createdAt,
     };
 
     return NextResponse.json({
       success: true,
-      user,
+      user: userData,
       message: 'Account created successfully'
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Signup error:', error);
+    
+    // Handle MongoDB duplicate key errors
+    if (error && typeof error === 'object' && 'code' in error && error.code === 11000 && 'keyPattern' in error) {
+      const mongoError = error as { keyPattern: Record<string, unknown> };
+      const field = Object.keys(mongoError.keyPattern)[0];
+      return NextResponse.json(
+        { error: `An account with this ${field} already exists` },
+        { status: 409 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

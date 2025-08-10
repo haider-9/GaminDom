@@ -5,7 +5,8 @@ import { Toaster } from "react-hot-toast";
 import Header from "@/components/Header";
 import CircularFloatingMenu from "@/components/CircularFloatingMenu";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import FloatingHint from "@/components/FloatingHint";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import RightSidebar from "@/components/RightSideBar";
 
 
 const orbitron = Orbitron({
@@ -28,10 +29,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${orbitron.variable} font-Orbitron`}>
         <ThemeProvider>
-          <Toaster />
-          <Header />
-          <CircularFloatingMenu />
-          {children}
+          <FavoritesProvider>
+            <Toaster />
+            <Header />
+            <CircularFloatingMenu />
+            <RightSidebar />
+            {children}
+          </FavoritesProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Play, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import FavoriteButton from "./FavoriteButton";
 
 interface Game {
   id: number;
@@ -16,6 +17,7 @@ interface Game {
   platforms: Array<{ platform: { name: string } }>;
   metacritic: number;
   short_screenshots: Array<{ image: string }>;
+  description_raw?: string;
 }
 
 const NewGames = () => {
@@ -231,7 +233,7 @@ const NewGames = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <Image
-                      src={game.background_image || "/placeholder-game.jpg"}
+                      src={game.background_image || "/placeholder-game.svg"}
                       alt={game.name}
                       fill
                       className="object-cover"
@@ -281,13 +283,20 @@ const NewGames = () => {
                             {game.metacritic}
                           </motion.div>
                         )}
-                        <motion.button
-                          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-1.5 rounded-full transition-colors"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Heart size={12} />
-                        </motion.button>
+                        <FavoriteButton 
+                          game={{
+                            id: game.id,
+                            name: game.name,
+                            background_image: game.background_image,
+                            rating: game.rating,
+                            released: game.released,
+                            platforms: game.platforms,
+                            genres: game.genres,
+                            description: game.description_raw
+                          }}
+                          size={12}
+                          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 p-1.5 rounded-full transition-colors"
+                        />
                       </motion.div>
                     </motion.div>
 

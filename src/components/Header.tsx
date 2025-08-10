@@ -7,6 +7,7 @@ import {
   Clock,
   TrendingUp,
   Star,
+
 } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -199,6 +200,7 @@ const Header = () => {
                 <p>Notifications</p>
               </TooltipContent>
             </Tooltip>
+
           </div>
         </div>
 
@@ -279,6 +281,7 @@ const Header = () => {
                 <p>Notifications</p>
               </TooltipContent>
             </Tooltip>
+
           </div>
         </div>
       </div>
@@ -471,7 +474,7 @@ const Header = () => {
                         >
                           <Image
                             src={
-                              game.background_image || "/placeholder-game.jpg"
+                              game.background_image || "/placeholder-game.svg"
                             }
                             alt={game.name}
                             width={40}

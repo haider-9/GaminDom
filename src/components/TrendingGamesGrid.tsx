@@ -1,9 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { TrendingUp, Star, Calendar, Users, Play, Heart, ArrowLeft,  Flame } from "lucide-react";
+import { TrendingUp, Star, Calendar, Users, ArrowLeft, Flame, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Pagination from "./Pagination";
+import FavoriteButton from "./FavoriteButton";
+import ReviewModal from "./ReviewModal";
 
 interface Game {
   id: number;
@@ -16,6 +18,7 @@ interface Game {
   metacritic: number;
   ratings_count: number;
   added: number;
+  description_raw?: string;
 }
 
 const TrendingGamesGrid = () => {
@@ -25,6 +28,8 @@ const TrendingGamesGrid = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const itemsPerPage = 24;
 
   useEffect(() => {
@@ -138,7 +143,7 @@ const TrendingGamesGrid = () => {
               {/* Background Image */}
               <div className="relative h-64 overflow-hidden">
                 <Image
-                  src={game.background_image || "/placeholder-game.jpg"}
+                  src={game.background_image || "/placeholder-game.svg"}
                   alt={game.name}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -148,12 +153,32 @@ const TrendingGamesGrid = () => {
 
               {/* Action Buttons */}
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-colors">
-                  <Play size={16} fill="white" />
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSelectedGame(game);
+                    setReviewModalOpen(true);
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition-colors"
+                  title="Write a review"
+                >
+                  <MessageSquare size={16} />
                 </button>
-                <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-colors">
-                  <Heart size={16} />
-                </button>
+                <FavoriteButton 
+                  game={{
+                    id: game.id,
+                    name: game.name,
+                    background_image: game.background_image,
+                    rating: game.rating,
+                    released: game.released,
+                    platforms: game.platforms,
+                    genres: game.genres,
+                    description: game.description_raw
+                  }}
+                  size={16}
+                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 p-2 rounded-full transition-colors"
+                />
               </div>
 
               {/* Content */}
@@ -216,7 +241,27 @@ const TrendingGamesGrid = () => {
       )}
 
       {/* Trending Statistics */}
-    
+      
+      {/* Review Modal */}
+      {selectedGame && (
+        <ReviewModal
+          isOpen={reviewModalOpen}
+          onClose={() => {
+            setReviewModalOpen(false);
+            setSelectedGame(null);
+          }}
+          game={{
+            id: selectedGame.id,
+            name: selectedGame.name,
+            background_image: selectedGame.background_image,
+            rating: selectedGame.rating,
+            released: selectedGame.released,
+            platforms: selectedGame.platforms,
+            genres: selectedGame.genres,
+            description: selectedGame.description_raw
+          }}
+        />
+      )}
     </div>
   );
 };

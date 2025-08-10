@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/db';
+import User from '@/models/User';
 
 export async function POST(request: NextRequest) {
   try {
+    await connectDB();
+    
     const { email, password } = await request.json();
 
     // Basic validation
@@ -12,32 +16,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Replace with actual authentication logic
-    // For now, we'll simulate a successful login
-    if (email === 'demo@gamindom.com' && password === 'demo123') {
-      const user = {
-        id: '1',
-        username: 'DemoUser',
-        email: email,
-        avatar: null,
-        joinedDate: new Date().toISOString(),
-      };
-
-      return NextResponse.json({
-        success: true,
-        user,
-        message: 'Login successful'
-      });
+    // Find user by email
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Invalid email or password' },
+        { status: 401 }
+      );
     }
 
-    // Simulate checking credentials
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // In production, you should hash and compare passwords with bcrypt
+    // For now, we'll do a simple comparison
+    if (user.password !== password) {
+      return NextResponse.json(
+        { error: 'Invalid email or password' },
+        { status: 401 }
+      );
+    }
 
-    return NextResponse.json(
-      { error: 'Invalid email or password' },
-      { status: 401 }
-    );
-  } catch (error) {
+    // Return user data (excluding password)
+    const userData = {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      profileImage: user.profileImage,
+      bannerImage: user.bannerImage,
+      bio: user.bio,
+      createdAt: user.createdAt,
+    };
+
+    return NextResponse.json({
+      success: true,
+      user: userData,
+      message: 'Login successful'
+    });
+  } catch (error: unknown) {
     console.error('Login error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -2,6 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { Star, Calendar, Play, Heart, Users } from "lucide-react";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 interface Game {
   id: number;
@@ -24,6 +25,14 @@ interface LatestGameCardProps {
 }
 
 const LatestGameCard: React.FC<LatestGameCardProps> = ({ game, onClick }) => {
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const favorite = isFavorite(game.id);
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    await toggleFavorite(game);
+  };
+
   return (
     <div
       onClick={onClick}
@@ -32,7 +41,7 @@ const LatestGameCard: React.FC<LatestGameCardProps> = ({ game, onClick }) => {
       {/* Background Image */}
       <div className="relative h-64 overflow-hidden">
         <Image
-          src={game.background_image || "/placeholder-game.jpg"}
+          src={game.background_image || "/placeholder-game.svg"}
           alt={game.name}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -45,10 +54,24 @@ const LatestGameCard: React.FC<LatestGameCardProps> = ({ game, onClick }) => {
         <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-colors">
           <Play size={16} fill="white" />
         </button>
-        <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-colors">
-          <Heart size={16} />
+        <button 
+          onClick={handleFavoriteClick}
+          className={`p-2 rounded-full transition-colors ${
+            favorite 
+              ? 'bg-red-500 hover:bg-red-600 text-white' 
+              : 'bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white'
+          }`}
+        >
+          <Heart size={16} className={favorite ? 'fill-current' : ''} />
         </button>
       </div>
+
+      {/* Favorite Indicator - Always visible if favorited */}
+      {favorite && (
+        <div className="absolute top-4 left-4 bg-red-500 text-white p-2 rounded-full shadow-lg">
+          <Heart size={14} className="fill-current" />
+        </div>
+      )}
 
       {/* Content */}
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white">

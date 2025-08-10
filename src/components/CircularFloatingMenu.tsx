@@ -14,9 +14,12 @@ import {
   Menu,
   X,
   LogIn,
+  LogOut,
   RotateCcw,
   ArrowRight,
   ArrowLeft,
+  User,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -33,68 +36,138 @@ const CircularFloatingMenu = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
 
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const menuItems = useMemo(() => [
-    {
-      icon: <Home size={20} />,
-      label: "Home",
-      route: "/",
-      shortcut: "H",
-      classes: "bg-red-500 text-red-100 border-red-300 bg-red-500/95 border-red-300/30"
-    },
-    {
-      icon: <Gamepad2 size={20} />,
-      label: "Latest",
-      route: "/latest",
-      shortcut: "L",
-      classes: "bg-emerald-500 text-emerald-100 border-emerald-300 bg-emerald-500/95 border-emerald-300/30"
-    },
-    {
-      icon: <Trophy size={20} />,
-      label: "Top Rated",
-      route: "/top-rated",
-      shortcut: "T",
-      classes: "bg-yellow-500 text-yellow-100 border-yellow-300 bg-yellow-500/95 border-yellow-300/30"
-    },
-    {
-      icon: <TrendingUp size={20} />,
-      label: "Trending",
-      route: "/trending",
-      shortcut: "R",
-      classes: "bg-purple-500 text-purple-100 border-purple-300 bg-purple-500/95 border-purple-300/30"
-    },
-    {
-      icon: <Newspaper size={20} />,
-      label: "News",
-      route: "/news",
-      shortcut: "N",
-      classes: "bg-blue-500 text-blue-100 border-blue-300 bg-blue-500/95 border-blue-300/30"
-    },
-    {
-      icon: <Info size={20} />,
-      label: "About",
-      route: "/about",
-      shortcut: "A",
-      classes: "bg-cyan-500 text-cyan-100 border-cyan-300 bg-cyan-500/95 border-cyan-300/30"
-    },
-    {
-      icon: <LogIn size={20} />,
-      label: "Get Started",
-      route: "/get-started",
-      shortcut: "G",
-      classes: "bg-pink-500 text-pink-100 border-pink-300 bg-pink-500/95 border-pink-300/30"
-    },
-    {
-      icon: <Settings size={20} />,
-      label: "Settings",
-      route: "/settings",
-      shortcut: "S",
-      classes: "bg-slate-500 text-slate-100 border-slate-300 bg-slate-500/95 border-slate-300/30"
-    },
-  ], []);
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = () => {
+      const userData = localStorage.getItem('user');
+      setIsLoggedIn(!!userData);
+    };
+
+    checkAuth();
+    // Listen for storage changes (login/logout from other tabs)
+    window.addEventListener('storage', checkAuth);
+    // Listen for auth changes (login/logout from same tab)
+    window.addEventListener('authChange', checkAuth);
+    
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('authChange', checkAuth);
+    };
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    setIsOpen(false);
+    router.push('/');
+    // Trigger events for other components
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event('authChange'));
+  }, [router]);
+
+  interface MenuItem {
+    icon: React.ReactElement;
+    label: string;
+    route: string;
+    shortcut: string;
+    classes: string;
+    onClick?: () => void;
+  }
+
+  const menuItems = useMemo(() => {
+    const baseItems: MenuItem[] = [
+      {
+        icon: <Home size={20} />,
+        label: "Home",
+        route: "/",
+        shortcut: "H",
+        classes: "bg-red-500 text-red-100 border-red-300 bg-red-500/95 border-red-300/30"
+      },
+      {
+        icon: <Gamepad2 size={20} />,
+        label: "Latest",
+        route: "/latest",
+        shortcut: "L",
+        classes: "bg-emerald-500 text-emerald-100 border-emerald-300 bg-emerald-500/95 border-emerald-300/30"
+      },
+      {
+        icon: <Trophy size={20} />,
+        label: "Top Rated",
+        route: "/top-rated",
+        shortcut: "T",
+        classes: "bg-yellow-500 text-yellow-100 border-yellow-300 bg-yellow-500/95 border-yellow-300/30"
+      },
+      {
+        icon: <TrendingUp size={20} />,
+        label: "Trending",
+        route: "/trending",
+        shortcut: "R",
+        classes: "bg-purple-500 text-purple-100 border-purple-300 bg-purple-500/95 border-purple-300/30"
+      },
+      {
+        icon: <Newspaper size={20} />,
+        label: "News",
+        route: "/news",
+        shortcut: "N",
+        classes: "bg-blue-500 text-blue-100 border-blue-300 bg-blue-500/95 border-blue-300/30"
+      },
+      {
+        icon: <Info size={20} />,
+        label: "About",
+        route: "/about",
+        shortcut: "A",
+        classes: "bg-cyan-500 text-cyan-100 border-cyan-300 bg-cyan-500/95 border-cyan-300/30"
+      },
+      {
+        icon: <Settings size={20} />,
+        label: "Settings",
+        route: "/settings",
+        shortcut: "S",
+        classes: "bg-slate-500 text-slate-100 border-slate-300 bg-slate-500/95 border-slate-300/30"
+      },
+    ];
+
+    if (isLoggedIn) {
+      baseItems.splice(5, 0, {
+        icon: <User size={20} />,
+        label: "Profile",
+        route: "/profile",
+        shortcut: "P",
+        classes: "bg-indigo-500 text-indigo-100 border-indigo-300 bg-indigo-500/95 border-indigo-300/30"
+      });
+      baseItems.splice(6, 0, {
+        icon: <Users size={20} />,
+        label: "Users",
+        route: "/users",
+        shortcut: "U",
+        classes: "bg-orange-500 text-orange-100 border-orange-300 bg-orange-500/95 border-orange-300/30"
+      });
+      baseItems.push({
+        icon: <LogOut size={20} />,
+        label: "Logout",
+        route: "#",
+        shortcut: "O",
+        classes: "bg-red-600 text-red-100 border-red-400 bg-red-600/95 border-red-400/30",
+        onClick: handleLogout
+      });
+    } else {
+      baseItems.push({
+        icon: <LogIn size={20} />,
+        label: "Get Started",
+        route: "/get-started",
+        shortcut: "G",
+        classes: "bg-pink-500 text-pink-100 border-pink-300 bg-pink-500/95 border-pink-300/30"
+      });
+    }
+
+    return baseItems;
+  }, [isLoggedIn, handleLogout]);
 
   useEffect(() => {
     setMounted(true);
@@ -125,12 +198,14 @@ const CircularFloatingMenu = () => {
   }, [isMobile]);
   const resetRotation = useCallback(() => setRotation(0), []);
 
-  const router = useRouter();
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      // Check if e.key exists and is a string
+      if (!e.key || typeof e.key !== 'string') return;
+
       // Open menu with 'M' key on desktop
-      if (!isOpen && e.key.toLowerCase() === 'm' && !isMobile && e.ctrlKey ) {
+      if (!isOpen && e.key.toLowerCase() === 'm' && !isMobile && e.ctrlKey) {
         setIsOpen(true);
         return;
       }
@@ -138,8 +213,14 @@ const CircularFloatingMenu = () => {
       if (!isOpen) return;
 
       const key = e.key.toLowerCase();
-      const item = menuItems.find(i => i.shortcut.toLowerCase() === key);
-      if (item) router.push(item.route);
+      const item = menuItems.find(i => i.shortcut && i.shortcut.toLowerCase() === key);
+      if (item) {
+        if (item.onClick) {
+          item.onClick();
+        } else {
+          router.push(item.route);
+        }
+      }
       if (e.key === "Escape") setIsOpen(false);
 
       // Only allow rotation on desktop
@@ -227,12 +308,18 @@ const CircularFloatingMenu = () => {
                     >
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Link href={item.route} onClick={() => setIsOpen(false)}>
-                            <div className={cn(
-                              "w-14 h-14 rounded-2xl flex items-center justify-center border-2 shadow-md text-white relative",
-                              bg,
-                              "border-white/30 hover:border-white"
-                            )}>
+                          {item.onClick ? (
+                            <button
+                              onClick={() => {
+                                setIsOpen(false);
+                                item.onClick?.();
+                              }}
+                              className={cn(
+                                "w-14 h-14 rounded-2xl flex items-center justify-center border-2 shadow-md text-white relative cursor-pointer",
+                                bg,
+                                "border-white/30 hover:border-white"
+                              )}
+                            >
                               <motion.div
                                 animate={{ rotate: isMobile ? 0 : -rotation }}
                                 transition={{ duration: 0.3 }}
@@ -252,8 +339,36 @@ const CircularFloatingMenu = () => {
                                   {item.shortcut}
                                 </span>
                               </motion.div>
-                            </div>
-                          </Link>
+                            </button>
+                          ) : (
+                            <Link href={item.route} onClick={() => setIsOpen(false)}>
+                              <div className={cn(
+                                "w-14 h-14 rounded-2xl flex items-center justify-center border-2 shadow-md text-white relative",
+                                bg,
+                                "border-white/30 hover:border-white"
+                              )}>
+                                <motion.div
+                                  animate={{ rotate: isMobile ? 0 : -rotation }}
+                                  transition={{ duration: 0.3 }}
+                                  className={cn(
+                                    "drop-shadow-sm filter brightness-110",
+                                    text
+                                  )}
+                                >
+                                  {item.icon}
+                                </motion.div>
+                                <motion.div
+                                  className="hidden md:flex absolute -top-1 -right-1 w-5 h-5 bg-black/80 backdrop-blur-sm border border-white/30 rounded-full items-center justify-center"
+                                  animate={{ rotate: isMobile ? 0 : -rotation }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  <span className="text-[10px] font-mono font-semibold text-white/90">
+                                    {item.shortcut}
+                                  </span>
+                                </motion.div>
+                              </div>
+                            </Link>
+                          )}
                         </TooltipTrigger>
                         {!isMobile && (
                           <TooltipContent

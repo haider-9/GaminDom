@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { showToast } from "@/lib/toast-config";
 import {
@@ -14,6 +15,10 @@ import {
   UserPlus,
   LogIn,
   ArrowLeft,
+  Camera,
+  X,
+  Image as ImageIcon,
+  Upload,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -29,7 +34,12 @@ const GetStartedPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    profileImage: "",
+    bannerImage: "",
   });
+
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [bannerPreview, setBannerPreview] = useState<string>("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,6 +47,35 @@ const GetStartedPage = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'banner') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        showToast.error("Image size should be less than 5MB");
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        if (type === 'profile') {
+          setImagePreview(base64String);
+          setFormData(prev => ({
+            ...prev,
+            profileImage: base64String
+          }));
+        } else {
+          setBannerPreview(base64String);
+          setFormData(prev => ({
+            ...prev,
+            bannerImage: base64String
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,6 +101,8 @@ const GetStartedPage = () => {
             username: formData.username,
             email: formData.email,
             password: formData.password,
+            profileImage: formData.profileImage,
+            bannerImage: formData.bannerImage,
           };
 
       const response = await fetch(endpoint, {
@@ -79,6 +120,10 @@ const GetStartedPage = () => {
           isLogin ? "Welcome back!" : "Account created successfully!"
         );
         localStorage.setItem("user", JSON.stringify(data.user));
+        
+        // Dispatch custom event to notify components about auth change
+        window.dispatchEvent(new Event('authChange'));
+        
         router.push("/");
       } else {
         showToast.error(data.error || "Something went wrong");
@@ -97,7 +142,11 @@ const GetStartedPage = () => {
       email: "",
       password: "",
       confirmPassword: "",
+      profileImage: "",
+      bannerImage: "",
     });
+    setImagePreview("");
+    setBannerPreview("");
     setShowPassword(false);
     setShowConfirmPassword(false);
   };
@@ -163,30 +212,144 @@ const GetStartedPage = () => {
                 <AnimatePresence mode="wait">
                   {!isLogin && (
                     <motion.div
-                      key="username"
+                      key="signup-fields"
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="space-y-2"
+                      className="space-y-6"
                     >
-                      <label className="text-secondary text-sm font-medium">
-                        Username
-                      </label>
-                      <div className="relative">
-                        <User
-                          size={18}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 accent-primary"
-                        />
-                        <input
-                          type="text"
-                          name="username"
-                          value={formData.username}
-                          onChange={handleInputChange}
-                          required={!isLogin}
-                          className="w-full bg-surface border border-primary rounded-xl pl-12 pr-4 py-3 text-primary placeholder-muted focus:accent-border focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:outline-none transition-all duration-300"
-                          placeholder="Choose a username"
-                        />
+                      {/* Banner Image Upload */}
+                      <div className="space-y-2">
+                        <label className="text-[#e0d0d0] text-sm font-medium">
+                          Banner Image (Optional)
+                        </label>
+                        <div className="relative">
+                          <div className="w-full h-24 bg-[#2a1a1a] border-2 border-dashed border-[#3a1a1a] rounded-lg flex items-center justify-center overflow-hidden">
+                            {bannerPreview ? (
+                              <Image
+                                src={bannerPreview}
+                                alt="Banner preview"
+                                width={400}
+                                height={96}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="text-center">
+                                <ImageIcon size={20} className="text-[#bb3b3b] mx-auto mb-1" />
+                                <p className="text-[#8a6e6e] text-xs">Upload banner</p>
+                              </div>
+                            )}
+                          </div>
+                          {bannerPreview && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setBannerPreview("");
+                                setFormData(prev => ({ ...prev, bannerImage: "" }));
+                              }}
+                              className="absolute top-2 right-2 w-6 h-6 bg-[#bb3b3b] rounded-full flex items-center justify-center text-white hover:bg-[#d14d4d] transition-colors"
+                            >
+                              <X size={12} />
+                            </button>
+                          )}
+                          <div className="mt-2">
+                            <input
+                              type="file"
+                              id="bannerImage"
+                              accept="image/*"
+                              onChange={(e) => handleImageChange(e, 'banner')}
+                              className="hidden"
+                            />
+                            <label
+                              htmlFor="bannerImage"
+                              className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#2a1a1a] border border-[#3a1a1a] rounded-lg text-[#e0d0d0] hover:bg-[#3a1a1a] transition-colors cursor-pointer text-sm"
+                            >
+                              <Upload size={14} />
+                              Choose Banner
+                            </label>
+                            <p className="text-xs text-[#8a6e6e] mt-1">
+                              1200x300px recommended, Max 5MB
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Profile Image Upload */}
+                      <div className="space-y-2">
+                        <label className="text-[#e0d0d0] text-sm font-medium">
+                          Profile Picture (Optional)
+                        </label>
+                        <div className="flex items-center gap-4">
+                          <div className="relative">
+                            <div className="w-20 h-20 rounded-full bg-[#2a1a1a] border-2 border-[#3a1a1a] flex items-center justify-center overflow-hidden">
+                              {imagePreview ? (
+                                <Image
+                                  src={imagePreview}
+                                  alt="Profile preview"
+                                  width={80}
+                                  height={80}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <User size={24} className="text-[#bb3b3b]" />
+                              )}
+                            </div>
+                            {imagePreview && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setImagePreview("");
+                                  setFormData(prev => ({ ...prev, profileImage: "" }));
+                                }}
+                                className="absolute -top-2 -right-2 w-6 h-6 bg-[#bb3b3b] rounded-full flex items-center justify-center text-white hover:bg-[#d14d4d] transition-colors"
+                              >
+                                <X size={12} />
+                              </button>
+                            )}
+                          </div>
+                          <div>
+                            <input
+                              type="file"
+                              id="profileImage"
+                              accept="image/*"
+                              onChange={(e) => handleImageChange(e, 'profile')}
+                              className="hidden"
+                            />
+                            <label
+                              htmlFor="profileImage"
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-[#2a1a1a] border border-[#3a1a1a] rounded-lg text-[#e0d0d0] hover:bg-[#3a1a1a] transition-colors cursor-pointer"
+                            >
+                              <Camera size={16} />
+                              Choose Image
+                            </label>
+                            <p className="text-xs text-[#8a6e6e] mt-1">
+                              Max 5MB, JPG/PNG
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Username Field */}
+                      <div className="space-y-2">
+                        <label className="text-[#e0d0d0] text-sm font-medium">
+                          Username
+                        </label>
+                        <div className="relative">
+                          <User
+                            size={18}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#bb3b3b]"
+                          />
+                          <input
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleInputChange}
+                            required={!isLogin}
+                            className="w-full bg-[#2a1a1a] border border-[#3a1a1a] rounded-xl pl-12 pr-4 py-3 text-white placeholder-[#8a6e6e] focus:border-[#bb3b3b] focus:ring-2 focus:ring-[#bb3b3b]/30 focus:outline-none transition-all duration-300"
+                            placeholder="Choose a username"
+                          />
+                        </div>
                       </div>
                     </motion.div>
                   )}

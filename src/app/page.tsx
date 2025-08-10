@@ -13,96 +13,51 @@ import MenuHintWithArrow from "@/components/MenuHintWithArrow";
 
 const page = () => {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.3 }}
       className="w-full max-w-7xl mx-auto px-4 py-8 relative"
     >
       <MenuHintWithArrow />
 
       {/* Grid Layout */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8"
-      >
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
         {/* Main Carousel - Takes full width on mobile, 8 cols on desktop */}
-        <motion.div 
-          className="lg:col-span-8"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
+        <div className="lg:col-span-8">
           <PNGCarousal />
-        </motion.div>
+        </div>
 
         {/* Recent Games - Takes full width on mobile, 4 cols on desktop */}
-        <motion.div 
-          className="lg:col-span-4"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
+        <div className="lg:col-span-4">
           <Suspense fallback={<RecentGameSkeleton count={3} />}>
             <RecentGame />
           </Suspense>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       {/* Second Row Grid */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-        className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"
-      >
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-        >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div>
           <NewGames />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
+        </div>
+        <div>
           <PlayerStats />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       {/* Full Width Sections */}
-      <motion.div 
-        className="space-y-8"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.7 }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
+      <div className="space-y-8">
+        <div>
           <TrendingGames />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.9 }}
-        >
+        </div>
+        <div>
           <PopularTags />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.0 }}
-        >
+        </div>
+        <div>
           <TopRatedGames />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       {/* Mobile spacing for bottom navigation */}
       <div className="h-20 lg:h-0"></div>

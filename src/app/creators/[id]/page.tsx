@@ -192,7 +192,7 @@ const CreatorPage = () => {
         <div className="bg-black/50 rounded-3xl p-6 mb-8 relative overflow-hidden">
           <div className="absolute inset-0 opacity-20">
             <Image
-              src={creator.image_background || "/placeholder-game.jpg"}
+              src={creator.image_background || "/placeholder-game.svg"}
               alt={creator.name}
               fill
               className="object-cover"

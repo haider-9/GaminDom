@@ -165,7 +165,7 @@ const TagGamesGrid = ({ tagSlug }: TagGamesGridProps) => {
             {/* Background Image */}
             <div className="relative h-64 overflow-hidden">
               <Image
-                src={game.background_image || "/placeholder-game.jpg"}
+                src={game.background_image || "/placeholder-game.svg"}
                 alt={game.name}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-110"
