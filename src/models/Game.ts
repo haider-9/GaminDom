@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Schema, Model, Document } from "mongoose";
 
 export interface IGame extends Document {
   title: string;
@@ -15,7 +15,7 @@ export interface IGame extends Document {
 const GameSchema: Schema<IGame> = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
-  rawgId: { type: Number, unique: true }, // For linking with RAWG API
+  rawgId: { type: Number, unique: true },
   image: { type: String },
   rating: { type: Number },
   released: { type: Date },
