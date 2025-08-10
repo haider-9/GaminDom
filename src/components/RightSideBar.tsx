@@ -48,15 +48,36 @@ const RightSidebar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // Normalize various possible ID shapes (string, ObjectId-like, {$oid: "..."}) to a string
+  const normalizeId = (val: unknown): string | null => {
+    if (!val) return null;
+    if (typeof val === 'string') return val;
+    if (typeof val === 'object') {
+      const obj = val as Record<string, unknown> & { toString?: () => string };
+      // MongoDB extended JSON
+      if (typeof (obj as any).$oid === 'string') return (obj as any).$oid as string;
+      // Custom nested id fields
+      if (typeof (obj as any).id === 'string') return (obj as any).id as string;
+      if (typeof (obj as any)._id === 'string') return (obj as any)._id as string;
+      // Fall back to toString if it doesn't return [object Object]
+      if (typeof obj.toString === 'function') {
+        const s = obj.toString();
+        if (s && s !== '[object Object]') return s;
+      }
+    }
+    return null;
+  };
+
   const fetchUserData = useCallback(async (userId: string) => {
     // Prevent multiple simultaneous calls
     if (isLoading) {
       return;
     }
 
-    // Only fetch if we don't already have the user data or if the user ID changed
-    if (user && (user.id === userId || user._id === userId)) {
-      return; // Already have this user's data
+    // Only skip if we already have this user's full profile (including favourites)
+    const sameUser = user && (normalizeId((user as any).id) === userId || normalizeId((user as any)._id) === userId);
+    if (sameUser && Array.isArray((user as any).favourites)) {
+      return; // Already have this user's full data
     }
 
     try {
@@ -91,15 +112,20 @@ const RightSidebar = () => {
 
         if (userData) {
           const parsedUser = JSON.parse(userData);
-          const userId = parsedUser.id || parsedUser._id;
-          const currentUserId = user?.id || user?._id;
+          const storedId = normalizeId(parsedUser.id) || normalizeId(parsedUser._id);
+          const currentId = normalizeId(user?.id) || normalizeId(user?._id);
 
           // Only update if it's actually a different user or we don't have a user yet
-          if (!user || (userId && userId !== currentUserId)) {
+          if (!user || (storedId && storedId !== currentId)) {
             setUser(parsedUser);
-            // Only fetch additional data if we don't have it or it's a different user
-            if (userId && (!user || userId !== currentUserId)) {
-              fetchUserData(userId);
+            // Fetch full profile and reviews using a safe ID string
+            if (storedId) {
+              fetchUserData(storedId);
+            }
+          } else if (user && !Array.isArray((user as any).favourites)) {
+            // We have a user but likely from localStorage without favourites populated
+            if (storedId) {
+              fetchUserData(storedId);
             }
           }
         } else if (user) {

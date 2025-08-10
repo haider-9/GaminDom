@@ -164,20 +164,20 @@ const UserPage = () => {
           <div className="max-w-6xl mx-auto px-4 h-full flex flex-col">
             {/* Back Button */}
             <div className="pt-6">
-              <button
-                onClick={() => router.back()}
-                className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors backdrop-blur-sm bg-black/20 px-3 py-2 rounded-lg"
+              <Link
+                href="/"
+                className="inline-flex items-center  gap-2 text-white/80 hover:text-white transition-colors backdrop-blur-sm bg-black/20 px-3 py-2 rounded-lg"
               >
                 <ArrowLeft size={16} />
-                Back
-              </button>
+                Back to Home
+              </Link>
             </div>
 
             {/* Profile Info */}
             <div className="flex-1 flex items-end pb-6">
               <div className="flex items-end gap-6 w-full">
                 {/* Profile Image */}
-                <div className="w-32 h-32 rounded-full bg-[#2a1a1a] border-4 border-white flex items-center justify-center overflow-hidden shadow-xl">
+                <div className="w-24 h-24 xs:w-28 xs:h-28 md:w-32 md:h-32 rounded-full bg-[#2a1a1a] border-4 border-white flex items-center justify-center overflow-hidden shadow-xl shrink-0">
                   {user.profileImage ? (
                     <Image
                       src={user.profileImage}
@@ -187,44 +187,24 @@ const UserPage = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User size={48} className="text-[#bb3b3b]" />
+                    <User size={40} className="text-[#bb3b3b]" />
                   )}
                 </div>
 
                 {/* User Info */}
                 <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-2">
-                    <h1 className="text-3xl font-bold text-white drop-shadow-lg">{user.username}</h1>
-                    {!isOwnProfile && currentUser && (
-                      <button
-                        onClick={handleFollowToggle}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                          isFollowing
-                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                            : 'bg-[#bb3b3b] hover:bg-[#d14d4d] text-white'
-                        }`}
-                      >
-                        {isFollowing ? <UserCheck size={16} /> : <UserPlus size={16} />}
-                        {isFollowing ? 'Following' : 'Follow'}
-                      </button>
-                    )}
-                  </div>
-                  
-                  <p className="text-white/90 mb-4 drop-shadow">{user.bio || "No bio added yet"}</p>
-                  
+          
+
+                  <p className="text-white/90 mb-4 drop-shadow">
+                    {user.bio || "No bio added yet"}
+                  </p>
+
                   <div className="flex items-center gap-6 text-sm text-white/80">
                     <div className="flex items-center gap-2">
                       <Calendar size={16} />
                       Joined {new Date(user.createdAt).toLocaleDateString()}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Heart size={16} />
-                      {user.favourites?.length || 0} Favorites
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MessageSquare size={16} />
-                      {reviews.length} Reviews
-                    </div>
+
                   </div>
                 </div>
               </div>

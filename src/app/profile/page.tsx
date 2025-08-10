@@ -9,7 +9,7 @@ import {
   Edit3,
   GamepadIcon,
   MessageSquare,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -58,26 +58,46 @@ const ProfilePage = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'favorites' | 'reviews'>('favorites');
+  const [activeTab, setActiveTab] = useState<"favorites" | "reviews">(
+    "favorites"
+  );
+  const [reviewsLoaded, setReviewsLoaded] = useState(false);
+
+  // Normalize various possible ID shapes to a string
+  const normalizeId = (val: unknown): string | null => {
+    if (!val) return null;
+    if (typeof val === "string") return val;
+    if (typeof val === "object") {
+      const obj = val as Record<string, unknown> & { toString?: () => string };
+      if (typeof (obj as any).$oid === "string") return (obj as any).$oid as string;
+      if (typeof (obj as any).id === "string") return (obj as any).id as string;
+      if (typeof (obj as any)._id === "string") return (obj as any)._id as string;
+      if (typeof obj.toString === "function") {
+        const s = obj.toString();
+        if (s && s !== "[object Object]") return s;
+      }
+    }
+    return null;
+  };
 
   useEffect(() => {
     const checkAuthAndLoadProfile = () => {
-      const userData = localStorage.getItem('user');
+      const userData = localStorage.getItem("user");
       if (userData) {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
-        // Handle both 'id' and '_id' field names
-        const userId = parsedUser.id || parsedUser._id;
+        // Handle both 'id' and '_id' field names safely
+        const userId = normalizeId(parsedUser.id) || normalizeId(parsedUser._id);
         if (userId) {
-          fetchUserData(userId);
+          fetchUserFavorites(userId);
         } else {
           setLoading(false);
-          showToast.error('Invalid user data. Please log in again.');
+          showToast.error("Invalid user data. Please log in again.");
         }
       } else {
         setLoading(false);
-        showToast.error('Please log in to view your profile');
-        router.push('/get-started');
+        showToast.error("Please log in to view your profile");
+        router.push("/get-started");
       }
     };
 
@@ -89,37 +109,60 @@ const ProfilePage = () => {
       checkAuthAndLoadProfile();
     };
 
-    window.addEventListener('storage', handleAuthChange);
-    window.addEventListener('authChange', handleAuthChange);
+    window.addEventListener("storage", handleAuthChange);
+    window.addEventListener("authChange", handleAuthChange);
 
     return () => {
-      window.removeEventListener('storage', handleAuthChange);
-      window.removeEventListener('authChange', handleAuthChange);
+      window.removeEventListener("storage", handleAuthChange);
+      window.removeEventListener("authChange", handleAuthChange);
     };
   }, [router]);
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserFavorites = async (userId: string) => {
     try {
-      // Fetch complete user profile with favorites
+      // Fetch complete user profile with favorites only
       const userResponse = await fetch(`/api/users/${userId}`);
       if (userResponse.ok) {
         const userData = await userResponse.json();
         setUser(userData.user);
       }
-
-      // Fetch user's reviews
-      const reviewsResponse = await fetch(`/api/reviews?userId=${userId}`);
-      if (reviewsResponse.ok) {
-        const reviewsData = await reviewsResponse.json();
-        setReviews(reviewsData.reviews || []);
-      }
     } catch (error) {
-      console.error('Error fetching user data:', error);
-      showToast.error('Failed to load profile data');
+      console.error("Error fetching user favorites:", error);
+      showToast.error("Failed to load profile data");
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchUserReviews = async (userId: string) => {
+    try {
+      const reviewsResponse = await fetch(`/api/reviews?userId=${userId}`);
+      if (reviewsResponse.ok) {
+        const reviewsData = await reviewsResponse.json();
+        setReviews(reviewsData.reviews || []);
+        setReviewsLoaded(true);
+      }
+    } catch (error) {
+      console.error("Error fetching user reviews:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "reviews" && !reviewsLoaded) {
+      const local = localStorage.getItem("user");
+      if (local) {
+        try {
+          const parsed = JSON.parse(local);
+          const id = normalizeId(parsed.id) || normalizeId(parsed._id);
+          if (id) {
+            fetchUserReviews(id);
+          }
+        } catch {
+          // ignore JSON parse errors
+        }
+      }
+    }
+  }, [activeTab, reviewsLoaded]);
 
   if (loading) {
     return (
@@ -135,7 +178,9 @@ const ProfilePage = () => {
         <div className="text-center">
           <GamepadIcon size={64} className="text-[#bb3b3b] mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Not Logged In</h2>
-          <p className="text-[#d1c0c0] mb-6">Please log in to view your profile</p>
+          <p className="text-[#d1c0c0] mb-6">
+            Please log in to view your profile
+          </p>
           <Link
             href="/get-started"
             className="inline-flex items-center gap-2 bg-[#bb3b3b] hover:bg-[#d14d4d] text-white px-6 py-3 rounded-xl transition-colors"
@@ -174,7 +219,7 @@ const ProfilePage = () => {
             <div className="pt-6">
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors backdrop-blur-sm bg-black/20 px-3 py-2 rounded-lg"
+                className="inline-flex items-center  gap-2 text-white/80 hover:text-white transition-colors backdrop-blur-sm bg-black/20 px-3 py-2 rounded-lg"
               >
                 <ArrowLeft size={16} />
                 Back to Home
@@ -185,7 +230,7 @@ const ProfilePage = () => {
             <div className="flex-1 flex items-end pb-6">
               <div className="flex items-end gap-6 w-full">
                 {/* Profile Image */}
-                <div className="w-32 h-32 rounded-full bg-[#2a1a1a] border-4 border-white flex items-center justify-center overflow-hidden shadow-xl">
+                <div className="w-24 h-24 xs:w-28 xs:h-28 md:w-32 md:h-32 rounded-full bg-[#2a1a1a] border-4 border-white flex items-center justify-center overflow-hidden shadow-xl shrink-0">
                   {user.profileImage ? (
                     <Image
                       src={user.profileImage}
@@ -195,38 +240,35 @@ const ProfilePage = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User size={48} className="text-[#bb3b3b]" />
+                    <User size={40} className="text-[#bb3b3b]" />
                   )}
                 </div>
 
                 {/* User Info */}
                 <div className="flex-1">
                   <div className="flex items-center gap-4 mb-2">
-                    <h1 className="text-3xl font-bold text-white drop-shadow-lg">{user.username}</h1>
+                    <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                      {user.username}
+                    </h1>
                     <Link
                       href="/profile/edit"
-                      className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm text-white hover:bg-white/20 transition-colors"
                     >
-                      <Edit3 size={16} />
+                      <Edit3 className="size-3 sm:size-5" />
                       Edit Profile
                     </Link>
                   </div>
 
-                  <p className="text-white/90 mb-4 drop-shadow">{user.bio || "No bio added yet"}</p>
+                  <p className="text-white/90 mb-4 drop-shadow">
+                    {user.bio || "No bio added yet"}
+                  </p>
 
                   <div className="flex items-center gap-6 text-sm text-white/80">
                     <div className="flex items-center gap-2">
                       <Calendar size={16} />
                       Joined {new Date(user.createdAt).toLocaleDateString()}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Heart size={16} />
-                      {user.favourites?.length || 0} Favorites
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MessageSquare size={16} />
-                      {reviews.length} Reviews
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -240,20 +282,20 @@ const ProfilePage = () => {
         {/* Tabs */}
         <div className="flex gap-1 mb-8 bg-[#1a0a0a] p-1 rounded-xl w-fit">
           <button
-            onClick={() => setActiveTab('favorites')}
-            className={`px-6 py-3 rounded-lg font-medium transition-all ${activeTab === 'favorites'
-              ? 'bg-[#bb3b3b] text-white'
-              : 'text-[#d1c0c0] hover:text-white hover:bg-[#2a1a1a]'
+            onClick={() => setActiveTab("favorites")}
+            className={`px-6 py-3 rounded-lg font-medium transition-all ${activeTab === "favorites"
+              ? "bg-[#bb3b3b] text-white"
+              : "text-[#d1c0c0] hover:text-white hover:bg-[#2a1a1a]"
               }`}
           >
             <Heart size={16} className="inline mr-2" />
             Favorites ({user.favourites?.length || 0})
           </button>
           <button
-            onClick={() => setActiveTab('reviews')}
-            className={`px-6 py-3 rounded-lg font-medium transition-all ${activeTab === 'reviews'
-              ? 'bg-[#bb3b3b] text-white'
-              : 'text-[#d1c0c0] hover:text-white hover:bg-[#2a1a1a]'
+            onClick={() => setActiveTab("reviews")}
+            className={`px-6 py-3 rounded-lg font-medium transition-all ${activeTab === "reviews"
+              ? "bg-[#bb3b3b] text-white"
+              : "text-[#d1c0c0] hover:text-white hover:bg-[#2a1a1a]"
               }`}
           >
             <Star size={16} className="inline mr-2" />
@@ -268,7 +310,7 @@ const ProfilePage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {activeTab === 'favorites' && (
+          {activeTab === "favorites" && (
             <div>
               {user.favourites && user.favourites.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -280,10 +322,14 @@ const ProfilePage = () => {
                       background_image: game.image || "/placeholder-game.svg",
                       rating: game.rating || 0,
                       released: game.released || new Date().toISOString(),
-                      genres: game.genres?.map(g => ({ name: g })) || [{ name: "Game" }],
-                      platforms: game.platforms?.map(p => ({ platform: { name: p } })) || [{ platform: { name: "PC" } }],
+                      genres: game.genres?.map((g) => ({ name: g })) || [
+                        { name: "Game" },
+                      ],
+                      platforms: game.platforms?.map((p) => ({
+                        platform: { name: p },
+                      })) || [{ platform: { name: "PC" } }],
                       metacritic: 0, // Will be fetched from RAWG if needed
-                      added: 1000 // Default added count
+                      added: 1000, // Default added count
                     };
 
                     return (
@@ -304,8 +350,12 @@ const ProfilePage = () => {
               ) : (
                 <div className="text-center py-12">
                   <Heart size={48} className="text-[#bb3b3b] mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-2">No Favorites Yet</h3>
-                  <p className="text-[#d1c0c0] mb-6">Start exploring games and add them to your favorites!</p>
+                  <h3 className="text-xl font-bold text-white mb-2">
+                    No Favorites Yet
+                  </h3>
+                  <p className="text-[#d1c0c0] mb-6">
+                    Start exploring games and add them to your favorites!
+                  </p>
                   <Link
                     href="/"
                     className="inline-flex items-center gap-2 bg-[#bb3b3b] hover:bg-[#d14d4d] text-white px-6 py-3 rounded-xl transition-colors"
@@ -317,7 +367,7 @@ const ProfilePage = () => {
             </div>
           )}
 
-          {activeTab === 'reviews' && (
+          {activeTab === "reviews" && (
             <div>
               {reviews.length > 0 ? (
                 <div className="space-y-6">
@@ -343,15 +393,17 @@ const ProfilePage = () => {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-bold text-white">{review.game.title}</h3>
+                            <h3 className="font-bold text-white">
+                              {review.game.title}
+                            </h3>
                             <div className="flex items-center gap-1">
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
                                   size={14}
                                   className={`${i < review.rating
-                                    ? 'text-yellow-500 fill-current'
-                                    : 'text-[#3a1a1a]'
+                                    ? "text-yellow-500 fill-current"
+                                    : "text-[#3a1a1a]"
                                     }`}
                                 />
                               ))}
@@ -368,9 +420,16 @@ const ProfilePage = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <MessageSquare size={48} className="text-[#bb3b3b] mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-2">No Reviews Yet</h3>
-                  <p className="text-[#d1c0c0] mb-6">Share your thoughts about games you&apos;ve played!</p>
+                  <MessageSquare
+                    size={48}
+                    className="text-[#bb3b3b] mx-auto mb-4"
+                  />
+                  <h3 className="text-xl font-bold text-white mb-2">
+                    No Reviews Yet
+                  </h3>
+                  <p className="text-[#d1c0c0] mb-6">
+                    Share your thoughts about games you&apos;ve played!
+                  </p>
                   <Link
                     href="/"
                     className="inline-flex items-center gap-2 bg-[#bb3b3b] hover:bg-[#d14d4d] text-white px-6 py-3 rounded-xl transition-colors"
