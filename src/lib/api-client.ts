@@ -204,5 +204,88 @@ export const authApi = {
   },
 };
 
+// News API functions
+export const newsApi = {
+  // Get gaming news
+  getGamingNews: async (params: {
+    q?: string;
+    category?: string;
+    page?: number;
+    pageSize?: number;
+    sortBy?: 'relevancy' | 'popularity' | 'publishedAt';
+  } = {}) => {
+    const apiKey = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+    const baseUrl = process.env.NEXT_PUBLIC_NEWS_API_URL || 'https://newsapi.org/v2';
+    
+    if (!apiKey) {
+      throw new Error('NewsAPI key not configured');
+    }
+
+    const searchParams = new URLSearchParams({
+      apiKey,
+      language: 'en',
+      sortBy: params.sortBy || 'publishedAt',
+      page: String(params.page || 1),
+      pageSize: String(params.pageSize || 20),
+    });
+
+    // If specific query is provided, use everything endpoint
+    if (params.q) {
+      searchParams.append('q', params.q);
+      const url = `${baseUrl}/everything?${searchParams.toString()}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`NewsAPI error: ${response.status}`);
+      }
+      return await response.json();
+    }
+
+    // Otherwise use top-headlines with gaming-related sources
+    const gamingSources = [
+      'ign',
+      'polygon',
+      'gamespot',
+      'kotaku',
+      'the-verge',
+      'techcrunch',
+      'engadget',
+      'ars-technica'
+    ].join(',');
+
+    searchParams.delete('q'); // Remove query param for top-headlines
+    searchParams.append('sources', gamingSources);
+    
+    const url = `${baseUrl}/top-headlines?${searchParams.toString()}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`NewsAPI error: ${response.status}`);
+    }
+    return await response.json();
+  },
+
+  // Search news by category
+  searchNewsByCategory: async (category: string, page: number = 1, pageSize: number = 20) => {
+    const categoryQueries: Record<string, string> = {
+      gaming: 'gaming OR "video games" OR esports OR "game development"',
+      pc: '"PC gaming" OR Steam OR "Epic Games" OR "PC games"',
+      console: 'PlayStation OR Xbox OR Nintendo OR "console gaming"',
+      mobile: '"mobile gaming" OR "iOS games" OR "Android games" OR "mobile games"',
+      esports: 'esports OR "competitive gaming" OR tournaments OR "professional gaming"',
+      industry: '"game industry" OR "gaming industry" OR "game development" OR "gaming business"'
+    };
+
+    const query = categoryQueries[category] || categoryQueries.gaming;
+    
+    return newsApi.getGamingNews({
+      q: query,
+      page,
+      pageSize,
+      sortBy: 'publishedAt'
+    });
+  },
+};
+
 // Export default client for custom requests
 export default apiClient;

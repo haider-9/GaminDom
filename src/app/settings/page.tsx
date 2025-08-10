@@ -11,6 +11,8 @@ import {
   Sun,
   Save,
   ArrowLeft,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { showToast } from "@/lib/toast-config";
@@ -34,6 +36,8 @@ const SettingsPage = () => {
 
   const [hasChanges, setHasChanges] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   useEffect(() => {
     // Load user data from localStorage
@@ -113,10 +117,51 @@ const SettingsPage = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation !== "DELETE") {
+      showToast.error("Please type 'DELETE' to confirm");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        const user = JSON.parse(userData);
+        const userId = user.id || user._id;
+
+        const response = await fetch(`/api/users/${userId}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          // Clear all user data
+          localStorage.removeItem("user");
+          localStorage.removeItem("userSettings");
+          showToast.success("Account deleted successfully");
+          
+          // Redirect to home page
+          window.location.href = "/";
+        } else {
+          const error = await response.json();
+          showToast.error(error.error || "Failed to delete account");
+        }
+      }
+    } catch (error) {
+      console.error("Delete account error:", error);
+      showToast.error("Failed to delete account");
+    } finally {
+      setLoading(false);
+      setShowDeleteModal(false);
+      setDeleteConfirmation("");
+    }
+  };
+
   const tabs = [
     { id: "appearance", label: "Appearance", icon: Palette },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "privacy", label: "Privacy", icon: Shield },
+    { id: "account", label: "Account", icon: Trash2 },
   ];
 
   return (
@@ -373,10 +418,99 @@ const SettingsPage = () => {
                   </div>
                 </motion.div>
               )}
+
+              {/* Account Settings */}
+              {activeTab === "account" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  <h2 className="text-2xl font-bold text-primary mb-6">
+                    Account Management
+                  </h2>
+
+                  <div className="space-y-6">
+                    {/* Danger Zone */}
+                    <div className="border border-red-500/30 rounded-lg p-6 bg-red-500/5">
+                      <div className="flex items-start gap-4">
+                        <AlertTriangle className="text-red-500 mt-1" size={24} />
+                        <div className="flex-1">
+                          <h3 className="text-red-500 font-semibold text-lg mb-2">
+                            Danger Zone
+                          </h3>
+                          <p className="text-secondary mb-4">
+                            Once you delete your account, there is no going back. Please be certain.
+                          </p>
+                          <button
+                            onClick={() => setShowDeleteModal(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                          >
+                            <Trash2 size={16} />
+                            Delete Account
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-surface rounded-xl p-6 border border-red-500/30 max-w-md w-full"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <AlertTriangle className="text-red-500" size={24} />
+              <h3 className="text-xl font-bold text-red-500">Delete Account</h3>
+            </div>
+            
+            <p className="text-secondary mb-4">
+              This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
+            </p>
+            
+            <div className="mb-4">
+              <label className="block text-secondary text-sm font-medium mb-2">
+                Type DELETE to confirm:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmation}
+                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                className="w-full bg-surface border border-primary rounded-lg px-4 py-2 text-primary focus:accent-border focus:outline-none transition-colors"
+                placeholder="DELETE"
+              />
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteConfirmation("");
+                }}
+                className="flex-1 px-4 py-2 border border-primary rounded-lg text-secondary hover:text-primary transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={loading || deleteConfirmation !== "DELETE"}
+                className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? "Deleting..." : "Delete Account"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

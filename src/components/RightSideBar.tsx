@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -183,7 +184,7 @@ const RightSidebar = () => {
       window.removeEventListener('storage', checkAuth);
       window.removeEventListener('authChange', handleAuthChange);
     };
-  }, []); // Remove all dependencies to prevent infinite loops
+  }, [fetchUserData, hasInitialized]); // Add the missing dependencies
 
   const handleLogout = () => {
     localStorage.removeItem('user');

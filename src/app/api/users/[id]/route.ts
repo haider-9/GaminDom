@@ -10,7 +10,7 @@ export async function GET(
     await connectDB();
     
     // Ensure Game model is registered
-    Game;
+    void Game;
     
     const { id } = await params;
     if (!id) {
@@ -135,6 +135,49 @@ export async function PUT(
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 400 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+    
+    const { id } = await params;
+    if (!id) {
+      return NextResponse.json(
+        { error: 'User ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // First check if user exists
+    const user = await User.findById(id);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    // Delete user's reviews first (to maintain data integrity)
+    const { Review } = await import('@/models/index.js');
+    await Review.deleteMany({ user: id });
+
+    // Delete the user
+    await User.findByIdAndDelete(id);
+    
+    return NextResponse.json({ 
+      message: 'Account deleted successfully' 
+    });
+  } catch (error: unknown) {
+    console.error('Delete user error:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to delete account' },
+      { status: 500 }
     );
   }
 }

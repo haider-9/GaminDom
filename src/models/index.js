@@ -6,9 +6,11 @@ import Review from './Review.js';
 // Export all models
 export { User, Game, Review };
 
-// Ensure all models are registered
-export default {
+// Create models object and export as default
+const models = {
   User,
   Game,
   Review
 };
+
+export default models;

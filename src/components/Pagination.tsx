@@ -8,6 +8,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
   totalItems: number;
   itemsPerPage: number;
+  itemType?: string;
 }
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -16,6 +17,7 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
   totalItems,
   itemsPerPage,
+  itemType = "games",
 }) => {
   const getVisiblePages = () => {
     const delta = 2;
@@ -58,7 +60,7 @@ const Pagination: React.FC<PaginationProps> = ({
         {/* Results Info */}
         <div className="text-white/70 text-sm">
           Showing {startItem.toLocaleString()} to {endItem.toLocaleString()} of{" "}
-          {totalItems.toLocaleString()} games
+          {totalItems.toLocaleString()} {itemType}
         </div>
 
         {/* Pagination Controls */}
