@@ -11,13 +11,13 @@ import {
   MessageSquare,
   ArrowLeft,
   Users,
-  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/lib/toast-config";
 import LatestGameCard from "@/components/LatestGameCard";
+import CharacterCard from "@/components/CharacterCard";
 import { useCharacterFavorites } from "@/hooks/useCharacterFavorites";
 
 interface UserProfile {
@@ -429,93 +429,13 @@ const ProfilePage = () => {
               ) : favoriteCharacters.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {favoriteCharacters.map((character, index) => (
-                    <motion.div
+                    <CharacterCard
                       key={character._id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className="bg-[#1a0a0a] rounded-xl border border-[#3a1a1a] overflow-hidden hover:border-[#bb3b3b] transition-all group"
-                    >
-                      {/* Character Image */}
-                      <div className="relative h-48 overflow-hidden">
-                        {character.image ? (
-                          <Image
-                            src={character.image}
-                            alt={character.name}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = '/placeholder-character.svg';
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#2a1a1a] to-[#3a1a1a] flex items-center justify-center">
-                            <User size={48} className="text-[#8a6e6e]" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-                        {/* Remove Button */}
-                        <button
-                          onClick={() => character._id && handleRemoveCharacterFromFavorites(character._id)}
-                          className="absolute top-3 right-3 p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-full transition-colors opacity-0 group-hover:opacity-100"
-                          title="Remove from favorites"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-
-                      {/* Character Info */}
-                      <div className="p-4">
-                        <h3 className="text-lg font-bold text-white mb-2 line-clamp-1">
-                          {character.name}
-                        </h3>
-
-                        <div className="flex items-center gap-2 mb-3">
-                          <GamepadIcon size={14} className="text-[#bb3b3b]" />
-                          <span className="text-sm text-[#d1c0c0] line-clamp-1">
-                            {character.gameTitle}
-                          </span>
-                        </div>
-
-                        {character.description && (
-                          <p className="text-sm text-[#8a6e6e] line-clamp-2 mb-4">
-                            {character.description}
-                          </p>
-                        )}
-
-                        {/* Character Details */}
-                        <div className="space-y-2">
-                          {character.gender && (
-                            <div className="flex items-center gap-2">
-                              <User size={12} className="text-[#8a6e6e]" />
-                              <span className="text-xs text-[#8a6e6e]">
-                                {character.gender}
-                              </span>
-                            </div>
-                          )}
-
-                          {character.aliases && character.aliases.length > 0 && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-[#8a6e6e]">
-                                Aliases: {character.aliases.join(', ')}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* View Character Button */}
-                        {character.giantBombId && (
-                          <Link
-                            href={`/character/${character.giantBombId}`}
-                            className="mt-4 w-full bg-[#2a1a1a] hover:bg-[#3a1a1a] text-[#d1c0c0] hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center block"
-                          >
-                            View Details
-                          </Link>
-                        )}
-                      </div>
-                    </motion.div>
+                      character={character}
+                      index={index}
+                      onRemove={handleRemoveCharacterFromFavorites}
+                      showRemoveButton={true}
+                    />
                   ))}
                 </div>
               ) : (

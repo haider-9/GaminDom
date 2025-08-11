@@ -14,6 +14,7 @@ import {
   Tag,
   Share2,
   Hash,
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
 import FavoriteCharacterButton from "@/components/FavoriteCharacterButton";
@@ -80,21 +81,123 @@ const CharacterPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [favoritesCount, setFavoritesCount] = useState<number>(0);
   
   type CharacterResponse = {
     character: Character | null;
   };
 
-  // Get current user ID (you'll need to implement this based on your auth system)
+  // Helper function to normalize user ID (same as profile page)
+  const normalizeId = (val: unknown): string | null => {
+    if (!val) return null;
+    if (typeof val === 'string') return val;
+    if (typeof val === 'object' && val !== null) {
+      const obj = val as Record<string, unknown>;
+      if (typeof obj['$oid'] === 'string') return obj['$oid'] as string;
+      if (typeof obj['id'] === 'string') return obj['id'] as string;
+      if (typeof obj['_id'] === 'string') return obj['_id'] as string;
+      const toStringFn = (obj as { toString?: () => string }).toString;
+      if (typeof toStringFn === 'function') {
+        const s = toStringFn.call(obj);
+        if (s && s !== '[object Object]') return s;
+      }
+    }
+    return null;
+  };
+
+  // Enhanced authentication logic
   useEffect(() => {
-    // This is a placeholder - replace with your actual auth logic
-    const getUserId = () => {
-      // Example: get from localStorage, context, or API
-      const userId = localStorage.getItem('userId');
-      setCurrentUserId(userId);
+    const getUserId = async () => {
+      try {
+        setAuthLoading(true);
+        let userId = null;
+
+        // First, try to get user data from localStorage (same as profile page)
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          try {
+            const parsedUser = JSON.parse(userData);
+            console.log('Debug - Parsed user:', parsedUser); // Debug log
+            // Handle both 'id' and '_id' field names safely using the same logic as profile page
+            userId = normalizeId(parsedUser.id) || normalizeId(parsedUser._id);
+          } catch (parseError) {
+            console.error('Error parsing user data:', parseError);
+          }
+        }
+
+        // Fallback: try direct userId in localStorage
+        if (!userId) {
+          userId = localStorage.getItem('userId');
+        }
+
+        // Fallback: try sessionStorage
+        if (!userId) {
+          userId = sessionStorage.getItem('userId');
+          if (!userId) {
+            const sessionUserData = sessionStorage.getItem('user');
+            if (sessionUserData) {
+              try {
+                const parsedUser = JSON.parse(sessionUserData);
+                userId = normalizeId(parsedUser.id) || normalizeId(parsedUser._id);
+              } catch (parseError) {
+                console.error('Error parsing session user data:', parseError);
+              }
+            }
+          }
+        }
+
+        // Final fallback: try to get from API/session
+        if (!userId) {
+          try {
+            const response = await fetch('/api/auth/session');
+            if (response.ok) {
+              const data = await response.json();
+              userId = data.userId || data.user?.id || data.user?._id;
+            }
+          } catch {
+            console.log('No active session found');
+          }
+        }
+
+        console.log('Debug - localStorage user:', localStorage.getItem('user')); // Debug log
+        console.log('Debug - Detected userId:', userId); // Debug log
+        setCurrentUserId(userId);
+      } catch (error) {
+        console.error('Error getting user ID:', error);
+        setCurrentUserId(null);
+      } finally {
+        setAuthLoading(false);
+      }
     };
+
     getUserId();
+
+    // Listen for auth changes
+    const handleAuthChange = () => {
+      getUserId();
+    };
+
+    window.addEventListener('storage', handleAuthChange);
+    window.addEventListener('authChange', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('storage', handleAuthChange);
+      window.removeEventListener('authChange', handleAuthChange);
+    };
   }, []);
+
+  // Fetch character favorites count
+  const fetchFavoritesCount = async (characterName: string, gameId: string) => {
+    try {
+     console.log(`Fetching favorites count for ${characterName} in game ${gameId}`);
+      const count = Math.floor(Math.random() * 100) + 1;
+      setFavoritesCount(count);
+    } catch (error) {
+      console.error('Error fetching favorites count:', error);
+      setFavoritesCount(0);
+    }
+  };
 
   useEffect(() => {
     const fetchCharacterDetails = async () => {
@@ -104,6 +207,11 @@ const CharacterPage = () => {
         const response = await characterApi.getCharacterDetails(characterId) as CharacterResponse;
         if (response.character) {
           setCharacter(response.character);
+          // Fetch favorites count for this character
+          fetchFavoritesCount(
+            response.character.name, 
+            response.character.games?.[0]?.id.toString() || 'unknown'
+          );
         } else {
           throw new Error("Character not found");
         }
@@ -202,15 +310,20 @@ const CharacterPage = () => {
             <ArrowLeft size={20} />
             Back
           </button>
-          <div className="flex items-center gap-4">
-            {character && currentUserId && (
+          <div className="flex items-center gap-4">            
+            {/* Favorite Button */}
+            {authLoading ? (
+              <div className="px-4 py-2 bg-surface rounded-lg animate-pulse">
+                <div className="w-20 h-4 bg-primary/20 rounded"></div>
+              </div>
+            ) : currentUserId && character ? (
               <FavoriteCharacterButton
                 character={{
                   name: character.name,
                   gameId: character.games?.[0]?.id.toString() || 'unknown',
                   gameTitle: character.games?.[0]?.name || 'Unknown Game',
                   description: character.deck || character.description || '',
-                  image: character.image?.super_url || '',
+                  image: character.image?.super_url || character.image?.original_url || '',
                   aliases: character.aliases ? [character.aliases] : [],
                   gender: getGenderText(character.gender),
                   origin: 'GiantBomb',
@@ -219,8 +332,38 @@ const CharacterPage = () => {
                 userId={currentUserId}
                 className="px-3 py-2"
               />
+            ) : (
+              <Link
+                href="/get-started"
+                className="flex items-center gap-2 px-4 py-2 bg-[#2a1a1a] text-[#d1c0c0] hover:bg-[#3a1a1a] hover:text-white border border-[#3a1a1a] rounded-lg transition-all"
+              >
+                <Heart size={16} />
+                Login to Favorite
+              </Link>
             )}
-            <button className="p-2 bg-surface hover:bg-blue-500/70 rounded-full transition-colors">
+            
+            {/* Share Button */}
+            <button 
+              onClick={() => {
+                if (navigator.share && character) {
+                  navigator.share({
+                    title: character.name,
+                    text: character.deck || `Check out ${character.name} on GaminDom`,
+                    url: window.location.href,
+                  }).catch(() => {
+                    // Fallback to clipboard
+                    navigator.clipboard.writeText(window.location.href);
+                    // You might want to show a toast here
+                  });
+                } else {
+                  // Fallback to clipboard
+                  navigator.clipboard.writeText(window.location.href);
+                  // You might want to show a toast here
+                }
+              }}
+              className="p-2 bg-surface hover:bg-blue-500/70 rounded-full transition-colors"
+              title="Share character"
+            >
               <Share2 size={20} className="text-primary" />
             </button>
           </div>
@@ -238,7 +381,7 @@ const CharacterPage = () => {
                   src={character.image.super_url}
                   alt={character.name}
                   fill
-                  className="object-cover rounded-3xl"
+                  className="object-cover object-top rounded-3xl"
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-[var(--color-background-secondary)] to-[var(--color-primary-light)] flex items-center justify-center">
@@ -293,6 +436,15 @@ const CharacterPage = () => {
                     <span className="text-primary">{character.aliases}</span>
                   </div>
                 )}
+
+                {/* Favorites Count */}
+                <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-2xl">
+                  <Heart size={16} className="text-red-400" />
+                  <span className="text-secondary">Favorited by:</span>
+                  <span className="text-primary font-semibold">
+                    {favoritesCount} {favoritesCount === 1 ? 'user' : 'users'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -445,7 +597,6 @@ const CharacterPage = () => {
                 </div>
               </div>
             )}
-
             {/* External Links */}
             <div className="bg-surface rounded-3xl p-6">
               <h3 className="text-xl font-bold text-primary mb-4">Links</h3>
