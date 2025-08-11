@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema({
   bannerImage: { type: String, default: '' }, // URL or base64 string
   bio: { type: String, default: '', maxlength: 500 },
   favourites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }],
+  favouriteCharacters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Character' }],
   createdAt: { type: Date, default: Date.now },
 });
 

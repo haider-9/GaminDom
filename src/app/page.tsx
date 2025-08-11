@@ -8,6 +8,7 @@ import PlayerStats from "@/components/PlayerStats";
 import TrendingGames from "@/components/TrendingGames";
 import TopRatedGames from "@/components/TopRatedGames";
 import PopularTags from "@/components/PopularTags";
+import TrendingNews from "@/components/TrendingNews";
 import { motion } from "framer-motion";
 import MenuHintWithArrow from "@/components/MenuHintWithArrow";
 
@@ -21,7 +22,7 @@ const page = () => {
     >
       <MenuHintWithArrow />
 
-      {/* Grid Layout */}
+      {/* Main Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
         {/* Main Carousel - Takes full width on mobile, 8 cols on desktop */}
         <div className="lg:col-span-8">
@@ -34,6 +35,11 @@ const page = () => {
             <RecentGame />
           </Suspense>
         </div>
+      </div>
+
+      {/* Trending News Section */}
+      <div className="mb-8">
+        <TrendingNews />
       </div>
 
       {/* Second Row Grid */}

@@ -12,11 +12,11 @@ import {
   Users,
   MapPin,
   Tag,
-  Heart,
   Share2,
   Hash,
 } from "lucide-react";
 import Link from "next/link";
+import FavoriteCharacterButton from "@/components/FavoriteCharacterButton";
 
 interface Character {
   id: number;
@@ -79,9 +79,22 @@ const CharacterPage = () => {
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
   type CharacterResponse = {
     character: Character | null;
   };
+
+  // Get current user ID (you'll need to implement this based on your auth system)
+  useEffect(() => {
+    // This is a placeholder - replace with your actual auth logic
+    const getUserId = () => {
+      // Example: get from localStorage, context, or API
+      const userId = localStorage.getItem('userId');
+      setCurrentUserId(userId);
+    };
+    getUserId();
+  }, []);
 
   useEffect(() => {
     const fetchCharacterDetails = async () => {
@@ -190,9 +203,23 @@ const CharacterPage = () => {
             Back
           </button>
           <div className="flex items-center gap-4">
-            <button className="p-2 bg-surface hover:bg-red-500/70 rounded-full transition-colors">
-              <Heart size={20} className="text-primary" />
-            </button>
+            {character && currentUserId && (
+              <FavoriteCharacterButton
+                character={{
+                  name: character.name,
+                  gameId: character.games?.[0]?.id.toString() || 'unknown',
+                  gameTitle: character.games?.[0]?.name || 'Unknown Game',
+                  description: character.deck || character.description || '',
+                  image: character.image?.super_url || '',
+                  aliases: character.aliases ? [character.aliases] : [],
+                  gender: getGenderText(character.gender),
+                  origin: 'GiantBomb',
+                  giantBombId: character.id.toString(),
+                }}
+                userId={currentUserId}
+                className="px-3 py-2"
+              />
+            )}
             <button className="p-2 bg-surface hover:bg-blue-500/70 rounded-full transition-colors">
               <Share2 size={20} className="text-primary" />
             </button>

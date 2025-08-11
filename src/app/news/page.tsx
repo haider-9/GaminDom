@@ -13,8 +13,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { showToast } from "@/lib/toast-config";
 import Pagination from "@/components/Pagination";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface NewsArticle {
+  id: string;
   title: string;
   description: string;
   url: string;
@@ -24,6 +26,12 @@ interface NewsArticle {
     name: string;
   };
   author?: string;
+}
+
+interface NewsResponse {
+  articles: NewsArticle[];
+  totalResults: number;
+  status: string;
 }
 
 const NewsPage = () => {
@@ -36,13 +44,19 @@ const NewsPage = () => {
   const [totalPages, setTotalPages] = useState(0);
   const itemsPerPage = 12;
 
+  // Debounce search query to prevent excessive API calls
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+  // Show typing indicator when search query is different from debounced query
+  const isTyping = searchQuery !== debouncedSearchQuery && searchQuery.length > 0;
+
   const categories = [
-    { id: "gaming", label: "Gaming", query: "gaming OR video games OR esports" },
-    { id: "pc", label: "PC Gaming", query: "PC gaming OR Steam OR Epic Games" },
-    { id: "console", label: "Console", query: "PlayStation OR Xbox OR Nintendo" },
-    { id: "mobile", label: "Mobile Gaming", query: "mobile gaming OR iOS games OR Android games" },
-    { id: "esports", label: "Esports", query: "esports OR competitive gaming OR tournaments" },
-    { id: "industry", label: "Industry", query: "game industry OR game development OR gaming news" },
+    { id: "gaming", label: "Gaming", query: "general gaming news" },
+    { id: "pc", label: "PC Gaming", query: "PC gaming news" },
+    { id: "console", label: "Console", query: "console gaming news" },
+    { id: "mobile", label: "Mobile Gaming", query: "mobile gaming news" },
+    { id: "esports", label: "Esports", query: "esports news" },
+    { id: "industry", label: "Industry", query: "gaming industry news" },
   ];
 
   const fetchNews = async (category: string, search: string = "", pageNum: number = 1) => {
@@ -50,7 +64,7 @@ const NewsPage = () => {
     try {
       const { newsApi } = await import("@/lib/api-client");
 
-      let response;
+      let response: NewsResponse;
 
       if (search) {
         // If there's a search query, use it directly
@@ -58,11 +72,11 @@ const NewsPage = () => {
           q: search,
           page: pageNum,
           pageSize: 12,
-          sortBy: 'publishedAt'
-        });
+          sortBy: 'publish_date'
+        }) as NewsResponse;
       } else {
         // Otherwise, search by category
-        response = await newsApi.searchNewsByCategory(category, pageNum, 12);
+        response = await newsApi.searchNewsByCategory(category, pageNum, 12) as NewsResponse;
       }
 
       if (response && response.articles) {
@@ -76,20 +90,33 @@ const NewsPage = () => {
       }
     } catch (error) {
       console.error("Error fetching news:", error);
-      showToast.error("Failed to fetch news articles. Please try again later.");
+      showToast.error("Failed to fetch news articles from GameSpot. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Effect for initial load and category/page changes
   useEffect(() => {
-    fetchNews(selectedCategory, searchQuery, page);
-  }, [selectedCategory, searchQuery, page]);
+    fetchNews(selectedCategory, debouncedSearchQuery, page);
+  }, [selectedCategory, debouncedSearchQuery, page]);
+
+  // Reset page when search query changes
+  useEffect(() => {
+    if (page !== 1) {
+      setPage(1);
+    }
+  }, [debouncedSearchQuery, page]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setPage(1);
-    fetchNews(selectedCategory, searchQuery, 1);
+    // The search will be triggered automatically by the debounced effect
+    // This is just for when user clicks the search button
+    if (page !== 1) {
+      setPage(1);
+    } else {
+      fetchNews(selectedCategory, searchQuery, 1);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -107,28 +134,29 @@ const NewsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] p-6">
+    <div className="min-h-screen bg-[var(--color-background)] p-3 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
             <Link
               href="/"
               className="flex items-center gap-2 text-[#d1c0c0] hover:text-white transition-colors"
             >
               <ArrowLeft size={20} />
-              Back to Home
+              <span className="hidden sm:inline">Back to Home</span>
+              <span className="sm:hidden">Back</span>
             </Link>
           </div>
 
-          <div className="bg-[#1a0a0a] rounded-xl p-6 border border-[#3a1a1a]">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-[#bb3b3b] rounded-xl flex items-center justify-center">
-                <Newspaper size={32} className="text-white" />
+          <div className="bg-[#1a0a0a] rounded-xl p-4 sm:p-6 border border-[#3a1a1a]">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[#bb3b3b] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Newspaper size={24} className="text-white sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <h1 className="text-4xl font-bold text-white mb-2">Gaming News</h1>
-                <p className="text-[#d1c0c0]">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">Gaming News</h1>
+                <p className="text-sm sm:text-base text-[#d1c0c0]">
                   Stay updated with the latest gaming news and industry updates
                 </p>
               </div>
@@ -137,34 +165,41 @@ const NewsPage = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="mb-8">
-          <div className="bg-[#1a0a0a] rounded-xl p-6 border border-[#3a1a1a]">
+        <div className="mb-6 sm:mb-8">
+          <div className="bg-[#1a0a0a] rounded-xl p-4 sm:p-6 border border-[#3a1a1a]">
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="mb-6">
+            <form onSubmit={handleSearch} className="mb-4 sm:mb-6">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8a6e6e]" size={20} />
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-[#8a6e6e]" size={18} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search gaming news..."
-                  className="w-full bg-[#2a1a1a] border border-[#3a1a1a] rounded-lg pl-12 pr-4 py-3 text-white placeholder-[#8a6e6e] focus:border-[#bb3b3b] focus:outline-none transition-colors"
+                  className="w-full bg-[#2a1a1a] border border-[#3a1a1a] rounded-lg pl-10 sm:pl-12 pr-16 sm:pr-20 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-[#8a6e6e] focus:border-[#bb3b3b] focus:outline-none transition-colors"
                 />
+                {isTyping && (
+                  <div className="absolute right-12 sm:right-16 top-1/2 transform -translate-y-1/2 hidden sm:flex items-center gap-2 text-[#8a6e6e] text-sm">
+                    <div className="w-3 h-3 border border-[#8a6e6e] border-t-transparent rounded-full animate-spin"></div>
+                    <span>Searching...</span>
+                  </div>
+                )}
                 <button
                   type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#bb3b3b] hover:bg-[#d14d4d] text-white px-4 py-2 rounded-lg transition-colors"
+                  className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-[#bb3b3b] hover:bg-[#d14d4d] text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors text-sm"
                 >
-                  Search
+                  <span className="hidden sm:inline">Search</span>
+                  <Search size={16} className="sm:hidden" />
                 </button>
               </div>
             </form>
 
             {/* Category Filters */}
-            <div className="flex items-center gap-2 mb-4">
-              <Filter size={16} className="text-[#8a6e6e]" />
-              <span className="text-[#8a6e6e] text-sm">Categories:</span>
+            <div className="flex items-center gap-2 mb-3 sm:mb-4">
+              <Filter size={14} className="text-[#8a6e6e] flex-shrink-0" />
+              <span className="text-[#8a6e6e] text-xs sm:text-sm">Categories:</span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {categories.map((category) => (
                 <button
                   key={category.id}
@@ -172,9 +207,9 @@ const NewsPage = () => {
                     setSelectedCategory(category.id);
                     setPage(1);
                   }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === category.id
-                      ? "bg-[#bb3b3b] text-white"
-                      : "bg-[#2a1a1a] text-[#d1c0c0] hover:text-white hover:bg-[#3a1a1a]"
+                  className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${selectedCategory === category.id
+                    ? "bg-[#bb3b3b] text-white"
+                    : "bg-[#2a1a1a] text-[#d1c0c0] hover:text-white hover:bg-[#3a1a1a]"
                     }`}
                 >
                   {category.label}
@@ -190,75 +225,81 @@ const NewsPage = () => {
             <div className="w-8 h-8 border-2 border-[#bb3b3b]/30 border-t-[#bb3b3b] rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {articles.map((article, index) => (
               <motion.article
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="bg-[#1a0a0a] rounded-xl border border-[#3a1a1a] overflow-hidden hover:border-[#bb3b3b] transition-all group"
+                className="bg-[#1a0a0a] rounded-xl border border-[#3a1a1a] overflow-hidden hover:border-[#bb3b3b] transition-all group flex flex-col"
               >
                 {/* Article Image */}
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative h-40 sm:h-48 overflow-hidden flex-shrink-0">
                   <Image
                     src={article.urlToImage || "/placeholder-news.svg"}
                     alt={article.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = "/placeholder-news.svg";
                     }}
-                    unoptimized={!article.urlToImage?.includes('unsplash.com')}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4">
+                  <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4">
                     <div className="flex items-center gap-2 text-xs text-white/80">
                       <Clock size={12} />
-                      {formatDate(article.publishedAt)}
+                      <span className="truncate">{formatDate(article.publishedAt)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Article Content */}
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs text-[#bb3b3b] font-medium">
-                      {article.source.name}
+                <div className="p-4 sm:p-6 flex-1 flex flex-col">
+                  <div className="flex items-center gap-2 mb-3 text-xs">
+                    <span className="text-[#bb3b3b] font-medium">
+                      GameSpot
                     </span>
                     {article.author && (
                       <>
                         <span className="text-[#8a6e6e]">•</span>
-                        <span className="text-xs text-[#8a6e6e]">
+                        <span className="text-[#8a6e6e] truncate">
                           {article.author}
                         </span>
                       </>
                     )}
                   </div>
 
-                  <div
-
-                    className="block"
+                  <Link
+                    href={`/news/${article.id}`}
+                    className="block flex-1"
                   >
-                    <h3 className="text-lg font-bold text-white mb-3 line-clamp-2 group-hover:text-[#bb3b3b] transition-colors">
+                    <h3 className="text-base sm:text-lg font-bold text-white mb-3 line-clamp-2 group-hover:text-[#bb3b3b] transition-colors leading-tight">
                       {article.title}
                     </h3>
-                  </div>
+                  </Link>
 
-                  <p className="text-[#d1c0c0] text-sm mb-4 line-clamp-3">
+                  <p className="text-[#d1c0c0] text-sm mb-4 line-clamp-3 flex-1">
                     {article.description}
                   </p>
 
-                  <div className="flex items-center gap-4">
-
+                  <div className="flex items-center gap-3 sm:gap-4 pt-2 border-t border-[#3a1a1a]">
+                    <Link
+                      href={`/news/${article.id}`}
+                      className="inline-flex items-center gap-1.5 text-[#bb3b3b] hover:text-[#d14d4d] text-sm font-medium transition-colors"
+                    >
+                      Read More
+                    </Link>
                     <a
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-[#8a6e6e] hover:text-[#d1c0c0] text-sm font-medium transition-colors"
+                      className="inline-flex items-center gap-1.5 text-[#8a6e6e] hover:text-[#d1c0c0] text-sm font-medium transition-colors"
                     >
-                      Original
+                      <span className="hidden sm:inline">Original</span>
+                      <span className="sm:hidden">Source</span>
                       <ExternalLink size={12} />
                     </a>
                   </div>

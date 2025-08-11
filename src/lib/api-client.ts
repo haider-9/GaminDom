@@ -13,7 +13,7 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     try {
       const response = await fetch(url, {
         headers: {
@@ -37,8 +37,14 @@ class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
-    const searchParams = params ? `?${new URLSearchParams(params).toString()}` : '';
+  async get<T>(endpoint: string, params?: Record<string, string | undefined>): Promise<T> {
+    // Filter out undefined values
+    const filteredParams = params ? Object.fromEntries(
+      Object.entries(params).filter(([, value]) => value !== undefined)
+    ) : {};
+    const searchParams = Object.keys(filteredParams).length > 0
+      ? `?${new URLSearchParams(filteredParams as Record<string, string>).toString()}`
+      : '';
     return this.request<T>(`${endpoint}${searchParams}`);
   }
 
@@ -56,9 +62,10 @@ class ApiClient {
     });
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
+  async delete<T>(endpoint: string, data?: object): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'DELETE',
+      body: data ? JSON.stringify(data) : undefined,
     });
   }
 }
@@ -67,6 +74,7 @@ class ApiClient {
 export const apiClient = new ApiClient('/api/config');
 export const authClient = new ApiClient('/api/auth');
 export const charactersClient = new ApiClient('/api/characters');
+export const newsClient = new ApiClient('/api');
 
 // Game-related API functions
 export const gameApi = {
@@ -189,6 +197,21 @@ export const characterApi = {
   getCharacterDetails: async (characterId: string) => {
     return charactersClient.get(`/${characterId}`);
   },
+
+  // Add character to favorites
+  addToFavorites: async (userId: string, characterData: object) => {
+    return charactersClient.post('/favorite', { userId, characterData });
+  },
+
+  // Remove character from favorites
+  removeFromFavorites: async (userId: string, characterId: string) => {
+    return charactersClient.delete('/favorite', { userId, characterId });
+  },
+
+  // Get user's favorite characters
+  getFavoriteCharacters: async (userId: string) => {
+    return charactersClient.get('/favorite', { userId });
+  },
 };
 
 // Authentication API functions
@@ -204,86 +227,53 @@ export const authApi = {
   },
 };
 
-// News API functions
+// News API functions using GameSpot
 export const newsApi = {
-  // Get gaming news
+  // Get gaming news from GameSpot
   getGamingNews: async (params: {
     q?: string;
     category?: string;
     page?: number;
     pageSize?: number;
-    sortBy?: 'relevancy' | 'popularity' | 'publishedAt';
+    sortBy?: 'publish_date' | 'update_date';
   } = {}) => {
-    const apiKey = process.env.NEXT_PUBLIC_NEWS_API_KEY;
-    const baseUrl = process.env.NEXT_PUBLIC_NEWS_API_URL || 'https://newsapi.org/v2';
-    
-    if (!apiKey) {
-      throw new Error('NewsAPI key not configured');
-    }
-
-    const searchParams = new URLSearchParams({
-      apiKey,
-      language: 'en',
-      sortBy: params.sortBy || 'publishedAt',
+    const requestParams: Record<string, string | undefined> = {
       page: String(params.page || 1),
-      pageSize: String(params.pageSize || 20),
-    });
-
-    // If specific query is provided, use everything endpoint
-    if (params.q) {
-      searchParams.append('q', params.q);
-      const url = `${baseUrl}/everything?${searchParams.toString()}`;
-      
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`NewsAPI error: ${response.status}`);
-      }
-      return await response.json();
-    }
-
-    // Otherwise use top-headlines with gaming-related sources
-    const gamingSources = [
-      'ign',
-      'polygon',
-      'gamespot',
-      'kotaku',
-      'the-verge',
-      'techcrunch',
-      'engadget',
-      'ars-technica'
-    ].join(',');
-
-    searchParams.delete('q'); // Remove query param for top-headlines
-    searchParams.append('sources', gamingSources);
-    
-    const url = `${baseUrl}/top-headlines?${searchParams.toString()}`;
-    
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`NewsAPI error: ${response.status}`);
-    }
-    return await response.json();
-  },
-
-  // Search news by category
-  searchNewsByCategory: async (category: string, page: number = 1, pageSize: number = 20) => {
-    const categoryQueries: Record<string, string> = {
-      gaming: 'gaming OR "video games" OR esports OR "game development"',
-      pc: '"PC gaming" OR Steam OR "Epic Games" OR "PC games"',
-      console: 'PlayStation OR Xbox OR Nintendo OR "console gaming"',
-      mobile: '"mobile gaming" OR "iOS games" OR "Android games" OR "mobile games"',
-      esports: 'esports OR "competitive gaming" OR tournaments OR "professional gaming"',
-      industry: '"game industry" OR "gaming industry" OR "game development" OR "gaming business"'
+      limit: String(params.pageSize || 12),
+      sort: params.sortBy || 'publish_date:desc',
     };
 
-    const query = categoryQueries[category] || categoryQueries.gaming;
-    
-    return newsApi.getGamingNews({
-      q: query,
-      page,
-      pageSize,
-      sortBy: 'publishedAt'
-    });
+    if (params.q) {
+      requestParams.filter = `title:${params.q}`;
+    }
+
+    return newsClient.get('/news', requestParams);
+  },
+
+  // Search news by category (GameSpot doesn't have categories, so we'll use filters)
+  searchNewsByCategory: async (category: string, page: number = 1, pageSize: number = 12) => {
+    const categoryFilters: Record<string, string> = {
+      gaming: '',
+      pc: 'pc',
+      console: 'playstation,xbox,nintendo-switch',
+      mobile: 'mobile',
+      esports: 'esports',
+      industry: 'business'
+    };
+
+    const filter = categoryFilters[category];
+
+    const requestParams: Record<string, string | undefined> = {
+      page: String(page),
+      limit: String(pageSize),
+      sort: 'publish_date:desc',
+    };
+
+    if (filter) {
+      requestParams.filter = `associations:${filter}`;
+    }
+
+    return newsClient.get('/news', requestParams);
   },
 };
 

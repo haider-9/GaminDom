@@ -23,7 +23,7 @@ import {
   User,
   MessageSquare
 } from "lucide-react";
-import { SiEpicgames, SiSteam, SiPlaystation, SiBox } from "react-icons/si";
+import { SiEpicgames, SiSteam, SiPlaystation, SiBox, SiMetacritic, SiReddit } from "react-icons/si";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SAMPLE_AVATARS } from "@/constants";
 import Link from "next/link";
@@ -515,12 +515,12 @@ const GamePage = () => {
                           <div className="flex flex-col items-center w-full pt-4 pb-3 px-3">
                             <div className="relative w-12 h-12 sm:w-14 sm:h-14 mb-2 rounded-full overflow-hidden border-2 border-[#bb3b3b] bg-black/30">
                               {character.image ? (
-                              <Image
-                              src={character.image}
-                              alt={character.name}
-                              fill
-                              className="object-cover rounded-full"
-                              />
+                                <Image
+                                  src={character.image}
+                                  alt={character.name}
+                                  fill
+                                  className="object-cover rounded-full"
+                                />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center rounded-full bg-black/30">
                                   <User size={22} className="sm:w-8 sm:h-8 text-white/50" />
@@ -541,6 +541,91 @@ const GamePage = () => {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Developer & Publisher */}
+            <div className="bg-black/50 rounded-3xl p-6">
+              <h2 className="text-2xl font-bold text-white mb-4">Credits</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {game.developers.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Developer</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {game.developers.map((dev) => (
+                        <span key={dev.id} className="text-white bg-black/30 px-4 py-2 rounded-full text-sm font-medium">
+                          {dev.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {game.publishers.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Publisher</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {game.publishers.map((pub) => (
+                        <span key={pub.id} className="text-white bg-black/30 px-4 py-2 rounded-full text-sm font-medium">
+                          {pub.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* External Links */}
+            {(game.website || game.reddit_url || game.metacritic_url) && (
+              <div className="bg-black/50 rounded-3xl p-6">
+                <h2 className="text-2xl font-bold text-white mb-4">Links</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {game.website && (
+                    <a
+                      href={game.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 bg-black/30 hover:bg-black/40 rounded-2xl transition-colors group"
+                    >
+                      <Globe size={20} className="text-blue-400" />
+                      <div className="flex-1">
+                        <span className="text-white group-hover:text-white/80 font-medium">Official Website</span>
+                        <p className="text-white/50 text-sm">Visit official site</p>
+                      </div>
+                      <ExternalLink size={16} className="text-white/50" />
+                    </a>
+                  )}
+                  {game.reddit_url && (
+                    <a
+                      href={game.reddit_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 bg-black/30 hover:bg-black/40 rounded-2xl transition-colors group"
+                    >
+                      <SiReddit size={20} className="text-orange-400" />
+                      <div className="flex-1">
+                        <span className="text-white group-hover:text-white/80 font-medium">Reddit</span>
+                        <p className="text-white/50 text-sm">Community discussions</p>
+                      </div>
+                      <ExternalLink size={16} className="text-white/50" />
+                    </a>
+                  )}
+                  {game.metacritic_url && (
+                    <a
+                      href={game.metacritic_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 bg-black/30 hover:bg-black/40 rounded-2xl transition-colors group"
+                    >
+                      <SiMetacritic size={20} className="text-green-400" />
+                      <div className="flex-1">
+                        <span className="text-white group-hover:text-white/80 font-medium">Metacritic</span>
+                        <p className="text-white/50 text-sm">Reviews & scores</p>
+                      </div>
+                      <ExternalLink size={16} className="text-white/50" />
+                    </a>
+                  )}
+                </div>
               </div>
             )}
 
@@ -702,99 +787,120 @@ const GamePage = () => {
               </div>
             </div>
 
+            {/* System Requirements */}
+            {(() => {
+              const pcPlatform = game.platforms.find(p =>
+                p.platform.name.toLowerCase().includes('pc') ||
+                p.platform.name.toLowerCase().includes('windows')
+              );
+
+              const parseRequirements = (reqText: string) => {
+                // Clean up the text and split into lines
+                const lines = reqText
+                  .replace(/<[^>]*>/g, '') // Remove HTML tags
+                  .split(/\n|<br\s*\/?>/i)
+                  .map(line => line.trim())
+                  .filter(line => line.length > 0);
+
+                const requirements: { [key: string]: string } = {};
+
+                lines.forEach(line => {
+                  // Look for patterns like "OS: Windows 10" or "Processor: Intel Core i5"
+                  const match = line.match(/^([^:]+):\s*(.+)$/);
+                  if (match) {
+                    const [, key, value] = match;
+                    requirements[key.trim()] = value.trim();
+                  }
+                });
+
+                return requirements;
+              };
+
+              if (pcPlatform?.requirements && (pcPlatform.requirements.minimum || pcPlatform.requirements.recommended)) {
+                return (
+                  <div className="bg-black/50 rounded-3xl p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                      <Monitor className="text-blue-400" size={20} />
+                      System Requirements
+                    </h3>
+
+                    <div className="space-y-6">
+                      {pcPlatform.requirements.minimum && (
+                        <div>
+                          <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                            Minimum
+                          </h4>
+                          <div className="bg-black/30 rounded-2xl p-4 border border-white/10 overflow-hidden">
+                            {(() => {
+                              const minReqs = parseRequirements(pcPlatform.requirements.minimum!);
+                              return Object.keys(minReqs).length > 0 ? (
+                                <div className="space-y-3">
+                                  {Object.entries(minReqs).map(([key, value]) => (
+                                    <div key={key} className="flex flex-col gap-1">
+                                      <span className="text-white font-semibold text-sm">{key}:</span>
+                                      <span className="text-white/70 text-sm break-words">{value}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="text-white/70 text-sm leading-relaxed break-words">
+                                  {pcPlatform.requirements.minimum!.replace(/<[^>]*>/g, '')}
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      )}
+
+                      {pcPlatform.requirements.recommended && (
+                        <div>
+                          <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            Recommended
+                          </h4>
+                          <div className="bg-black/30 rounded-2xl p-4 border border-white/10 overflow-hidden">
+                            {(() => {
+                              const recReqs = parseRequirements(pcPlatform.requirements.recommended!);
+                              return Object.keys(recReqs).length > 0 ? (
+                                <div className="space-y-3">
+                                  {Object.entries(recReqs).map(([key, value]) => (
+                                    <div key={key} className="flex flex-col gap-1">
+                                      <span className="text-white font-semibold text-sm">{key}:</span>
+                                      <span className="text-white/70 text-sm break-words">{value}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="text-white/70 text-sm leading-relaxed break-words">
+                                  {pcPlatform.requirements.recommended!.replace(/<[^>]*>/g, '')}
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
             {/* Platforms */}
             <div className="bg-black/50 rounded-3xl p-6">
               <h3 className="text-xl font-bold text-white mb-4">Available On</h3>
-              <div className="space-y-2">
-                {game.platforms.map((platform) => (
-                  <Link
-                    href={`/platforms/${platform.platform.id}`}
-                    className="flex flex-col gap-2"
-                    key={platform.platform.id}
-                  >
-                    <div
-                      key={platform.platform.id}
-                      className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors"
-                    >
-                      {getPlatformIcon(platform.platform.name)}
-                      <span className="text-white/70">{platform.platform.name}</span>
-                    </div>
+              <div className="space-y-3">
+                {game.platforms.map((platform, index) => (
+                  <Link href={`/platforms/${platform.platform.id}`} key={index} className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl">
+                    {getPlatformIcon(platform.platform.name)}
+                    <span className="text-white font-medium">{platform.platform.name}</span>
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* Developer & Publisher */}
-            <div className="bg-black/50 rounded-3xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4">Details</h3>
-              <div className="space-y-4">
-                {game.developers.length > 0 && (
-                  <div className="bg-black/30 rounded-2xl p-3">
-                    <span className="text-white/50 text-sm">Developer</span>
-                    <p className="text-white font-medium">
-                      {game.developers.map((dev) => dev.name).join(", ")}
-                    </p>
-                  </div>
-                )}
-                {game.publishers.length > 0 && (
-                  <div className="bg-black/30 rounded-2xl p-3">
-                    <span className="text-white/50 text-sm">Publisher</span>
-                    <p className="text-white font-medium">
-                      {game.publishers.map((pub) => pub.name).join(", ")}
-                    </p>
-                  </div>
-                )}
-                {game.esrb_rating && (
-                  <div className="bg-black/30 rounded-2xl p-3">
-                    <span className="text-white/50 text-sm">ESRB Rating</span>
-                    <p className="text-white font-medium">{game.esrb_rating.name}</p>
-                  </div>
-                )}
-              </div>
-            </div>
 
-            {/* External Links */}
-            <div className="bg-black/50 rounded-3xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4">Links</h3>
-              <div className="space-y-2">
-                {game.website && (
-                  <a
-                    href={game.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors group"
-                  >
-                    <Globe size={16} className="text-blue-400" />
-                    <span className="text-white/70 group-hover:text-white">Official Website</span>
-                    <ExternalLink size={14} className="text-white/50 ml-auto" />
-                  </a>
-                )}
-                {game.metacritic_url && (
-                  <a
-                    href={game.metacritic_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors group"
-                  >
-                    <Trophy size={16} className="text-green-400" />
-                    <span className="text-white/70 group-hover:text-white">Metacritic</span>
-                    <ExternalLink size={14} className="text-white/50 ml-auto" />
-                  </a>
-                )}
-                {game.reddit_url && (
-                  <a
-                    href={game.reddit_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 bg-black/30 rounded-2xl hover:bg-black/40 transition-colors group"
-                  >
-                    <Users size={16} className="text-orange-400" />
-                    <span className="text-white/70 group-hover:text-white">Reddit</span>
-                    <ExternalLink size={14} className="text-white/50 ml-auto" />
-                  </a>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -809,5 +915,6 @@ const GamePage = () => {
     </div>
   );
 };
+
 
 export default GamePage;
