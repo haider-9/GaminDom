@@ -251,7 +251,7 @@ const RightSidebar = () => {
               initial={{ opacity: 0, x: 300 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 300 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              transition={{ type: "spring", damping: 30, stiffness: 400, duration: 0.3 }}
               className="fixed top-0 right-0 h-full w-80 bg-[#1a0a0a] border-l border-[#3a1a1a] z-50 overflow-y-auto"
             >
               {/* Header */}

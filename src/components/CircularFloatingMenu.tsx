@@ -1,5 +1,11 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
@@ -30,7 +36,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-
 const CircularFloatingMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -45,30 +50,30 @@ const CircularFloatingMenu = () => {
   // Check authentication status
   useEffect(() => {
     const checkAuth = () => {
-      const userData = localStorage.getItem('user');
+      const userData = localStorage.getItem("user");
       setIsLoggedIn(!!userData);
     };
 
     checkAuth();
     // Listen for storage changes (login/logout from other tabs)
-    window.addEventListener('storage', checkAuth);
+    window.addEventListener("storage", checkAuth);
     // Listen for auth changes (login/logout from same tab)
-    window.addEventListener('authChange', checkAuth);
-    
+    window.addEventListener("authChange", checkAuth);
+
     return () => {
-      window.removeEventListener('storage', checkAuth);
-      window.removeEventListener('authChange', checkAuth);
+      window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("authChange", checkAuth);
     };
   }, []);
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
     setIsOpen(false);
-    router.push('/');
+    router.push("/");
     // Trigger events for other components
-    window.dispatchEvent(new Event('storage'));
-    window.dispatchEvent(new Event('authChange'));
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("authChange"));
   }, [router]);
 
   interface MenuItem {
@@ -88,49 +93,56 @@ const CircularFloatingMenu = () => {
         label: "Home",
         route: "/",
         shortcut: "H",
-        classes: "bg-red-500 text-red-100 border-red-300 bg-red-500/95 border-red-300/30"
+        classes:
+          "bg-red-500 text-red-100 border-red-300 bg-red-500/95 border-red-300/30",
       },
       {
         icon: <Gamepad2 size={iconSize} />,
         label: "Latest",
         route: "/latest",
         shortcut: "L",
-        classes: "bg-emerald-500 text-emerald-100 border-emerald-300 bg-emerald-500/95 border-emerald-300/30"
+        classes:
+          "bg-emerald-500 text-emerald-100 border-emerald-300 bg-emerald-500/95 border-emerald-300/30",
       },
       {
         icon: <Trophy size={iconSize} />,
         label: "Top Rated",
         route: "/top-rated",
         shortcut: "T",
-        classes: "bg-yellow-500 text-yellow-100 border-yellow-300 bg-yellow-500/95 border-yellow-300/30"
+        classes:
+          "bg-yellow-500 text-yellow-100 border-yellow-300 bg-yellow-500/95 border-yellow-300/30",
       },
       {
         icon: <TrendingUp size={iconSize} />,
         label: "Trending",
         route: "/trending",
         shortcut: "R",
-        classes: "bg-purple-500 text-purple-100 border-purple-300 bg-purple-500/95 border-purple-300/30"
+        classes:
+          "bg-purple-500 text-purple-100 border-purple-300 bg-purple-500/95 border-purple-300/30",
       },
       {
         icon: <Newspaper size={iconSize} />,
         label: "News",
         route: "/news",
         shortcut: "N",
-        classes: "bg-blue-500 text-blue-100 border-blue-300 bg-blue-500/95 border-blue-300/30"
+        classes:
+          "bg-blue-500 text-blue-100 border-blue-300 bg-blue-500/95 border-blue-300/30",
       },
       {
         icon: <Info size={iconSize} />,
         label: "About",
         route: "/about",
         shortcut: "A",
-        classes: "bg-cyan-500 text-cyan-100 border-cyan-300 bg-cyan-500/95 border-cyan-300/30"
+        classes:
+          "bg-cyan-500 text-cyan-100 border-cyan-300 bg-cyan-500/95 border-cyan-300/30",
       },
       {
         icon: <Settings size={iconSize} />,
         label: "Settings",
         route: "/settings",
         shortcut: "S",
-        classes: "bg-slate-500 text-slate-100 border-slate-300 bg-slate-500/95 border-slate-300/30"
+        classes:
+          "bg-slate-500 text-slate-100 border-slate-300 bg-slate-500/95 border-slate-300/30",
       },
     ];
 
@@ -140,22 +152,25 @@ const CircularFloatingMenu = () => {
         label: "Profile",
         route: "/profile",
         shortcut: "P",
-        classes: "bg-indigo-500 text-indigo-100 border-indigo-300 bg-indigo-500/95 border-indigo-300/30"
+        classes:
+          "bg-indigo-500 text-indigo-100 border-indigo-300 bg-indigo-500/95 border-indigo-300/30",
       });
       baseItems.splice(6, 0, {
         icon: <Users size={iconSize} />,
         label: "Users",
         route: "/users",
         shortcut: "U",
-        classes: "bg-orange-500 text-orange-100 border-orange-300 bg-orange-500/95 border-orange-300/30"
+        classes:
+          "bg-orange-500 text-orange-100 border-orange-300 bg-orange-500/95 border-orange-300/30",
       });
       baseItems.push({
         icon: <LogOut size={iconSize} />,
         label: "Logout",
         route: "#",
         shortcut: "O",
-        classes: "bg-red-600 text-red-100 border-red-400 bg-red-600/95 border-red-400/30",
-        onClick: handleLogout
+        classes:
+          "bg-red-600 text-red-100 border-red-400 bg-red-600/95 border-red-400/30",
+        onClick: handleLogout,
       });
     } else {
       baseItems.push({
@@ -163,7 +178,8 @@ const CircularFloatingMenu = () => {
         label: "Get Started",
         route: "/get-started",
         shortcut: "G",
-        classes: "bg-pink-500 text-pink-100 border-pink-300 bg-pink-500/95 border-pink-300/30"
+        classes:
+          "bg-pink-500 text-pink-100 border-pink-300 bg-pink-500/95 border-pink-300/30",
       });
     }
 
@@ -182,7 +198,7 @@ const CircularFloatingMenu = () => {
     const handleWheel = (e: WheelEvent) => {
       if (isOpen && !isMobile) {
         e.preventDefault();
-        setRotation(prev => prev + e.deltaY * 0.8);
+        setRotation((prev) => prev + e.deltaY * 0.8);
       }
     };
     if (isOpen && !isMobile) {
@@ -191,22 +207,24 @@ const CircularFloatingMenu = () => {
     }
   }, [isOpen, isMobile]);
 
-  const activeIndex = menuItems.findIndex(item => item.route === pathname);
-  const handleDrag = useCallback((_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (!isMobile) {
-      setRotation(prev => prev + info.delta.x * 0.8);
-    }
-  }, [isMobile]);
+  const activeIndex = menuItems.findIndex((item) => item.route === pathname);
+  const handleDrag = useCallback(
+    (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      if (!isMobile) {
+        setRotation((prev) => prev + info.delta.x * 0.8);
+      }
+    },
+    [isMobile]
+  );
   const resetRotation = useCallback(() => setRotation(0), []);
-
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       // Check if e.key exists and is a string
-      if (!e.key || typeof e.key !== 'string') return;
+      if (!e.key || typeof e.key !== "string") return;
 
       // Open menu with 'M' key on desktop
-      if (!isOpen && e.key.toLowerCase() === 'm' && !isMobile && e.ctrlKey) {
+      if (!isOpen && e.key.toLowerCase() === "m" && !isMobile && e.ctrlKey) {
         setIsOpen(true);
         return;
       }
@@ -214,7 +232,9 @@ const CircularFloatingMenu = () => {
       if (!isOpen) return;
 
       const key = e.key.toLowerCase();
-      const item = menuItems.find(i => i.shortcut && i.shortcut.toLowerCase() === key);
+      const item = menuItems.find(
+        (i) => i.shortcut && i.shortcut.toLowerCase() === key
+      );
       if (item) {
         if (item.onClick) {
           item.onClick();
@@ -226,8 +246,8 @@ const CircularFloatingMenu = () => {
 
       // Only allow rotation on desktop
       if (!isMobile) {
-        if (e.key === "ArrowLeft") setRotation(r => r - 45);
-        if (e.key === "ArrowRight") setRotation(r => r + 45);
+        if (e.key === "ArrowLeft") setRotation((r) => r - 45);
+        if (e.key === "ArrowRight") setRotation((r) => r + 45);
       }
     };
     document.addEventListener("keydown", handleKey);
@@ -240,39 +260,53 @@ const CircularFloatingMenu = () => {
 
   return (
     <>
-      {mounted && isOpen && createPortal(
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-md"
-          onClick={() => setIsOpen(false)}
-        />,
-        document.body
-      )}
+      {mounted &&
+        isOpen &&
+        createPortal(
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-md"
+            onClick={() => setIsOpen(false)}
+          />,
+          document.body
+        )}
 
       <motion.div
         ref={containerRef}
         data-menu-container
         className={cn(
           "fixed z-50",
-          isMobile ? "bottom-6 left-1/2 -translate-x-1/2" : "top-1/2 -translate-y-1/2",
+          isMobile
+            ? "bottom-6 left-1/2 -translate-x-1/2"
+            : "top-1/2 -translate-y-1/2",
           "transition-all"
         )}
-        style={{ width: isOpen ? centerSize : 64, height: isOpen ? centerSize : 64, left: isMobile ? undefined : isOpen ? menuOffsetX : 24 }}
+        style={{
+          width: isOpen ? centerSize : 64,
+          height: isOpen ? centerSize : 64,
+          left: isMobile ? undefined : isOpen ? menuOffsetX : 24,
+        }}
       >
         <motion.button
-          onClick={() => setIsOpen(p => !p)}
+          onClick={() => setIsOpen((p) => !p)}
           className="absolute w-14 h-14 rounded-full border-2 border-white/20 text-white flex items-center justify-center shadow-2xl z-[999]"
           style={{
             background: `linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))`,
-            left: isOpen ? centerSize / 2 - 32 : 0, top: isOpen ? centerSize / 2 - 32 : 0
+            left: isOpen ? centerSize / 2 - 32 : 0,
+            top: isOpen ? centerSize / 2 - 32 : 0,
           }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          <motion.div className="absolute inset-0 rounded-full bg-white/20 animate-spin" style={{ animationDuration: "20s" }} />
-          <motion.div>{isOpen ? <X size={24} /> : <Menu size={24} />}</motion.div>
+          <motion.div
+            className="absolute inset-0 rounded-full bg-white/20 animate-spin"
+            style={{ animationDuration: "20s" }}
+          />
+          <motion.div>
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </motion.div>
         </motion.button>
 
         <AnimatePresence>
@@ -284,13 +318,18 @@ const CircularFloatingMenu = () => {
               dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
               dragElastic={0}
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1, rotate: isMobile ? 0 : rotation }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                rotate: isMobile ? 0 : rotation,
+              }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.5 }}
             >
               <TooltipProvider delayDuration={100}>
                 {menuItems.map((item, index) => {
-                  const angle = (index * 2 * Math.PI) / menuItems.length - Math.PI / 2;
+                  const angle =
+                    (index * 2 * Math.PI) / menuItems.length - Math.PI / 2;
                   const x = centerSize / 2 + radius * Math.cos(angle);
                   const y = centerSize / 2 + radius * Math.sin(angle);
                   const isActive = activeIndex === index;
@@ -316,7 +355,9 @@ const CircularFloatingMenu = () => {
                                 item.onClick?.();
                               }}
                               className={cn(
-                                isMobile ? "w-10 h-10 rounded-xl" : "w-14 h-14 rounded-2xl",
+                                isMobile
+                                  ? "w-10 h-10 rounded-xl"
+                                  : "w-14 h-14 rounded-2xl",
                                 "flex items-center justify-center border-2 shadow-md text-white relative cursor-pointer",
                                 bg,
                                 "border-white/30 hover:border-white"
@@ -343,13 +384,20 @@ const CircularFloatingMenu = () => {
                               </motion.div>
                             </button>
                           ) : (
-                            <Link href={item.route} onClick={() => setIsOpen(false)}>
-                              <div className={cn(
-                                isMobile ? "w-10 h-10 rounded-xl" : "w-14 h-14 rounded-2xl",
-                                "flex items-center justify-center border-2 shadow-md text-white relative",
-                                bg,
-                                "border-white/30 hover:border-white"
-                              )}>
+                            <Link
+                              href={item.route}
+                              onClick={() => setIsOpen(false)}
+                            >
+                              <div
+                                className={cn(
+                                  isMobile
+                                    ? "w-10 h-10 rounded-xl"
+                                    : "w-14 h-14 rounded-2xl",
+                                  "flex items-center justify-center border-2 shadow-md text-white relative",
+                                  bg,
+                                  "border-white/30 hover:border-white"
+                                )}
+                              >
                                 <motion.div
                                   animate={{ rotate: isMobile ? 0 : -rotation }}
                                   transition={{ duration: 0.3 }}
@@ -385,16 +433,17 @@ const CircularFloatingMenu = () => {
                               "data-[side=right]:translate-x-1"
                             )}
                           >
-
                             <div className="flex flex-col gap-1 items-start">
                               <div>{item.label}</div>
                               <div className="flex items-center gap-1 text-xs text-white/80">
                                 <span>Press</span>
-                                <span className={cn(
-                                  "px-1.5 py-0.5 rounded font-mono font-bold",
-                                  `${bg}/50`,
-                                  "text-white"
-                                )}>
+                                <span
+                                  className={cn(
+                                    "px-1.5 py-0.5 rounded font-mono font-bold",
+                                    `${bg}/50`,
+                                    "text-white"
+                                  )}
+                                >
                                   {item.shortcut}
                                 </span>
                               </div>
@@ -410,7 +459,6 @@ const CircularFloatingMenu = () => {
           )}
         </AnimatePresence>
 
-
         {isOpen && (
           <motion.div
             className={cn(
@@ -419,19 +467,27 @@ const CircularFloatingMenu = () => {
                 ? "bottom-full left-1/2 -translate-x-1/2 mb-4"
                 : "top-1/2 left-full ml-4 -translate-y-1/2"
             )}
-            initial={{ opacity: 0, y: isMobile ? 10 : 0, x: isMobile ? 0 : -10 }}
+            initial={{
+              opacity: 0,
+              y: isMobile ? 10 : 0,
+              x: isMobile ? 0 : -10,
+            }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: isMobile ? 10 : 0, x: isMobile ? 0 : -10 }}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
-            <div className={cn(
-              "bg-black/80 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl",
-              isMobile
-                ? "px-4 py-3 flex flex-col gap-2 min-w-[200px]"
-                : "px-4 py-3 flex flex-col gap-3 min-w-[220px]"
-            )}>
+            <div
+              className={cn(
+                "bg-black/80 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl",
+                isMobile
+                  ? "px-4 py-3 flex flex-col gap-2 min-w-[200px]"
+                  : "px-4 py-3 flex flex-col gap-3 min-w-[220px]"
+              )}
+            >
               <div className="flex items-center justify-between">
-                <h3 className="text-white/90 font-medium text-sm">Menu Controls</h3>
+                <h3 className="text-white/90 font-medium text-sm">
+                  Menu Controls
+                </h3>
                 <div className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-white/60 text-xs">Active</span>
@@ -442,38 +498,54 @@ const CircularFloatingMenu = () => {
                 <div className="hidden md:block space-y-2">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/70">Open menu</span>
-                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded">M</span>
+                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded">
+                      M
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/70">Drag to rotate</span>
-                    <span className="text-white/50 font-mono bg-white/10 px-2 py-0.5 rounded">Mouse</span>
+                    <span className="text-white/50 font-mono bg-white/10 px-2 py-0.5 rounded">
+                      Mouse
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/70">Scroll to rotate</span>
-                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded">Wheel</span>
+                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded">
+                      Wheel
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/70">Arrow keys</span>
-                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded inline-flex *:size-4"><ArrowLeft /> {" "}<ArrowRight /></span>
+                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded inline-flex *:size-4">
+                      <ArrowLeft /> <ArrowRight />
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/70">Close menu</span>
-                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded">ESC</span>
+                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded">
+                      ESC
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/70">Quick access</span>
-                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded">A-Z</span>
+                    <span className="text-white/50 font-mono font-semibold bg-white/10 px-2 py-0.5 rounded">
+                      A-Z
+                    </span>
                   </div>
                 </div>
 
                 <div className="md:hidden space-y-2">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/70">Drag to rotate</span>
-                    <span className="text-white/50 font-mono bg-white/10 px-2 py-0.5 rounded">Touch</span>
+                    <span className="text-white/50 font-mono bg-white/10 px-2 py-0.5 rounded">
+                      Touch
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/70">Tap outside</span>
-                    <span className="text-white/50 font-mono bg-white/10 px-2 py-0.5 rounded">Close</span>
+                    <span className="text-white/50 font-mono bg-white/10 px-2 py-0.5 rounded">
+                      Close
+                    </span>
                   </div>
                 </div>
               </div>

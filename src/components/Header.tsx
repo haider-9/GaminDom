@@ -171,7 +171,7 @@ const Header = () => {
                 <Badge
                   {...badgeProps}
                   aria-label="Shopping cart"
-                  className="bg-surface rounded-full size-9 flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-colors"
+                  className="bg-surface rounded-full size-9 flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-all duration-200 hover:scale-105"
                 >
                   <ShoppingCart
                     size={20}
@@ -188,7 +188,7 @@ const Header = () => {
                 <Badge
                   {...badgeProps}
                   aria-label="Notifications"
-                  className="bg-surface rounded-full size-9 flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-colors"
+                  className="bg-surface rounded-full size-9 flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-all duration-200 hover:scale-105"
                 >
                   <Bell
                     size={20}
@@ -211,7 +211,7 @@ const Header = () => {
             <input
               type="text"
               placeholder="Search games..."
-              className="w-full pl-10 pr-16 py-3 bg-surface text-primary placeholder-gray-400 rounded-full focus:outline-none cursor-pointer"
+              className="w-full pl-10 pr-16 py-3 bg-surface text-primary placeholder-gray-400 rounded-full focus:outline-none cursor-pointer transition-all duration-200 hover:bg-surface-hover"
               aria-label="Search"
               readOnly
             />
@@ -239,16 +239,16 @@ const Header = () => {
         </Link>
 
         {/* Search Section */}
-        <div
-          className="flex-1 max-w-md mx-8 flex items-center justify-between"
-          onClick={() => setIsSearchOpen(true)}
-        >
-          <div className="relative">
+        <div className="flex-1 max-w-md mx-8 flex items-center justify-between">
+          <div 
+            className="relative flex-1 mr-4"
+            onClick={() => setIsSearchOpen(true)}
+          >
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
             <input
               type="text"
               placeholder="Search games..."
-              className="w-full pl-10 pr-20 py-2 bg-surface text-primary placeholder-gray-400 rounded-full focus:outline-none cursor-pointer"
+              className="w-full pl-10 pr-20 py-2 bg-surface text-primary placeholder-gray-400 rounded-full focus:outline-none cursor-pointer transition-all duration-200 hover:bg-surface-hover"
               aria-label="Search"
               readOnly
             />
@@ -281,7 +281,6 @@ const Header = () => {
                 <p>Notifications</p>
               </TooltipContent>
             </Tooltip>
-
           </div>
         </div>
       </div>

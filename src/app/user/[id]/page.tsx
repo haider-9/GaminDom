@@ -1,15 +1,15 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { 
-  User, 
-  Heart, 
-  Star, 
-  Calendar, 
+import {
+  User,
+  Heart,
+  Star,
+  Calendar,
   GamepadIcon,
   MessageSquare,
   ArrowLeft,
-  
+
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -66,7 +66,7 @@ const UserPage = () => {
 
   const fetchUserData = useCallback(async (id: string) => {
     if (!id) return;
-    
+
     try {
       setLoading(true);
       // Fetch user profile with favorites
@@ -96,7 +96,7 @@ const UserPage = () => {
 
   useEffect(() => {
     let isMounted = true;
-    
+
     // Get current user from localStorage
     const userData = localStorage.getItem('user');
     if (userData && isMounted) {
@@ -196,7 +196,8 @@ const UserPage = () => {
 
                 {/* User Info */}
                 <div className="flex-1">
-          
+                  <h1 className="text-2xl font-bold capitalize text-white mb-2">{user.username}</h1>
+
 
                   <p className="text-white/90 mb-4 drop-shadow">
                     {user.bio || "No bio added yet"}
@@ -225,22 +226,20 @@ const UserPage = () => {
             <div className="flex gap-1 mb-8 bg-[#1a0a0a] p-1 rounded-xl w-fit">
               <button
                 onClick={() => setActiveTab('favorites')}
-                className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                  activeTab === 'favorites'
+                className={`px-6 py-3 rounded-lg font-medium transition-all ${activeTab === 'favorites'
                     ? 'bg-[#bb3b3b] text-white'
                     : 'text-[#d1c0c0] hover:text-white hover:bg-[#2a1a1a]'
-                }`}
+                  }`}
               >
                 <Heart size={16} className="inline mr-2" />
                 Favorites ({user.favourites?.length || 0})
               </button>
               <button
                 onClick={() => setActiveTab('reviews')}
-                className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                  activeTab === 'reviews'
+                className={`px-6 py-3 rounded-lg font-medium transition-all ${activeTab === 'reviews'
                     ? 'bg-[#bb3b3b] text-white'
                     : 'text-[#d1c0c0] hover:text-white hover:bg-[#2a1a1a]'
-                }`}
+                  }`}
               >
                 <Star size={16} className="inline mr-2" />
                 Reviews ({reviews.length})
@@ -339,11 +338,10 @@ const UserPage = () => {
                                     <Star
                                       key={i}
                                       size={14}
-                                      className={`${
-                                        i < review.rating
+                                      className={`${i < review.rating
                                           ? 'text-yellow-500 fill-current'
                                           : 'text-[#3a1a1a]'
-                                      }`}
+                                        }`}
                                     />
                                   ))}
                                 </div>
@@ -384,7 +382,7 @@ const UserPage = () => {
             {/* Profile Stats */}
             <div className="bg-[#1a0a0a] rounded-xl p-6 border border-[#3a1a1a]">
               <h3 className="text-lg font-semibold text-white mb-4">Profile Stats</h3>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -393,7 +391,7 @@ const UserPage = () => {
                   </div>
                   <span className="text-white font-semibold">{user.favourites?.length || 0}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Star className="text-yellow-500" size={16} />
@@ -401,7 +399,7 @@ const UserPage = () => {
                   </div>
                   <span className="text-white font-semibold">{reviews.length}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Calendar className="text-blue-400" size={16} />
@@ -418,7 +416,7 @@ const UserPage = () => {
             {(user.favourites?.length > 0 || reviews.length > 0) && (
               <div className="bg-[#1a0a0a] rounded-xl p-6 border border-[#3a1a1a]">
                 <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
-                
+
                 <div className="space-y-3">
                   {user.favourites?.slice(0, 2).map((game) => (
                     <div key={game._id} className="flex items-center gap-3 p-2 bg-[#2a1a1a] rounded-lg">
@@ -441,7 +439,7 @@ const UserPage = () => {
                       </div>
                     </div>
                   ))}
-                  
+
                   {reviews.slice(0, 2).map((review) => (
                     <div key={review._id} className="flex items-center gap-3 p-2 bg-[#2a1a1a] rounded-lg">
                       <div className="w-8 h-8 rounded bg-[#3a1a1a] flex items-center justify-center overflow-hidden">
@@ -465,11 +463,10 @@ const UserPage = () => {
                               <Star
                                 key={i}
                                 size={10}
-                                className={`${
-                                  i < review.rating
+                                className={`${i < review.rating
                                     ? 'text-yellow-500 fill-current'
                                     : 'text-[#3a1a1a]'
-                                }`}
+                                  }`}
                               />
                             ))}
                           </div>
