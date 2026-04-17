@@ -107,7 +107,7 @@ const Header = () => {
   const iconProps = {
     size: 24,
     className:
-      "text-gray-400 hover:text-gray-200 transition-colors duration-200",
+      "text-muted hover:text-secondary transition-colors duration-200",
   };
 
   const badgeProps = {
@@ -175,11 +175,11 @@ const Header = () => {
                 >
                   <ShoppingCart
                     size={20}
-                    className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
+                    className="text-muted hover:text-secondary transition-colors duration-200"
                   />
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent className="bg-black text-white">
+              <TooltipContent>
                 <p>Cart</p>
               </TooltipContent>
             </Tooltip>
@@ -192,11 +192,11 @@ const Header = () => {
                 >
                   <Bell
                     size={20}
-                    className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
+                    className="text-muted hover:text-secondary transition-colors duration-200"
                   />
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent className="bg-black text-white">
+              <TooltipContent>
                 <p>Notifications</p>
               </TooltipContent>
             </Tooltip>
@@ -207,16 +207,16 @@ const Header = () => {
         {/* Search Section - Full width on mobile */}
         <div className="w-full" onClick={() => setIsSearchOpen(true)}>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted pointer-events-none" />
             <input
               type="text"
               placeholder="Search games..."
-              className="w-full pl-10 pr-16 py-3 bg-surface text-primary placeholder-gray-400 rounded-full focus:outline-none cursor-pointer transition-all duration-200 hover:bg-surface-hover"
+              className="w-full pl-10 pr-16 py-3 bg-surface text-primary placeholder-muted rounded-full focus:outline-none cursor-pointer transition-all duration-200 hover:bg-surface-hover"
               aria-label="Search"
               readOnly
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-              <kbd className="hidden sm:flex px-2 py-1  text-xs text-black dark:text-gray-700 bg-gray-700/50 rounded border border-gray-600 items-center">
+              <kbd className="hidden sm:flex px-2 py-1  text-xs text-text-inverse dark:text-muted bg-surface/50 rounded border border-border items-center">
                 <Command className="inline w-3 h-3 mr-1" />
                 +K
               </kbd>
@@ -244,16 +244,16 @@ const Header = () => {
             className="relative flex-1 mr-4"
             onClick={() => setIsSearchOpen(true)}
           >
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted pointer-events-none" />
             <input
               type="text"
               placeholder="Search games..."
-              className="w-full pl-10 pr-20 py-2 bg-surface text-primary placeholder-gray-400 rounded-full focus:outline-none cursor-pointer transition-all duration-200 hover:bg-surface-hover"
+              className="w-full pl-10 pr-20 py-2 bg-surface text-primary placeholder-muted rounded-full focus:outline-none cursor-pointer transition-all duration-200 hover:bg-surface-hover"
               aria-label="Search"
               readOnly
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-              <kbd className="px-2 py-1 text-xs text-black dark:text-gray-400 bg-gray-700/50 rounded border border-gray-600">
+              <kbd className="px-2 py-1 text-xs text-text-inverse dark:text-muted bg-surface/50 rounded border border-border">
                 <Command className="inline w-3 h-3 mr-1" />K
               </kbd>
             </div>
@@ -267,7 +267,7 @@ const Header = () => {
                   <ShoppingCart {...iconProps} />
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent className="bg-black text-white">
+              <TooltipContent>
                 <p>Cart</p>
               </TooltipContent>
             </Tooltip>
@@ -277,7 +277,7 @@ const Header = () => {
                   <Bell {...iconProps} />
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent className="bg-black text-white">
+              <TooltipContent>
                 <p>Notifications</p>
               </TooltipContent>
             </Tooltip>
@@ -296,14 +296,14 @@ const Header = () => {
 
           <div className="px-6 pb-4 ">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted" />
               <input
                 type="text"
                 placeholder="Search for games, genres, or publishers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="w-full pl-12 pr-4 py-3 bg-surface text-primary placeholder-gray-400 rounded-full border border-primary focus:outline-none"
+                className="w-full pl-12 pr-4 py-3 bg-surface text-primary placeholder-muted rounded-full border border-primary focus:outline-none"
                 aria-label="Search"
                 autoFocus
               />
@@ -361,7 +361,7 @@ const Header = () => {
                           className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover cursor-pointer transition-colors"
                           onClick={() => handleSearch(game)}
                         >
-                          <Star className="w-4 h-4 text-yellow-500" />
+                          <Star className="w-4 h-4 text-warning" />
                           <span className="text-secondary">{game}</span>
                         </div>
                       ))}
@@ -460,7 +460,7 @@ const Header = () => {
                       <p className="text-muted">Searching games...</p>
                     </div>
                   ) : searchError ? (
-                    <div className="text-center py-8 text-red-500">
+                    <div className="text-center py-8 text-error">
                       <p>{searchError}</p>
                     </div>
                   ) : searchResults.length > 0 ? (

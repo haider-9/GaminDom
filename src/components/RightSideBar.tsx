@@ -217,7 +217,7 @@ const RightSidebar = () => {
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-12 h-12 rounded-full bg-[#1a0a0a] border-2 border-[#bb3b3b] flex items-center justify-center overflow-hidden hover:border-[#d14d4d] transition-colors shadow-lg"
+          className="w-12 h-12 rounded-full bg-background-secondary border-2 accent-border flex items-center justify-center overflow-hidden hover:border-primary-hover transition-colors shadow-lg"
         >
           {user.profileImage ? (
             <Image
@@ -228,7 +228,7 @@ const RightSidebar = () => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <User size={20} className="text-[#bb3b3b]" />
+            <User size={20} className="accent-primary" />
           )}
         </button>
       </motion.div>
@@ -252,15 +252,15 @@ const RightSidebar = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 300 }}
               transition={{ type: "spring", damping: 30, stiffness: 400, duration: 0.3 }}
-              className="fixed top-0 right-0 h-full w-80 bg-[#1a0a0a] border-l border-[#3a1a1a] z-50 overflow-y-auto"
+              className="fixed top-0 right-0 h-full w-80 bg-background-secondary border-l border-background-quaternary z-50 overflow-y-auto"
             >
               {/* Header */}
-              <div className="p-6 border-b border-[#3a1a1a]">
+              <div className="p-6 border-b border-background-quaternary">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-white">Profile</h2>
+                  <h2 className="text-xl font-bold text-primary">Profile</h2>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="w-8 h-8 rounded-full bg-[#2a1a1a] flex items-center justify-center text-[#d1c0c0] hover:text-white hover:bg-[#3a1a1a] transition-colors"
+                    className="w-8 h-8 rounded-full bg-surface-secondary flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-tertiary transition-colors"
                   >
                     <X size={16} />
                   </button>
@@ -268,7 +268,7 @@ const RightSidebar = () => {
 
                 {/* User Info */}
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-[#2a1a1a] border-2 border-[#bb3b3b] flex items-center justify-center overflow-hidden">
+                  <div className="w-16 h-16 rounded-full bg-surface-secondary border-2 accent-border flex items-center justify-center overflow-hidden">
                     {user.profileImage ? (
                       <Image
                         src={user.profileImage}
@@ -278,35 +278,35 @@ const RightSidebar = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <User size={24} className="text-[#bb3b3b]" />
+                      <User size={24} className="accent-primary" />
                     )}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-white">{user.username}</h3>
-                    <p className="text-sm text-[#8a6e6e]">{user.email}</p>
+                    <h3 className="font-semibold text-primary">{user.username}</h3>
+                    <p className="text-sm text-muted">{user.email}</p>
                     {user.bio && (
-                      <p className="text-sm text-[#d1c0c0] mt-1 line-clamp-2">{user.bio}</p>
+                      <p className="text-sm text-secondary mt-1 line-clamp-2">{user.bio}</p>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* Quick Stats */}
-              <div className="p-6 border-b border-[#3a1a1a]">
-                <h3 className="text-sm font-semibold text-[#d1c0c0] mb-3">Quick Stats</h3>
+              <div className="p-6 border-b border-background-quaternary">
+                <h3 className="text-sm font-semibold text-secondary mb-3">Quick Stats</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#2a1a1a] rounded-lg p-3 text-center">
-                    <Heart size={16} className="text-[#bb3b3b] mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-white">{user.favourites?.length || 0}</p>
-                    <p className="text-xs text-[#8a6e6e]">Favorites</p>
+                  <div className="bg-surface-secondary rounded-lg p-3 text-center">
+                    <Heart size={16} className="accent-primary mx-auto mb-1" />
+                    <p className="text-sm font-semibold text-primary">{user.favourites?.length || 0}</p>
+                    <p className="text-xs text-muted">Favorites</p>
                   </div>
-                  <div className="bg-[#2a1a1a] rounded-lg p-3 text-center">
-                    <Star size={16} className="text-yellow-500 mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-white">{reviews.length}</p>
-                    <p className="text-xs text-[#8a6e6e]">Reviews</p>
+                  <div className="bg-surface-secondary rounded-lg p-3 text-center">
+                    <Star size={16} className="text-warning mx-auto mb-1" />
+                    <p className="text-sm font-semibold text-primary">{reviews.length}</p>
+                    <p className="text-xs text-muted">Reviews</p>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center gap-2 text-xs text-[#8a6e6e]">
+                <div className="mt-3 flex items-center gap-2 text-xs text-muted">
                   <Calendar size={12} />
                   Joined {new Date(user.createdAt).toLocaleDateString()}
                 </div>
@@ -318,7 +318,7 @@ const RightSidebar = () => {
                   <Link
                     href="/profile"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-[#d1c0c0] hover:text-white hover:bg-[#2a1a1a] transition-colors group"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-primary hover:bg-surface-secondary transition-colors group"
                   >
                     <User size={18} />
                     <span>View Profile</span>
@@ -328,7 +328,7 @@ const RightSidebar = () => {
                   <Link
                     href="/profile/edit"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-[#d1c0c0] hover:text-white hover:bg-[#2a1a1a] transition-colors group"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-primary hover:bg-surface-secondary transition-colors group"
                   >
                     <Edit3 size={18} />
                     <span>Edit Profile</span>
@@ -338,7 +338,7 @@ const RightSidebar = () => {
                   <Link
                     href="/settings"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-[#d1c0c0] hover:text-white hover:bg-[#2a1a1a] transition-colors group"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-primary hover:bg-surface-secondary transition-colors group"
                   >
                     <Settings size={18} />
                     <span>Settings</span>
@@ -347,7 +347,7 @@ const RightSidebar = () => {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors group"
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-error hover:text-error/80 hover:bg-error-light transition-colors group"
                   >
                     <LogOut size={18} />
                     <span>Logout</span>

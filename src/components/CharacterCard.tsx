@@ -10,6 +10,7 @@ import {
   Tag,
   Heart,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface Character {
   _id?: string;
@@ -78,13 +79,19 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
         {/* Action Buttons */}
         <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {showRemoveButton && character._id && onRemove && (
-            <button
-              onClick={handleRemove}
-              className="p-1.5 bg-red-500/80 hover:bg-red-500 text-white rounded-full transition-all duration-200"
-              title="Remove from favorites"
-            >
-              <Trash2 size={12} />
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={handleRemove}
+                  className="p-1.5 bg-error/80 hover:bg-error text-text-inverse rounded-full transition-all duration-200"
+                >
+                  <Trash2 size={12} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Remove from favorites</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
 

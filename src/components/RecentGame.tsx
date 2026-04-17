@@ -166,17 +166,17 @@ const RecentGame = () => {
                     <motion.div
                       whileHover={{ scale: 1.2, rotate: 10 }}
                     >
-                      <Star size={12} className="text-yellow-400 fill-yellow-400" />
+                      <Star size={12} className="text-warning fill-warning" />
                     </motion.div>
-                    <span className="text-yellow-400 text-xs font-semibold">
+                    <span className="text-warning text-xs font-semibold">
                       {game.rating ? game.rating.toFixed(1) : "N/A"}
                     </span>
                   </div>
 
                   {game.released && (
                     <div className="flex items-center gap-1">
-                      <Calendar size={12} className="text-blue-400" />
-                      <span className="text-blue-400 text-xs">
+                      <Calendar size={12} className="text-info" />
+                      <span className="text-info text-xs">
                         {new Date(game.released).getFullYear()}
                       </span>
                     </div>
@@ -184,8 +184,8 @@ const RecentGame = () => {
 
                   {game.metacritic && (
                     <div className="flex items-center gap-1">
-                      <Gamepad2 size={12} className="text-green-400" />
-                      <span className="text-green-400 text-xs font-semibold">
+                      <Gamepad2 size={12} className="text-success" />
+                      <span className="text-success text-xs font-semibold">
                         {game.metacritic}
                       </span>
                     </div>
@@ -193,7 +193,7 @@ const RecentGame = () => {
 
                   {game.genres && game.genres.length > 0 && (
                     <motion.span
-                      className="text-purple-400 text-xs bg-purple-500/20 px-2 py-0.5 rounded-full"
+                      className="text-info text-xs bg-info-light px-2 py-0.5 rounded-full"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 300, delay: 0.4 + index * 0.05 }}

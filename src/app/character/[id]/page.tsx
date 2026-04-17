@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import FavoriteCharacterButton from "@/components/FavoriteCharacterButton";
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Character {
   id: number;
@@ -343,29 +344,35 @@ const CharacterPage = () => {
             )}
             
             {/* Share Button */}
-            <button 
-              onClick={() => {
-                if (navigator.share && character) {
-                  navigator.share({
-                    title: character.name,
-                    text: character.deck || `Check out ${character.name} on GaminDom`,
-                    url: window.location.href,
-                  }).catch(() => {
-                    // Fallback to clipboard
-                    navigator.clipboard.writeText(window.location.href);
-                    // You might want to show a toast here
-                  });
-                } else {
-                  // Fallback to clipboard
-                  navigator.clipboard.writeText(window.location.href);
-                  // You might want to show a toast here
-                }
-              }}
-              className="p-2 bg-surface hover:bg-blue-500/70 rounded-full transition-colors"
-              title="Share character"
-            >
-              <Share2 size={20} className="text-primary" />
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  onClick={() => {
+                    if (navigator.share && character) {
+                      navigator.share({
+                        title: character.name,
+                        text: character.deck || `Check out ${character.name} on GaminDom`,
+                        url: window.location.href,
+                      }).catch(() => {
+                        // Fallback to clipboard
+                        navigator.clipboard.writeText(window.location.href);
+                        // You might want to show a toast here
+                      });
+                    } else {
+                      // Fallback to clipboard
+                      navigator.clipboard.writeText(window.location.href);
+                      // You might want to show a toast here
+                    }
+                  }}
+                  className="p-2 bg-surface hover:bg-info/70 rounded-full transition-colors"
+                >
+                  <Share2 size={20} className="text-primary" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Share character</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>

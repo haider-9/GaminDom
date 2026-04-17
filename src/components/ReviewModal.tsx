@@ -155,15 +155,15 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="fixed inset-0 z-51 flex items-center justify-center p-4"
           >
-            <div className="bg-[#1a0a0a] rounded-xl border border-[#3a1a1a] w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="bg-background-secondary rounded-xl border border-background-quaternary w-full max-w-md max-h-[90vh] overflow-y-auto">
               {/* Header */}
-              <div className="p-6 border-b border-[#3a1a1a]">
+              <div className="p-6 border-b border-background-quaternary">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-white">Write a Review</h2>
+                  <h2 className="text-xl font-bold text-primary">Write a Review</h2>
                   <button
                     onClick={handleClose}
                     disabled={isSubmitting}
-                    className="w-8 h-8 rounded-full bg-[#2a1a1a] flex items-center justify-center text-[#d1c0c0] hover:text-white hover:bg-[#3a1a1a] transition-colors disabled:opacity-50"
+                    className="w-8 h-8 rounded-full bg-surface-secondary flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-tertiary transition-colors disabled:opacity-50"
                   >
                     <X size={16} />
                   </button>
@@ -171,7 +171,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
                 
                 {/* Game Info */}
                 <div className="flex items-center gap-3 mt-4">
-                  <div className="w-12 h-12 bg-[#2a1a1a] rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="w-12 h-12 bg-surface-secondary rounded-lg flex items-center justify-center overflow-hidden">
                     {game.background_image ? (
                       <Image
                         src={game.background_image}
@@ -181,12 +181,12 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="text-[#bb3b3b] text-xs">No Image</div>
+                      <div className="accent-primary text-xs">No Image</div>
                     )}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white">{game.name}</h3>
-                    <p className="text-sm text-[#8a6e6e]">Rate and review this game</p>
+                    <h3 className="font-semibold text-primary">{game.name}</h3>
+                    <p className="text-sm text-muted">Rate and review this game</p>
                   </div>
                 </div>
               </div>
@@ -195,7 +195,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
               <form onSubmit={handleSubmit} className="p-6">
                 {/* Rating */}
                 <div className="mb-6">
-                  <label className="block text-[#e0d0d0] text-sm font-medium mb-3">
+                  <label className="block text-secondary text-sm font-medium mb-3">
                     Your Rating *
                   </label>
                   <div className="flex items-center gap-1">
@@ -212,13 +212,13 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
                           size={24}
                           className={`transition-colors ${
                             star <= (hoverRating || rating)
-                              ? 'text-yellow-500 fill-current'
-                              : 'text-[#3a1a1a]'
+                              ? 'text-warning fill-current'
+                              : 'text-background-quaternary'
                           }`}
                         />
                       </button>
                     ))}
-                    <span className="ml-2 text-sm text-[#d1c0c0]">
+                    <span className="ml-2 text-sm text-secondary">
                       {rating > 0 && `${rating}/5 stars`}
                     </span>
                   </div>
@@ -226,7 +226,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
 
                 {/* Review Text */}
                 <div className="mb-6">
-                  <label className="block text-[#e0d0d0] text-sm font-medium mb-2">
+                  <label className="block text-secondary text-sm font-medium mb-2">
                     Your Review (Optional)
                   </label>
                   <textarea
@@ -234,10 +234,10 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
                     onChange={(e) => setReviewText(e.target.value)}
                     rows={4}
                     maxLength={1000}
-                    className="w-full bg-[#2a1a1a] border border-[#3a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#8a6e6e] focus:border-[#bb3b3b] focus:ring-2 focus:ring-[#bb3b3b]/30 focus:outline-none transition-all resize-none"
+                    className="w-full bg-surface-secondary border border-background-quaternary rounded-lg px-4 py-3 text-primary placeholder-muted focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition-all resize-none"
                     placeholder="Share your thoughts about this game..."
                   />
-                  <p className="text-xs text-[#8a6e6e] mt-1">
+                  <p className="text-xs text-muted mt-1">
                     {reviewText.length}/1000 characters
                   </p>
                 </div>
@@ -248,17 +248,17 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
                     type="button"
                     onClick={handleClose}
                     disabled={isSubmitting}
-                    className="flex-1 px-4 py-3 bg-[#2a1a1a] border border-[#3a1a1a] rounded-lg text-[#d1c0c0] hover:bg-[#3a1a1a] transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-surface-secondary border border-background-quaternary rounded-lg text-secondary hover:bg-surface-tertiary transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting || rating === 0}
-                    className="flex-1 px-4 py-3 bg-[#bb3b3b] hover:bg-[#d14d4d] disabled:bg-[#8a2a2a] text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-3 accent-bg hover:bg-primary-hover disabled:bg-primary/50 text-text-inverse font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-text-inverse/30 border-t-text-inverse rounded-full animate-spin" />
                     ) : (
                       <>
                         <Send size={16} />

@@ -90,7 +90,7 @@ const TopRatedGames = () => {
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 300, delay: 0.3 }}
           >
-            <Trophy className="text-yellow-500" size={32} />
+            <Trophy className="text-warning" size={32} />
           </motion.div>
           <motion.h2 
             className="text-3xl font-bold text-primary"
@@ -102,7 +102,7 @@ const TopRatedGames = () => {
         </div>
         <motion.button
           onClick={() => router.push("/top-rated")}
-          className="text-yellow-500 hover:text-yellow-400 transition-colors text-lg font-semibold"
+          className="text-warning hover:text-warning/80 transition-colors text-lg font-semibold"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -180,7 +180,7 @@ const TopRatedGames = () => {
                   <motion.div
                     whileHover={{ scale: 1.2, rotate: 10 }}
                   >
-                    <Star className="w-4 h-4 text-yellow-400" />
+                    <Star className="w-4 h-4 text-warning" />
                   </motion.div>
                   <span>{game.rating.toFixed(1)}</span>
                 </div>

@@ -17,7 +17,7 @@ const RecentGameSkeleton = ({ count = 3 }: RecentGameSkeletonProps) => {
             <div className="h-4 bg-gray-600 rounded w-3/4"></div>
             <div className="h-3 bg-gray-600 rounded w-full"></div>
           </div>
-          <ChevronRight size={20} className="text-gray-600" />
+          <ChevronRight size={20} className="text-muted" />
         </div>
       ))}
     </div>

@@ -4,20 +4,101 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  /* Default Dark Theme */
-  --color-primary: #bb3b3b;
-  --color-primary-hover: #d14d4d;
-  --color-primary-light: #bb3b3b20;
-  --color-background: #361518;
-  --color-background-secondary: #1a0a0a;
+  /* ===== PRIMITIVE COLORS ===== */
+  /* Primary Brand Colors */
+  --red-50: #fef2f2;
+  --red-100: #fee2e2;
+  --red-200: #fecaca;
+  --red-300: #fca5a5;
+  --red-400: #f87171;
+  --red-500: #bb3b3b;
+  --red-600: #d14d4d;
+  --red-700: #a73030;
+  --red-800: #8b2525;
+  --red-900: #7f1d1d;
+
+  /* Neutral Grays */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  /* Dark Theme Specific */
+  --dark-50: #3a1a1a;
+  --dark-100: #2a1a1a;
+  --dark-200: #1a0a0a;
+  --dark-300: #361518;
+  --dark-400: #8a6e6e;
+
+  /* Semantic Colors */
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --green-400: #4ade80;
+  --green-500: #22c55e;
+  --green-600: #16a34a;
+  --yellow-400: #facc15;
+  --yellow-500: #eab308;
+  --purple-400: #a78bfa;
+  --purple-500: #8b5cf6;
+  --orange-500: #f97316;
+
+  /* ===== SEMANTIC TOKENS ===== */
+  /* Brand / Interactive */
+  --color-primary: var(--red-500);
+  --color-primary-hover: var(--red-600);
+  --color-primary-active: var(--red-700);
+  --color-primary-light: rgba(187, 59, 59, 0.1);
+  --color-primary-lighter: rgba(187, 59, 59, 0.05);
+
+  /* Backgrounds */
+  --color-background: var(--dark-300);
+  --color-background-secondary: var(--dark-200);
+  --color-background-tertiary: var(--dark-100);
+  --color-background-quaternary: var(--dark-50);
+
+  /* Surfaces */
   --color-surface: rgba(0, 0, 0, 0.5);
   --color-surface-hover: rgba(0, 0, 0, 0.7);
+  --color-surface-secondary: rgba(42, 26, 26, 1);
+  --color-surface-tertiary: rgba(58, 26, 26, 1);
+
+  /* Text */
   --color-text: #ffffff;
   --color-text-secondary: rgba(255, 255, 255, 0.7);
   --color-text-muted: rgba(255, 255, 255, 0.5);
+  --color-text-inverse: #000000;
+
+  /* Borders */
   --color-border: rgba(255, 255, 255, 0.2);
   --color-border-hover: rgba(255, 255, 255, 0.4);
-  
+  --color-border-primary: rgba(187, 59, 59, 0.3);
+  --color-border-primary-hover: rgba(187, 59, 59, 0.5);
+
+  /* Status Colors */
+  --color-success: var(--green-500);
+  --color-success-light: rgba(34, 197, 94, 0.1);
+  --color-warning: var(--yellow-400);
+  --color-warning-light: rgba(250, 204, 21, 0.1);
+  --color-error: var(--red-500);
+  --color-error-light: rgba(239, 68, 68, 0.1);
+  --color-info: var(--blue-500);
+  --color-info-light: rgba(59, 130, 246, 0.1);
+
+  /* Platform Colors */
+  --color-steam: #c7d5e0;
+  --color-playstation: var(--blue-400);
+  --color-xbox: var(--green-400);
+  --color-nintendo: #e60012;
+  --color-android: var(--green-400);
+  --color-apple: var(--gray-300);
+
   /* Legacy support */
   --color-red: var(--color-primary);
   --color-maroon: var(--color-background);
@@ -28,11 +109,16 @@
 [data-theme="light"] {
   --color-background: #f5f5f5;
   --color-background-secondary: #ffffff;
+  --color-background-tertiary: #f9fafb;
+  --color-background-quaternary: #f3f4f6;
   --color-surface: rgba(255, 255, 255, 0.8);
   --color-surface-hover: rgba(255, 255, 255, 0.9);
+  --color-surface-secondary: rgba(243, 244, 246, 1);
+  --color-surface-tertiary: rgba(229, 231, 235, 1);
   --color-text: #1a1a1a;
   --color-text-secondary: rgba(26, 26, 26, 0.7);
   --color-text-muted: rgba(26, 26, 26, 0.5);
+  --color-text-inverse: #ffffff;
   --color-border: rgba(0, 0, 0, 0.2);
   --color-border-hover: rgba(0, 0, 0, 0.4);
   --color-maroon: var(--color-background);
@@ -43,11 +129,16 @@
   [data-theme="auto"] {
     --color-background: #f5f5f5;
     --color-background-secondary: #ffffff;
+    --color-background-tertiary: #f9fafb;
+    --color-background-quaternary: #f3f4f6;
     --color-surface: rgba(255, 255, 255, 0.8);
     --color-surface-hover: rgba(255, 255, 255, 0.9);
+    --color-surface-secondary: rgba(243, 244, 246, 1);
+    --color-surface-tertiary: rgba(229, 231, 235, 1);
     --color-text: #1a1a1a;
     --color-text-secondary: rgba(26, 26, 26, 0.7);
     --color-text-muted: rgba(26, 26, 26, 0.5);
+    --color-text-inverse: #ffffff;
     --color-border: rgba(0, 0, 0, 0.2);
     --color-border-hover: rgba(0, 0, 0, 0.4);
     --color-maroon: var(--color-background);
@@ -56,39 +147,63 @@
 
 /* Accent Color Variants */
 [data-accent="red"] {
-  --color-primary: #bb3b3b;
-  --color-primary-hover: #d14d4d;
-  --color-primary-light: #bb3b3b20;
+  --color-primary: var(--red-500);
+  --color-primary-hover: var(--red-600);
+  --color-primary-active: var(--red-700);
+  --color-primary-light: rgba(187, 59, 59, 0.1);
+  --color-primary-lighter: rgba(187, 59, 59, 0.05);
+  --color-border-primary: rgba(187, 59, 59, 0.3);
+  --color-border-primary-hover: rgba(187, 59, 59, 0.5);
 }
 
 [data-accent="blue"] {
   --color-primary: #3b7ebb;
   --color-primary-hover: #4d8dd1;
-  --color-primary-light: #3b7ebb20;
+  --color-primary-active: #2a6ba8;
+  --color-primary-light: rgba(59, 126, 187, 0.1);
+  --color-primary-lighter: rgba(59, 126, 187, 0.05);
+  --color-border-primary: rgba(59, 126, 187, 0.3);
+  --color-border-primary-hover: rgba(59, 126, 187, 0.5);
 }
 
 [data-accent="green"] {
   --color-primary: #3bbb7e;
   --color-primary-hover: #4dd192;
-  --color-primary-light: #3bbb7e20;
+  --color-primary-active: #2a9c6b;
+  --color-primary-light: rgba(59, 187, 126, 0.1);
+  --color-primary-lighter: rgba(59, 187, 126, 0.05);
+  --color-border-primary: rgba(59, 187, 126, 0.3);
+  --color-border-primary-hover: rgba(59, 187, 126, 0.5);
 }
 
 [data-accent="purple"] {
   --color-primary: #7e3bbb;
   --color-primary-hover: #924dd1;
-  --color-primary-light: #7e3bbb20;
+  --color-primary-active: #6b2a9c;
+  --color-primary-light: rgba(126, 59, 187, 0.1);
+  --color-primary-lighter: rgba(126, 59, 187, 0.05);
+  --color-border-primary: rgba(126, 59, 187, 0.3);
+  --color-border-primary-hover: rgba(126, 59, 187, 0.5);
 }
 
 [data-accent="orange"] {
   --color-primary: #bb7e3b;
   --color-primary-hover: #d1924d;
-  --color-primary-light: #bb7e3b20;
+  --color-primary-active: #a86b2a;
+  --color-primary-light: rgba(187, 126, 59, 0.1);
+  --color-primary-lighter: rgba(187, 126, 59, 0.05);
+  --color-border-primary: rgba(187, 126, 59, 0.3);
+  --color-border-primary-hover: rgba(187, 126, 59, 0.5);
 }
 
 [data-accent="pink"] {
   --color-primary: #bb3b7e;
   --color-primary-hover: #d14d92;
-  --color-primary-light: #bb3b7e20;
+  --color-primary-active: #a82a6b;
+  --color-primary-light: rgba(187, 59, 126, 0.1);
+  --color-primary-lighter: rgba(187, 59, 126, 0.05);
+  --color-border-primary: rgba(187, 59, 126, 0.3);
+  --color-border-primary-hover: rgba(187, 59, 126, 0.5);
 }
 html,
 body {
@@ -258,12 +373,36 @@ button {
   background-color: var(--color-primary-hover);
 }
 
+.bg-primary-light {
+  background-color: var(--color-primary-light);
+}
+
 .bg-surface {
   background-color: var(--color-surface);
 }
 
 .bg-surface-hover:hover {
   background-color: var(--color-surface-hover);
+}
+
+.bg-surface-secondary {
+  background-color: var(--color-surface-secondary);
+}
+
+.bg-surface-tertiary {
+  background-color: var(--color-surface-tertiary);
+}
+
+.bg-background-secondary {
+  background-color: var(--color-background-secondary);
+}
+
+.bg-background-tertiary {
+  background-color: var(--color-background-tertiary);
+}
+
+.bg-background-quaternary {
+  background-color: var(--color-background-quaternary);
 }
 
 .text-primary {
@@ -276,6 +415,10 @@ button {
 
 .text-muted {
   color: var(--color-text-muted);
+}
+
+.text-text-inverse {
+  color: var(--color-text-inverse);
 }
 
 .border-primary {
@@ -300,6 +443,60 @@ button {
 
 .accent-border {
   border-color: var(--color-primary);
+}
+
+/* Status Colors */
+.bg-success {
+  background-color: var(--color-success);
+}
+
+.bg-warning {
+  background-color: var(--color-warning);
+}
+
+.bg-error {
+  background-color: var(--color-error);
+}
+
+.bg-info {
+  background-color: var(--color-info);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+.text-info {
+  color: var(--color-info);
+}
+
+/* Additional Utility Classes */
+.bg-surface-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.bg-surface-overlay-light {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.bg-surface-overlay-heavy {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.text-overlay {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.text-overlay-muted {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* =================== Line Clamp Utilities =================== */

@@ -13,7 +13,7 @@ const ThemeToggle = () => {
   ] as const;
 
   const colors = [
-    { value: "red", color: "#bb3b3b", label: "Red" },
+    { value: "red", color: "var(--red-500)", label: "Red" },
     { value: "blue", color: "#3b7ebb", label: "Blue" },
     { value: "green", color: "#3bbb7e", label: "Green" },
     { value: "purple", color: "#7e3bbb", label: "Purple" },
@@ -24,7 +24,7 @@ const ThemeToggle = () => {
   return (
     <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
       {/* Theme Toggle */}
-      <div className="flex gap-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-1">
+      <div className="flex gap-1 bg-surface border border-primary rounded-2xl p-1">
         {themes.map((themeOption) => {
           const Icon = themeOption.icon;
           return (
@@ -33,8 +33,8 @@ const ThemeToggle = () => {
               onClick={() => setTheme(themeOption.value)}
               className={`p-2 rounded-xl transition-colors ${
                 theme === themeOption.value
-                  ? "bg-[var(--color-primary)] text-white"
-                  : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+                  ? "accent-bg text-primary"
+                  : "text-secondary hover:text-primary"
               }`}
               title={themeOption.label}
             >
@@ -45,14 +45,14 @@ const ThemeToggle = () => {
       </div>
 
       {/* Color Toggle */}
-      <div className="flex gap-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-1">
+      <div className="flex gap-1 bg-surface border border-primary rounded-2xl p-1">
         {colors.map((color) => (
           <button
             key={color.value}
             onClick={() => setAccentColor(color.value)}
             className={`w-8 h-8 rounded-lg border-2 transition-all ${
               accentColor === color.value
-                ? "border-[var(--color-text)] scale-110"
+                ? "border-primary scale-110"
                 : "border-transparent hover:scale-105"
             }`}
             style={{ backgroundColor: color.color }}

@@ -73,7 +73,7 @@ const TagsOverview = () => {
       {/* Header */}
       <div className="mb-8 bg-black/50 rounded-3xl p-6">
         <div className="flex items-center gap-4 mb-4">
-          <Hash className="text-blue-500" size={40} />
+          <Hash className="text-info" size={40} />
           <div>
             <h1 className="text-4xl font-bold text-white">Game Tags</h1>
             <p className="text-white/70 mt-2">Discover games by popular tags and themes</p>

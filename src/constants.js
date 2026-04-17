@@ -17,7 +17,7 @@ export const GAMES_DATA = [
     description:
       "A military science fiction first-person shooter video game franchise created by Bungie.",
     image: "/assets/Halo.png",
-    bgColor: "bg-blue-500/50",
+    bgColor: "bg-info/50",
     platforms: ["steam", "epic"],
     isPopular: false,
     reviews: 89,
@@ -39,7 +39,7 @@ export const GAMES_DATA = [
     description:
       "An action-adventure game set in an open world, focusing on the life of an outlaw in the late 1800s.",
     image: "/assets/rdr2.png",
-    bgColor: "bg-red-500/50",
+    bgColor: "bg-error/50",
     platforms: ["steam", "epic"],
     isPopular: true,
     reviews: 150,
@@ -50,7 +50,7 @@ export const GAMES_DATA = [
     description:
       "An action-adventure game series set in historical settings, focusing on the conflict between Assassins and Templars.",
     image: "/assets/Assasin Creed.png",
-    bgColor: "bg-green-500/50",
+    bgColor: "bg-success/50",
     platforms: ["steam"],
     isPopular: false,
     reviews: 95,
@@ -121,14 +121,14 @@ export const PLATFORM_ICONS = {
 
 // Color variants for backgrounds
 export const BG_COLORS = {
-  red: "bg-red-500/50",
-  purple: "bg-purple-500/50",
-  blue: "bg-blue-500/50",
-  orange: "bg-orange-500/50",
-  green: "bg-green-500/50",
-  yellow: "bg-yellow-500/50",
-  pink: "bg-pink-500/50",
-  indigo: "bg-indigo-500/50",
+  red: "bg-error/50",
+  purple: "bg-info/50",
+  blue: "bg-info/50",
+  orange: "bg-warning/50",
+  green: "bg-success/50",
+  yellow: "bg-warning/50",
+  pink: "bg-error/50",
+  indigo: "bg-info/50",
 };
 
 // Sample user avatars for reviews

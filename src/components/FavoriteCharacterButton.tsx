@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
 import { useCharacterFavorites } from '@/hooks/useCharacterFavorites';
 import { showToast } from '@/lib/toast-config';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface FavoriteCharacterButtonProps {
   character: {
@@ -80,31 +81,37 @@ const FavoriteCharacterButton: React.FC<FavoriteCharacterButtonProps> = ({
   const isDisabled = loading || favoritesLoading;
 
   return (
-    <button
-      onClick={toggleFavorite}
-      disabled={isDisabled}
-      title={isCharacterFavorited ? `Remove ${character.name} from favorites` : `Add ${character.name} to favorites`}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-        isCharacterFavorited
-          ? 'bg-[#bb3b3b] text-white hover:bg-[#d14d4d] shadow-lg'
-          : 'bg-[#2a1a1a] text-[#d1c0c0] hover:bg-[#3a1a1a] hover:text-white border border-[#3a1a1a] hover:border-[#bb3b3b]'
-      } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'} ${className}`}
-    >
-      <Heart
-        size={16}
-        className={`transition-all duration-200 ${
-          isCharacterFavorited ? 'fill-current text-white' : 'text-current'
-        } ${loading ? 'animate-pulse' : ''}`}
-      />
-      <span className="font-medium">
-        {loading || favoritesLoading 
-          ? 'Loading...' 
-          : isCharacterFavorited 
-            ? 'Favorited' 
-            : 'Add to Favorites'
-        }
-      </span>
-    </button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          onClick={toggleFavorite}
+          disabled={isDisabled}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+            isCharacterFavorited
+              ? 'accent-bg text-text-inverse hover:bg-primary-hover shadow-lg'
+              : 'bg-surface-secondary text-secondary hover:bg-surface-tertiary hover:text-primary border border-background-quaternary hover:border-primary'
+          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'} ${className}`}
+        >
+          <Heart
+            size={16}
+            className={`transition-all duration-200 ${
+              isCharacterFavorited ? 'fill-current text-text-inverse' : 'text-current'
+            } ${loading ? 'animate-pulse' : ''}`}
+          />
+          <span className="font-medium">
+            {loading || favoritesLoading 
+              ? 'Loading...' 
+              : isCharacterFavorited 
+                ? 'Favorited' 
+                : 'Add to Favorites'
+            }
+          </span>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{isCharacterFavorited ? `Remove ${character.name} from favorites` : `Add ${character.name} to favorites`}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };
 

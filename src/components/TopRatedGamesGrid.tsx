@@ -113,7 +113,7 @@ const TopRatedGamesGrid = () => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Trophy className="text-yellow-500" size={40} />
+            <Trophy className="text-warning" size={40} />
             <div>
               <h1 className="text-4xl font-bold text-white">Top Rated Games</h1>
               <p className="text-white/70 mt-2">
@@ -175,7 +175,7 @@ const TopRatedGamesGrid = () => {
 
                 <div className="flex items-center gap-3 mb-2 text-sm text-white/80">
                   <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-400" />
+                    <Star className="w-4 h-4 text-warning" />
                     <span>{game.rating.toFixed(1)}</span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -215,7 +215,7 @@ const TopRatedGamesGrid = () => {
 
               {/* Crown for #1 */}
               {globalRank === 1 && (
-                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-yellow-400">
+                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-warning">
                   <Trophy size={20} fill="currentColor" />
                 </div>
               )}

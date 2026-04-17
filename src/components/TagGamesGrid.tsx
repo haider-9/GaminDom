@@ -196,7 +196,7 @@ const TagGamesGrid = ({ tagSlug }: TagGamesGridProps) => {
 
               <div className="flex items-center gap-3 mb-2 text-sm text-white/80">
                 <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-400" />
+                  <Star className="w-4 h-4 text-warning" />
                   <span>{game.rating.toFixed(1)}</span>
                 </div>
                 <div className="flex items-center gap-1">

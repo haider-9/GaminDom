@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Pagination from "./Pagination";
 import FavoriteButton from "./FavoriteButton";
 import ReviewModal from "./ReviewModal";
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface Game {
   id: number;
@@ -80,12 +81,12 @@ const TrendingGamesGrid = () => {
     return (
       <div>
         <div className="flex items-center justify-between mb-8">
-          <div className="h-12 bg-black/50 rounded-3xl w-64 animate-pulse"></div>
-          <div className="h-10 bg-black/50 rounded-3xl w-32 animate-pulse"></div>
+          <div className="h-12 bg-surface-overlay rounded-3xl w-64 animate-pulse"></div>
+          <div className="h-10 bg-surface-overlay rounded-3xl w-32 animate-pulse"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {[...Array(12)].map((_, i) => (
-            <div key={i} className="h-80 bg-black/50 rounded-3xl animate-pulse"></div>
+            <div key={i} className="h-80 bg-surface-overlay rounded-3xl animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -95,10 +96,10 @@ const TrendingGamesGrid = () => {
   return (
     <div>
       {/* Header */}
-      <div className="mb-8 bg-black/50 rounded-3xl p-6">
+      <div className="mb-8 bg-surface rounded-3xl p-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
+          className="flex items-center gap-2 text-secondary hover:text-primary mb-6 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           Back
@@ -106,10 +107,10 @@ const TrendingGamesGrid = () => {
         
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <TrendingUp className="text-orange-500" size={40} />
+            <TrendingUp className="text-warning" size={40} />
             <div>
-              <h1 className="text-4xl font-bold text-white">Trending Games</h1>
-              <p className="text-white/70 mt-2">
+              <h1 className="text-4xl font-bold text-primary">Trending Games</h1>
+              <p className="text-secondary mt-2">
                 Most popular games right now ({totalCount.toLocaleString()} games)
               </p>
             </div>
@@ -153,18 +154,24 @@ const TrendingGamesGrid = () => {
 
               {/* Action Buttons */}
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSelectedGame(game);
-                    setReviewModalOpen(true);
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition-colors"
-                  title="Write a review"
-                >
-                  <MessageSquare size={16} />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedGame(game);
+                        setReviewModalOpen(true);
+                      }}
+                      className="bg-info hover:bg-info/80 text-text-inverse p-2 rounded-full transition-colors"
+                    >
+                      <MessageSquare size={16} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Write a review</p>
+                  </TooltipContent>
+                </Tooltip>
                 <FavoriteButton 
                   game={{
                     id: game.id,
@@ -187,7 +194,7 @@ const TrendingGamesGrid = () => {
                 
                 <div className="flex items-center gap-3 mb-2 text-sm text-white/80">
                   <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-400" />
+                    <Star className="w-4 h-4 text-warning" />
                     <span>{game.rating.toFixed(1)}</span>
                   </div>
                   <div className="flex items-center gap-1">

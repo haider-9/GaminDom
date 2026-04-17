@@ -4,9 +4,9 @@ import toast, { ToastOptions } from 'react-hot-toast';
 const defaultToastOptions: ToastOptions = {
   duration: 4000,
   style: {
-    background: 'rgba(0, 0, 0, 0.8)',
-    color: '#fff',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    background: 'var(--color-surface)',
+    color: 'var(--color-text)',
+    border: '1px solid var(--color-border)',
     borderRadius: '24px',
     padding: '12px 16px',
     fontSize: '14px',
@@ -14,8 +14,8 @@ const defaultToastOptions: ToastOptions = {
     backdropFilter: 'blur(10px)',
   },
   iconTheme: {
-    primary: '#bb3b3b',
-    secondary: '#fff',
+    primary: 'var(--color-primary)',
+    secondary: 'var(--color-text)',
   },
 };
 
