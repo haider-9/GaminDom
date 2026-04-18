@@ -21,7 +21,6 @@ import {
   SiAndroid,
   SiApple,
   SiLinux,
-  SiNintendo,
   SiSega,
 } from "react-icons/si";
 
@@ -151,7 +150,7 @@ const CreatorPage = () => {
       case "linux":
         return <SiLinux size={16} />;
       case "nintendo":
-        return <SiNintendo size={16} />;
+        return <Gamepad2 size={16} />;
       case "sega":
         return <SiSega size={16} />;
       default:
@@ -287,7 +286,7 @@ const CreatorPage = () => {
                   ) && <SiApple className="text-gray-300 text-xl" />}
                   {creator.platforms.results.some(
                     (p) => p.platform.slug === "nintendo"
-                  ) && <SiNintendo className="text-red-500 text-xl" />}
+                  ) && <Gamepad2 className="text-error text-xl" />}
                 </div>
               </div>
             </div>
